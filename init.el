@@ -1,16 +1,17 @@
-;;; init.el --- asm Emacs config
+;;; init.el --- Alex Metzger's Emacs config
 ;;
 ;; Copyright (c) 2019 Alex Metzger
 ;;
 ;; Author: Alex Metzger <asm@asm.io>
-;; URL: https://github.com/ametzger/emacs.d
+;; URL: https://gitlab.com/ametzger/emacs.d
 
 ;; This file is not part of GNU Emacs.
 
 ;;; Commentary:
 
-;; asm Emacs config, heavily influenced by bbatsov's emacs.d
-;; https://github.com/bbatsov/emacs.d/blob/master/init.el
+;; Alex Metzger's Emacs config, heavily influenced by bbatsov's
+;; emacs.d https://github.com/bbatsov/emacs.d/blob/master/init.el and
+;; https://github.com/Atman50/emacs-config
 
 ;;; License:
 
@@ -31,6 +32,13 @@
 
 ;;; Code:
 
+;; load custom.el
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+
+(when (file-exists-p custom-file)
+  (load custom-file))
+
+;; packaging
 (require 'package)
 
 (add-to-list 'package-archives
@@ -42,28 +50,24 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
+;; vanity
 (setq user-full-name "Alex Metzger"
       user-mail-address "asm@asm.io")
 
-;; Always load newest byte code
 (setq load-prefer-newer t)
-
-;; reduce the frequency of garbage collection by making it happen on
-;; each 50MB of allocated data (the default is on every 0.76MB)
-(setq gc-cons-threshold 50000000)
+(setq gc-cons-threshold 64000000)
+(add-hook 'after-init-hook (lambda () (setq gc-cons-threshold 800000)))
 
 ;; warn when opening files bigger than 100MB
 (setq large-file-warning-threshold 100000000)
 
-(defconst bozhidar-savefile-dir (expand-file-name "savefile" user-emacs-directory))
+(defconst asm/savefile-dir
+  (expand-file-name "savefile" user-emacs-directory))
 
 ;; create the savefile dir if it doesn't exist
-(unless (file-exists-p bozhidar-savefile-dir)
-  (make-directory bozhidar-savefile-dir))
+(unless (file-exists-p asm/savefile-dir)
+  (make-directory asm/savefile-dir))
 
-;; the toolbar is just a waste of valuable screen estate
-;; in a tty tool-bar-mode does not properly auto-load, and is
-;; already disabled anyway
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
 
@@ -89,7 +93,8 @@
 ;; enable y/n answers
 (fset 'yes-or-no-p 'y-or-n-p)
 
-(set-frame-font "Operator Mono 14")
+;; Operator Mono with cursive keywords + comments
+(set-frame-font "Operator Mono 13")
 (custom-set-faces
  '(font-lock-comment-face ((t (:foreground "#6d7a96" :slant italic))))
  '(font-lock-doc-face ((t (:foreground "#6d7a96" :slant italic))))
@@ -188,7 +193,7 @@
 ;; saveplace remembers your location in a file when saving files
 (use-package saveplace
   :config
-  (setq save-place-file (expand-file-name "saveplace" bozhidar-savefile-dir))
+  (setq save-place-file (expand-file-name "saveplace" asm/savefile-dir))
   ;; activate it for all buffers
   (setq-default save-place t))
 
@@ -200,12 +205,12 @@
         ;; save every minute
         savehist-autosave-interval 60
         ;; keep the home clean
-        savehist-file (expand-file-name "savehist" bozhidar-savefile-dir))
+        savehist-file (expand-file-name "savehist" asm/savefile-dir))
   (savehist-mode +1))
 
 (use-package recentf
   :config
-  (setq recentf-save-file (expand-file-name "recentf" bozhidar-savefile-dir)
+  (setq recentf-save-file (expand-file-name "recentf" asm/savefile-dir)
         recentf-max-saved-items 500
         recentf-max-menu-items 15
         ;; disable recentf-cleanup on Emacs start, because it can cause
@@ -236,7 +241,7 @@
 
 (use-package lisp-mode
   :config
-  (defun bozhidar-visit-ielm ()
+  (defun asm/visit-ielm ()
     "Switch to default `ielm' buffer.
 Start `ielm' if it's not already running."
     (interactive)
@@ -244,7 +249,7 @@ Start `ielm' if it's not already running."
 
   (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
   (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
-  (define-key emacs-lisp-mode-map (kbd "C-c C-z") #'bozhidar-visit-ielm)
+  (define-key emacs-lisp-mode-map (kbd "C-c C-z") #'asm/visit-ielm)
   (define-key emacs-lisp-mode-map (kbd "C-c C-c") #'eval-defun)
   (define-key emacs-lisp-mode-map (kbd "C-c C-b") #'eval-buffer)
   (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
@@ -291,6 +296,7 @@ Start `ielm' if it's not already running."
   (setq projectile-completion-system 'ivy)
   :config
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   (projectile-mode +1))
 
 (use-package pt
@@ -299,12 +305,6 @@ Start `ielm' if it's not already running."
 (use-package expand-region
   :ensure t
   :bind ("C-=" . er/expand-region))
-
-(use-package elisp-slime-nav
-  :ensure t
-  :config
-  (dolist (hook '(emacs-lisp-mode-hook ielm-mode-hook))
-    (add-hook hook #'elisp-slime-nav-mode)))
 
 (use-package paredit
   :ensure t
@@ -415,7 +415,8 @@ Start `ielm' if it's not already running."
 
 (use-package crux
   :ensure t
-  :bind (("M-o" . crux-smart-open-line)
+  :bind (("C-c d" . crux-duplicate-current-line-or-region)
+         ("M-o" . crux-smart-open-line)
          ("C-c n" . crux-cleanup-buffer-or-region)
          ("C-c f" . crux-recentf-find-file)
          ("C-M-z" . crux-indent-defun)
@@ -497,12 +498,36 @@ Start `ielm' if it's not already running."
 (use-package volatile-highlights
   :ensure t
   :config
-  (volatile-highlights-mode +1))
+  (volatile-highlights-mode +1)
 
-;; config changes made through the customize UI will be stored here
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+  ;; Have `kill-region' delete the current line if no region is active
+  (defadvice kill-region (before smart-cut activate compile)
+  "When called interactively with no active region, kill a single line instead."
+  (interactive
+   (if mark-active (list (region-beginning) (region-end))
+     (list (line-beginning-position)
+           (line-beginning-position 2)))))
 
-(when (file-exists-p custom-file)
-  (load custom-file))
+  ;; Bind C-S-SPC to mark the whole line (similar to
+  ;; `evil-visual-line')
+  (defun asm/select-current-line ()
+    "Select the current line."
+    (interactive)
+    (end-of-line) ; move to end of line
+    (set-mark (line-beginning-position))
+    (forward-line))
+  (global-set-key (kbd "C-S-SPC") 'asm/select-current-line))
+
+(bind-keys :map global-map
+           :prefix-map asm/ctrl-z-prefix-map
+           :prefix "C-z"
+           ("r" . anzu-query-replace)
+           ("w" . ace-window)
+           ("R" . anzu-query-replace-regexp)
+           ("f" . projectile-find-file)
+           ("F" . projectile-find-file-other-window)
+           ("p" . projectile-switch-project)
+           ("R" . anzu-query-replace-regexp)
+           ("f" . projectile-find-file))
 
 ;;; init.el ends here
