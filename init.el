@@ -61,72 +61,76 @@
 (setq user-full-name "Alex Metzger"
       user-mail-address "asm@asm.io")
 
+;; emacs baseline + annoyances
 (setq load-prefer-newer t)
+
 (setq gc-cons-threshold 64000000)
 (add-hook 'after-init-hook (lambda () (setq gc-cons-threshold 800000)))
 
-;; warn when opening files bigger than 100MB
-(setq large-file-warning-threshold 100000000)
+(setq large-file-warning-threshold 50000000)
 
 (defconst asm/savefile-dir
   (expand-file-name "savefile" user-emacs-directory))
-
-;; create the savefile dir if it doesn't exist
 (unless (file-exists-p asm/savefile-dir)
   (make-directory asm/savefile-dir))
 
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
-
-;; the blinking cursor is nothing, but an annoyance
 (blink-cursor-mode -1)
-
-;; disable the annoying bell ring
+(when (fboundp 'scroll-bar-mode)
+  (scroll-bar-mode -1))
 (setq ring-bell-function 'ignore)
-
-;; disable startup screen
 (setq inhibit-startup-screen t)
+(setq initial-scratch-message ";; Hola!")
 
-;; nice scrolling
 (setq scroll-margin 3
       scroll-conservatively 100000
       scroll-preserve-screen-position 1)
 
-;; mode line settings
+(defun asm/split-window-vertically ()
+  "Open a new vertical window and switch to it."
+  (interactive)
+  (split-window-vertically)
+  (other-window 1))
+
+(defun asm/split-window-horizontally ()
+  "Open a new horizontal window and switch to it."
+  (interactive)
+  (split-window-horizontally)
+  (other-window 1))
+
+(global-set-key (kbd "C-x 2") 'asm/split-window-vertically)
+(global-set-key (kbd "C-x 3") 'asm/split-window-horizontally)
+
+(setq help-window-select t)
+
 (line-number-mode t)
 (column-number-mode t)
 (size-indication-mode t)
 
-;; enable y/n answers
 (fset 'yes-or-no-p 'y-or-n-p)
 
-;; Operator Mono with cursive keywords + comments
+;; font config
 (set-frame-font "Operator Mono 13")
 (custom-set-faces
  '(font-lock-comment-face ((t (:foreground "#6d7a96" :slant italic))))
  '(font-lock-doc-face ((t (:foreground "#6d7a96" :slant italic))))
  '(font-lock-keyword-face ((t (:foreground "#81A1C1" :slant italic)))))
 
-;; Emacs modes typically provide a standard means to change the
-;; indentation width -- eg. c-basic-offset: use that to adjust your
-;; personal indentation width, while maintaining the style (and
-;; meaning) of any files you load.
-(setq-default indent-tabs-mode nil)   ;; don't use tabs to indent
-(setq-default tab-width 4)            ;; but maintain correct appearance
+;; indentation
+(setq-default indent-tabs-mode nil
+              tab-width 4)
 
 ;; Newline at end of file
 (setq require-final-newline t)
 
-;; delete the selection with a keypress
 (delete-selection-mode t)
 
-;; store all backup and autosave files in the tmp dir
 (setq backup-directory-alist
       `((".*" . ,temporary-file-directory)))
 (setq auto-save-file-name-transforms
       `((".*" ,temporary-file-directory t)))
 
-;; revert buffers automatically when underlying files are changed externally
 (global-auto-revert-mode t)
 
 (prefer-coding-system 'utf-8)
@@ -150,19 +154,15 @@
 (global-set-key (kbd "M-/") #'hippie-expand)
 (global-set-key (kbd "s-/") #'hippie-expand)
 
-;; replace buffer-menu with ibuffer
 (global-set-key (kbd "C-x C-b") #'ibuffer)
-
-;; align code in a pretty way
 (global-set-key (kbd "C-x \\") #'align-regexp)
 
-(define-key 'help-command (kbd "C-i") #'info-display-manual)
-
-;; misc useful keybindings
-(global-set-key (kbd "s-<") #'beginning-of-buffer)
-(global-set-key (kbd "s->") #'end-of-buffer)
-(global-set-key (kbd "s-q") #'fill-paragraph)
-(global-set-key (kbd "s-x") #'execute-extended-command)
+(defun asm/switch-to-previous-buffer ()
+  "Switch to previously open buffer.
+Repeated invocations toggle between the two most recently open buffers."
+  (interactive)
+  (switch-to-buffer (other-buffer (current-buffer) 1)))
+(global-set-key (kbd "C-c b") #'asm/switch-to-previous-buffer)
 
 ;; smart tab behavior - indent or complete
 (setq tab-always-indent 'complete)
@@ -174,6 +174,10 @@
 (setq use-package-verbose t)
 
 ;;; built-in packages
+;; disable version control, magit forever
+(remove-hook 'find-file-hook 'vc-find-file-hook)
+(setq vc-handled-backends nil)
+
 (use-package paren
   :config
   (show-paren-mode +1))
@@ -246,14 +250,14 @@
   ;; enable some really cool extensions like C-x C-j(dired-jump)
   (require 'dired-x))
 
+(defun asm/visit-ielm ()
+  "Switch to default `ielm' buffer.
+Start `ielm' if it's not already running."
+  (interactive)
+  (crux-start-or-switch-to 'ielm "*ielm*"))
+
 (use-package lisp-mode
   :config
-  (defun asm/visit-ielm ()
-    "Switch to default `ielm' buffer.
-Start `ielm' if it's not already running."
-    (interactive)
-    (crux-start-or-switch-to 'ielm "*ielm*"))
-
   (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
   (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
   (define-key emacs-lisp-mode-map (kbd "C-c C-z") #'asm/visit-ielm)
@@ -276,8 +280,10 @@ Start `ielm' if it's not already running."
   (load-theme 'doom-nord))
 
 (use-package doom-modeline
-      :ensure t
-      :hook (after-init . doom-modeline-mode))
+  :ensure t
+  :hook (after-init . doom-modeline-mode)
+  :config
+  (setq-default doom-modeline-python-executable (expand-file-name "~/.pyenv/shims/python")))
 
 (use-package avy
   :ensure t
@@ -289,6 +295,10 @@ Start `ielm' if it's not already running."
 (use-package magit
   :ensure t
   :bind (("C-x g" . magit-status)))
+
+(use-package forge
+  :ensure t
+  :requires magit)
 
 (use-package git-timemachine
   :ensure t
@@ -392,6 +402,26 @@ Start `ielm' if it's not already running."
   (setq company-tooltip-flip-when-above t)
   (global-company-mode))
 
+;; python
+(use-package pyenv-mode
+  :ensure t
+  :config
+  (add-to-list 'exec-path "~/.pyenv/shims")
+  (add-hook 'python-mode-hook 'pyenv-mode)
+  (setq-default flycheck-python-pycompile-executable (expand-file-name "~/.pyenv/shims/python")
+                flycheck-python-flake8-executable (expand-file-name "~/.pyenv/shims/flake8")
+                flycheck-python-mypy-executable (expand-file-name "~/.pyenv/shims/mypy")))
+
+(use-package pyenv-mode-auto
+  :ensure t)
+
+(use-package python
+  :mode ("\\.py'" . python-mode)
+  :interpreter ("python" . python-mode)
+  :config
+  (setq-default python-fill-docstring-style 'django))
+
+;; universal code-related
 (use-package hl-todo
   :ensure t
   :config
@@ -409,6 +439,7 @@ Start `ielm' if it's not already running."
          ("s-i" . imenu-anywhere)))
 
 (use-package flycheck
+  :after pyenv-mode
   :ensure t
   :config
   (add-hook 'after-init-hook #'global-flycheck-mode))
@@ -474,20 +505,39 @@ Start `ielm' if it's not already running."
   (global-set-key (kbd "C-c C-r") 'ivy-resume)
   (global-set-key (kbd "<f6>") 'ivy-resume))
 
+(use-package swiper
+  :ensure t
+  :config
+  (global-set-key "\C-s" 'swiper))
+
+(use-package prescient
+  :ensure t)
+(use-package ivy-prescient
+  :requires ivy
+  :ensure t)
+(use-package company-prescient
+  :requires company
+  :ensure t)
+
 (use-package ace-window
   :ensure t
   :config
   (global-set-key (kbd "s-w") 'ace-window)
   (global-set-key [remap other-window] 'ace-window))
 
-(use-package swiper
-  :ensure t
-  :config
-  (global-set-key "\C-s" 'swiper))
-
 (use-package counsel
   :ensure t
   :config
+    (setq ivy-sort-matches-functions-alist
+        '((t)
+          (ivy-switch-buffer . ivy-sort-function-buffer)
+          (counsel-find-file . ivy--sort-by-length)))
+
+  (defun ivy--sort-by-length (_name candidates)
+    (cl-sort (copy-sequence candidates)
+             (lambda (f1 f2)
+               (< (length f1) (length f2)))))
+
   (global-set-key (kbd "M-x") 'counsel-M-x)
   (global-set-key (kbd "C-x C-f") 'counsel-find-file)
   (global-set-key (kbd "<f1> f") 'counsel-describe-function)
@@ -529,6 +579,7 @@ Start `ielm' if it's not already running."
            :prefix-map asm/ctrl-z-prefix-map
            :prefix "C-z"
            ("r" . anzu-query-replace)
+           ("e" . flycheck-list-errors)
            ("w" . ace-window)
            ("R" . anzu-query-replace-regexp)
            ("f" . projectile-find-file)
@@ -536,5 +587,12 @@ Start `ielm' if it's not already running."
            ("p" . projectile-switch-project)
            ("R" . anzu-query-replace-regexp)
            ("f" . projectile-find-file))
+
+;;; platform-specific
+(if (eq system-type 'darwin)
+      (progn (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+             (add-to-list 'default-frame-alist '(ns-appearance . dark))
+             (setq-default ns-use-srgb-colorspace t
+                           ns-use-proxy-icon nil)))
 
 ;;; init.el ends here
