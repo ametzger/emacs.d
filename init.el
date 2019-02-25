@@ -19,22 +19,24 @@
 ;;
 ;; Copyright (c) 2019 Alex Metzger
 ;;
-;; Permission is hereby granted, free of charge, to any person obtaining a copy
-;; of this software and associated documentation files (the "Software"), to deal
-;; in the Software without restriction, including without limitation the rights
-;; to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-;; copies of the Software, and to permit persons to whom the Software is
+;; Permission is hereby granted, free of charge, to any person
+;; obtaining a copy of this software and associated documentation
+;; files (the "Software"), to deal in the Software without
+;; restriction, including without limitation the rights to use, copy,
+;; modify, merge, publish, distribute, sublicense, and/or sell copies
+;; of the Software, and to permit persons to whom the Software is
 ;; furnished to do so, subject to the following conditions:
 ;;
-;; The above copyright notice and this permission notice shall be included in all
-;; copies or substantial portions of the Software.
+;; The above copyright notice and this permission notice shall be
+;; included in all copies or substantial portions of the Software.
 ;;
-;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-;; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-;; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-;; AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-;; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-;; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+;; EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+;; MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+;; NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+;; BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+;; ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+;; CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ;; SOFTWARE.
 
 ;;; Code:
@@ -81,7 +83,8 @@
   (scroll-bar-mode -1))
 (setq ring-bell-function 'ignore)
 (setq inhibit-startup-screen t)
-(setq initial-scratch-message ";; Hola!")
+(setq initial-scratch-message ";; Hola!
+")
 
 (setq scroll-margin 3
       scroll-conservatively 100000
@@ -109,6 +112,16 @@
 (size-indication-mode t)
 
 (fset 'yes-or-no-p 'y-or-n-p)
+
+;; Bind C-S-SPC to mark the whole line (similar to
+;; `evil-visual-line')
+(defun asm/select-current-line ()
+  "Select the current line."
+  (interactive)
+  (end-of-line) ; move to end of line
+  (set-mark (line-beginning-position))
+  (forward-line))
+(global-set-key (kbd "C-S-SPC") 'asm/select-current-line)
 
 ;; font config
 (set-frame-font "Operator Mono 13")
@@ -494,7 +507,12 @@ Start `ielm' if it's not already running."
   ;; autosave the undo-tree history
   (setq undo-tree-history-directory-alist
         `((".*" . ,temporary-file-directory)))
-  (setq undo-tree-auto-save-history t))
+  (setq undo-tree-auto-save-history t)
+  (global-set-key (kbd "C-/") 'undo-tree-undo)
+  (global-set-key (kbd "C-?") 'undo-tree-redo))
+
+(use-package flx
+  :ensure t)
 
 (use-package ivy
   :ensure t
@@ -502,22 +520,22 @@ Start `ielm' if it's not already running."
   (ivy-mode 1)
   (setq ivy-use-virtual-buffers t)
   (setq enable-recursive-minibuffers t)
-  (global-set-key (kbd "C-c C-r") 'ivy-resume)
-  (global-set-key (kbd "<f6>") 'ivy-resume))
+  (setq-default ivy-initial-inputs-alist nil)
+  (global-set-key (kbd "C-c C-r") 'ivy-resume))
 
 (use-package swiper
   :ensure t
   :config
   (global-set-key "\C-s" 'swiper))
 
-(use-package prescient
-  :ensure t)
-(use-package ivy-prescient
-  :requires ivy
-  :ensure t)
-(use-package company-prescient
-  :requires company
-  :ensure t)
+;; (use-package prescient
+;;   :ensure t)
+;; (use-package ivy-prescient
+;;   :requires ivy
+;;   :ensure t)
+;; (use-package company-prescient
+;;   :requires company
+;;   :ensure t)
 
 (use-package ace-window
   :ensure t
@@ -528,15 +546,10 @@ Start `ielm' if it's not already running."
 (use-package counsel
   :ensure t
   :config
-    (setq ivy-sort-matches-functions-alist
-        '((t)
-          (ivy-switch-buffer . ivy-sort-function-buffer)
-          (counsel-find-file . ivy--sort-by-length)))
-
-  (defun ivy--sort-by-length (_name candidates)
-    (cl-sort (copy-sequence candidates)
-             (lambda (f1 f2)
-               (< (length f1) (length f2)))))
+  (setq ivy-sort-matches-functions-alist '((t . nil)
+                                           (ivy-switch-buffer . ivy-sort-function-buffer)
+                                           (counsel-find-file . ivy-sort-function-buffer)
+                                           (projectile-find-file . ivy-sort-function-buffer)))
 
   (global-set-key (kbd "M-x") 'counsel-M-x)
   (global-set-key (kbd "C-x C-f") 'counsel-find-file)
@@ -563,17 +576,7 @@ Start `ielm' if it's not already running."
   (interactive
    (if mark-active (list (region-beginning) (region-end))
      (list (line-beginning-position)
-           (line-beginning-position 2)))))
-
-  ;; Bind C-S-SPC to mark the whole line (similar to
-  ;; `evil-visual-line')
-  (defun asm/select-current-line ()
-    "Select the current line."
-    (interactive)
-    (end-of-line) ; move to end of line
-    (set-mark (line-beginning-position))
-    (forward-line))
-  (global-set-key (kbd "C-S-SPC") 'asm/select-current-line))
+           (line-beginning-position 2))))))
 
 (bind-keys :map global-map
            :prefix-map asm/ctrl-z-prefix-map
