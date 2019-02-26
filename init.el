@@ -83,8 +83,7 @@
   (scroll-bar-mode -1))
 (setq ring-bell-function 'ignore)
 (setq inhibit-startup-screen t)
-(setq initial-scratch-message ";; Hola!
-")
+(setq initial-scratch-message (format ";; Hola!\n\n"))
 
 (setq scroll-margin 3
       scroll-conservatively 100000
@@ -263,17 +262,10 @@ Repeated invocations toggle between the two most recently open buffers."
   ;; enable some really cool extensions like C-x C-j(dired-jump)
   (require 'dired-x))
 
-(defun asm/visit-ielm ()
-  "Switch to default `ielm' buffer.
-Start `ielm' if it's not already running."
-  (interactive)
-  (crux-start-or-switch-to 'ielm "*ielm*"))
-
 (use-package lisp-mode
   :config
   (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
   (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
-  (define-key emacs-lisp-mode-map (kbd "C-c C-z") #'asm/visit-ielm)
   (define-key emacs-lisp-mode-map (kbd "C-c C-c") #'eval-defun)
   (define-key emacs-lisp-mode-map (kbd "C-c C-b") #'eval-buffer)
   (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
@@ -295,8 +287,10 @@ Start `ielm' if it's not already running."
 (use-package doom-modeline
   :ensure t
   :hook (after-init . doom-modeline-mode)
-  :config
-  (setq-default doom-modeline-python-executable (expand-file-name "~/.pyenv/shims/python")))
+  :init
+  (setq doom-modeline-python-executable (expand-file-name "~/.pyenv/shims/python"))
+  (setq doom-modeline-lsp nil)
+  (setq doom-modeline-mu4e nil))
 
 (use-package avy
   :ensure t
@@ -318,19 +312,25 @@ Start `ielm' if it's not already running."
   :bind (("s-g" . git-timemachine)))
 
 (use-package ag
+  :if (executable-find "ag")
+  :ensure t)
+
+(use-package ripgrep
+  :if (executable-find "rg")
+  :ensure t)
+
+(use-package pt
   :ensure t)
 
 (use-package projectile
   :ensure t
+  :after (ivy)
   :init
   (setq projectile-completion-system 'ivy)
   :config
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   (projectile-mode +1))
-
-(use-package pt
-  :ensure t)
 
 (use-package expand-region
   :ensure t
@@ -405,7 +405,7 @@ Start `ielm' if it's not already running."
 (use-package company
   :ensure t
   :config
-  (setq company-idle-delay 0.5)
+  (setq company-idle-delay 0.3)
   (setq company-show-numbers t)
   (setq company-tooltip-limit 10)
   (setq company-minimum-prefix-length 2)
@@ -511,8 +511,27 @@ Start `ielm' if it's not already running."
   (global-set-key (kbd "C-/") 'undo-tree-undo)
   (global-set-key (kbd "C-?") 'undo-tree-redo))
 
-(use-package flx
-  :ensure t)
+(use-package prescient
+  :ensure t
+  :config
+  (prescient-persist-mode +1))
+
+(use-package ivy-prescient
+  :ensure t
+  :after (ivy prescient)
+  :config
+  (ivy-prescient-mode +1))
+
+(use-package company-prescient
+  :ensure t
+  :after (company prescient)
+  :config
+  (company-prescient-mode +1))
+
+(defun asm/ivy-sort-by-length (_name candidates)
+  (cl-sort (copy-sequence candidates)
+           (lambda (f1 f2)
+             (< (length f1) (length f2)))))
 
 (use-package ivy
   :ensure t
@@ -520,22 +539,19 @@ Start `ielm' if it's not already running."
   (ivy-mode 1)
   (setq ivy-use-virtual-buffers t)
   (setq enable-recursive-minibuffers t)
-  (setq-default ivy-initial-inputs-alist nil)
+  (setq ivy-initial-inputs-alist nil)
+  (setq ivy-sort-matches-functions-alist
+        '((t)
+          (ivy-switch-buffer . ivy-sort-function-buffer)
+          (counsel-find-file . asm/ivy-sort-by-length)))
   (global-set-key (kbd "C-c C-r") 'ivy-resume))
 
 (use-package swiper
   :ensure t
   :config
-  (global-set-key "\C-s" 'swiper))
+  (global-set-key "\C-s" 'swiper)
+  (global-set-key "\C-r" 'swiper))
 
-;; (use-package prescient
-;;   :ensure t)
-;; (use-package ivy-prescient
-;;   :requires ivy
-;;   :ensure t)
-;; (use-package company-prescient
-;;   :requires company
-;;   :ensure t)
 
 (use-package ace-window
   :ensure t
@@ -546,11 +562,6 @@ Start `ielm' if it's not already running."
 (use-package counsel
   :ensure t
   :config
-  (setq ivy-sort-matches-functions-alist '((t . nil)
-                                           (ivy-switch-buffer . ivy-sort-function-buffer)
-                                           (counsel-find-file . ivy-sort-function-buffer)
-                                           (projectile-find-file . ivy-sort-function-buffer)))
-
   (global-set-key (kbd "M-x") 'counsel-M-x)
   (global-set-key (kbd "C-x C-f") 'counsel-find-file)
   (global-set-key (kbd "<f1> f") 'counsel-describe-function)
@@ -562,7 +573,8 @@ Start `ielm' if it's not already running."
   (global-set-key (kbd "C-c j") 'counsel-git-grep)
   (global-set-key (kbd "C-c a") 'counsel-ag)
   (global-set-key (kbd "C-x l") 'counsel-locate)
-  (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
+  (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
+  (define-key counsel-find-file-map (kbd "C-l") 'ivy-backward-delete-char))
 
 ;; temporarily highlight changes from yanking, etc
 (use-package volatile-highlights
@@ -589,7 +601,8 @@ Start `ielm' if it's not already running."
            ("F" . projectile-find-file-other-window)
            ("p" . projectile-switch-project)
            ("R" . anzu-query-replace-regexp)
-           ("f" . projectile-find-file))
+           ("f" . projectile-find-file)
+           ("i" . imenu))
 
 ;;; platform-specific
 (if (eq system-type 'darwin)

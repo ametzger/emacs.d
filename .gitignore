@@ -19,4 +19,5 @@ session*
 .cask
 tramp
 /var/pcache
+var/prescient-save.el
 custom.el
