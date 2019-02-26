@@ -41,25 +41,26 @@
 
 ;;; Code:
 
-;; load custom.el
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-
-(when (file-exists-p custom-file)
-  (load custom-file))
-
 ;; packaging
 (require 'package)
+(setq package-enable-at-startup nil)
 
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/") t)
 ;; keep the installed packages in .emacs.d
 (setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
-(unless package--initialized
-  (package-initialize t))
 
-;; update the package metadata is the local cache is missing
-(unless package-archive-contents
-  (package-refresh-contents))
+(package-initialize)
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+(require 'use-package)
+(setq use-package-verbose t)
+
+
+
 
 ;; vanity
 (setq user-full-name "Alex Metzger"
@@ -224,12 +225,6 @@ Repeated invocations toggle between the two most recently open buffers."
              (setq-default ns-use-srgb-colorspace t
                            ns-use-proxy-icon nil)))
 
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-
-(require 'use-package)
-(setq use-package-verbose t)
-
 ;;; built-in packages
 ;; disable version control, magit forever
 (remove-hook 'find-file-hook 'vc-find-file-hook)
@@ -322,6 +317,8 @@ Repeated invocations toggle between the two most recently open buffers."
   (add-hook 'ielm-mode-hook #'rainbow-delimiters-mode))
 
 ;;; third-party
+
+;; theme, modeline
 (use-package doom-themes
   :ensure t
   :after (rainbow-delimiters)
@@ -338,6 +335,7 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq doom-modeline-lsp nil)
   (setq doom-modeline-mu4e nil))
 
+;; usability (abo-abo, bbatsov and tarsius are gods)
 (use-package avy
   :ensure t
   :bind (("s-." . avy-goto-word-or-subword-1)
@@ -419,37 +417,43 @@ Repeated invocations toggle between the two most recently open buffers."
   (([(meta shift up)] . move-text-up)
    ([(meta shift down)] . move-text-down)))
 
-(use-package rainbow-delimiters
-  :ensure t)
+(use-package zop-to-char
+  :ensure t
+  :bind (("M-z" . zop-up-to-char)
+         ("M-Z" . zop-to-char)))
 
-(use-package rainbow-mode
+(use-package imenu-anywhere
+  :ensure t
+  :bind (("C-c i" . imenu-anywhere)
+         ("s-i" . imenu-anywhere)))
+
+;; universal code-related
+(use-package hl-todo
   :ensure t
   :config
-  (add-hook 'prog-mode-hook #'rainbow-mode))
+  (setq hl-todo-highlight-punctuation ":")
+  (global-hl-todo-mode))
 
-(use-package whitespace
-  :init
-  (dolist (hook '(prog-mode-hook text-mode-hook))
-    (add-hook hook #'whitespace-mode))
-  (add-hook 'before-save-hook #'whitespace-cleanup)
-  :config
-  (setq whitespace-line-column 100) ;; limit line length
-  (setq whitespace-style '(face tabs empty trailing lines-tail)))
-
-(use-package ruby-mode
-  :config
-  (setq ruby-insert-encoding-magic-comment nil)
-  (add-hook 'ruby-mode-hook #'subword-mode))
-
-(use-package markdown-mode
+(use-package dash-at-point
   :ensure t
-  :mode (("\\.md\\'" . gfm-mode)
-         ("\\.markdown\\'" . gfm-mode))
+  :if (memq window-system '(mac ns))
   :config
-  (setq markdown-fontify-code-blocks-natively t))
+  (add-to-list 'dash-at-point-mode-alist '(python-mode . "asmdj"))
+  (global-set-key (kbd "s-d") 'dash-at-point))
 
-(use-package yaml-mode
-  :ensure t)
+(use-package zeal-at-point
+  :ensure t
+  :if (memq window-system '(x))
+  :config
+  (global-set-key (kbd "s-d") 'zeal-at-point))
+
+(use-package flycheck
+  :after pyenv-mode
+  :ensure t
+  :config
+  (add-hook 'after-init-hook (lambda ()
+                               (flymake-mode -1)
+                               (global-flycheck-mode))))
 
 (use-package company
   :ensure t
@@ -463,95 +467,6 @@ Repeated invocations toggle between the two most recently open buffers."
   ;; is displayed on top (happens near the bottom of windows)
   (setq company-tooltip-flip-when-above t)
   (global-company-mode))
-
-;; python
-(use-package pyenv-mode
-  :ensure t
-  :config
-  (add-to-list 'exec-path "~/.pyenv/shims")
-  (add-hook 'python-mode-hook 'pyenv-mode)
-  (setq-default flycheck-python-pycompile-executable (expand-file-name "~/.pyenv/shims/python")
-                flycheck-python-flake8-executable (expand-file-name "~/.pyenv/shims/flake8")
-                flycheck-python-mypy-executable (expand-file-name "~/.pyenv/shims/mypy")))
-
-(use-package pyenv-mode-auto
-  :ensure t)
-
-(use-package pipenv
-  :ensure t)
-
-(defun asm/python-mode-hook ()
-  "Initialize `python-mode'."
-  (when (fboundp #'python-imenu-create-flat-index)
-    (setq-local imenu-create-index-function
-                #'python-imenu-create-flat-index)))
-
-(use-package python
-  :mode ("\\.py'" . python-mode)
-  :interpreter ("python" . python-mode)
-  :config
-  (setq-default python-fill-docstring-style 'django)
-  (add-hook 'python-mode-hook 'asm/python-mode-hook))
-
-(use-package jedi
-  :ensure t)
-
-(use-package company-jedi
-  :ensure t
-  :after (company jedi)
-  :config
-  (add-to-list 'company-backends 'company-jedi)
-  (setq-default company-jedi-python-bin "~/.pyenv/shims/python"))
-
-(use-package anaconda-mode
-  :ensure t
-  :config
-  (add-hook 'python-mode-hook 'anaconda-mode)
-  (add-hook 'python-mode-hook 'anaconda-eldoc-mode))
-
-(use-package company-anaconda
-  :ensure t
-  :after (company anaconda-mode)
-  :config
-  (add-to-list 'company-backends
-               '(company-anaconda :with company-capf)))
-
-(use-package blacken
-  :ensure t
-  :config
-  (setq blacken-executable "~/.pyenv/shims/black")
-  (define-key python-mode-map (kbd "C-c C-b") 'blacken-buffer))
-
-(use-package ein
-  :ensure t
-  :config
-  (setq-default ein:complete-on-dot -1
-                ein:use-auto-complete 1
-                ein:query-timeout 1000)
-  (setq-default request--curl-cookie-jar (concat user-emacs-directory "request/curl-cookie-jar")))
-
-;; universal code-related
-(use-package hl-todo
-  :ensure t
-  :config
-  (setq hl-todo-highlight-punctuation ":")
-  (global-hl-todo-mode))
-
-(use-package zop-to-char
-  :ensure t
-  :bind (("M-z" . zop-up-to-char)
-         ("M-Z" . zop-to-char)))
-
-(use-package imenu-anywhere
-  :ensure t
-  :bind (("C-c i" . imenu-anywhere)
-         ("s-i" . imenu-anywhere)))
-
-(use-package flycheck
-  :after pyenv-mode
-  :ensure t
-  :config
-  (add-hook 'after-init-hook #'global-flycheck-mode))
 
 (use-package super-save
   :ensure t
@@ -607,6 +522,15 @@ Repeated invocations toggle between the two most recently open buffers."
   (global-set-key (kbd "C-/") 'undo-tree-undo)
   (global-set-key (kbd "C-?") 'undo-tree-redo))
 
+(use-package prescient
+  :ensure t)
+
+(use-package ivy-prescient
+  :ensure t
+  :requires (prescient ivy)
+  :config
+  (ivy-prescient-mode))
+
 (defun asm/ivy-sort-by-length (_name candidates)
   "Sort `CANDIDATES' matching `_NAME' by length."
   (cl-sort (copy-sequence candidates)
@@ -655,7 +579,6 @@ Repeated invocations toggle between the two most recently open buffers."
   (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
   (define-key counsel-find-file-map (kbd "C-l") 'ivy-backward-delete-char))
 
-;; temporarily highlight changes from yanking, etc
 (use-package volatile-highlights
   :ensure t
   :config
@@ -668,6 +591,116 @@ Repeated invocations toggle between the two most recently open buffers."
    (if mark-active (list (region-beginning) (region-end))
      (list (line-beginning-position)
            (line-beginning-position 2))))))
+
+(use-package rainbow-delimiters
+  :ensure t)
+
+;; show hex colors with background, e.g. #0000ff
+(use-package rainbow-mode
+  :ensure t
+  :config
+  (add-hook 'prog-mode-hook #'rainbow-mode))
+
+(use-package whitespace
+  :init
+  (dolist (hook '(prog-mode-hook text-mode-hook))
+    (add-hook hook #'whitespace-mode))
+  (add-hook 'before-save-hook #'whitespace-cleanup)
+  :config
+  (setq whitespace-line-column 100) ;; limit line length
+  (setq whitespace-style '(face tabs empty trailing lines-tail)))
+
+;; ruby
+(use-package ruby-mode
+  :config
+  (setq ruby-insert-encoding-magic-comment nil)
+  (add-hook 'ruby-mode-hook #'subword-mode))
+
+;; markdown
+(use-package markdown-mode
+  :ensure t
+  :mode (("\\.md\\'" . gfm-mode)
+         ("\\.markdown\\'" . gfm-mode))
+  :config
+  (setq markdown-fontify-code-blocks-natively t))
+
+;; python
+(use-package pyenv-mode
+  :ensure t
+  :config
+  (add-to-list 'exec-path "~/.pyenv/shims")
+  (add-hook 'python-mode-hook 'pyenv-mode)
+  (setq-default flycheck-python-pycompile-executable (expand-file-name
+                                                      "~/.pyenv/shims/python")
+                flycheck-python-flake8-executable (expand-file-name
+                                                   "~/.pyenv/shims/flake8")
+                flycheck-python-mypy-executable (expand-file-name
+                                                 "~/.pyenv/shims/mypy")))
+
+(use-package pyenv-mode-auto
+  :ensure t)
+
+(use-package pipenv
+  :ensure t)
+
+(defun asm/python-mode-hook ()
+  "Initialize `python-mode'."
+
+  ;; use flat imenu
+  (when (fboundp #'python-imenu-create-flat-index)
+    (setq-local imenu-create-index-function
+                #'python-imenu-create-flat-index))
+  (subword-mode +1)
+  (setq indent-tabs-mode nil))
+
+(use-package python
+  :mode ("\\.py'" . python-mode)
+  :interpreter ("python" . python-mode)
+  :config
+  (setq-default python-fill-docstring-style 'django)
+  (add-hook 'python-mode-hook 'asm/python-mode-hook))
+
+(use-package jedi
+  :ensure t)
+
+(use-package company-jedi
+  :ensure t
+  :after (company jedi)
+  :config
+  (add-to-list 'company-backends 'company-jedi)
+  (setq-default company-jedi-python-bin "~/.pyenv/shims/python"))
+
+(use-package anaconda-mode
+  :ensure t
+  :config
+  (add-hook 'python-mode-hook 'anaconda-mode)
+  (add-hook 'python-mode-hook 'anaconda-eldoc-mode))
+
+(use-package company-anaconda
+  :ensure t
+  :after (company anaconda-mode)
+  :config
+  (add-to-list 'company-backends
+               '(company-anaconda :with company-capf)))
+
+(use-package blacken
+  :ensure t
+  :config
+  (setq blacken-executable "~/.pyenv/shims/black")
+  (define-key python-mode-map (kbd "C-c C-b") 'blacken-buffer))
+
+(use-package flycheck-mypy
+  :ensure t)
+
+(use-package ein
+  :ensure t
+  :config
+  (setq-default ein:complete-on-dot nil
+                ein:completion-backend 'ein:use-company-backend
+                ein:query-timeout 1000
+                ein:default-url-or-port "http://localhost:8888"
+                ein:worksheet-enable-undo 'full)
+  (setq-default request--curl-cookie-jar (concat user-emacs-directory "request/curl-cookie-jar")))
 
 (use-package json-mode
   :ensure t
@@ -717,6 +750,13 @@ Repeated invocations toggle between the two most recently open buffers."
            ("R" . anzu-query-replace-regexp)
            ("f" . projectile-find-file)
            ("s" . projectile-ag)
-           ("i" . imenu))
+           ("i" . imenu)
+           ("d" . dash-at-point))
+
+;; load custom.el
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+
+(when (file-exists-p custom-file)
+  (load custom-file))
 
 ;;; init.el ends here
