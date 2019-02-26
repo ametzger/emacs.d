@@ -24,3 +24,5 @@ custom.el
 transient/*
 anaconda-mode/*
 .python-environments/*
+ac-comphist.dat
+request/*

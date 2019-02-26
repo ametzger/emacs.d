@@ -54,7 +54,9 @@
              '("melpa" . "https://melpa.org/packages/") t)
 ;; keep the installed packages in .emacs.d
 (setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
-(package-initialize)
+(unless package--initialized
+  (package-initialize t))
+
 ;; update the package metadata is the local cache is missing
 (unless package-archive-contents
   (package-refresh-contents))
@@ -104,6 +106,34 @@
 (global-set-key (kbd "C-x 2") 'asm/split-window-vertically)
 (global-set-key (kbd "C-x 3") 'asm/split-window-horizontally)
 
+(defun asm/toggle-window-split ()
+  "Toggle how windows are split."
+  (interactive)
+  (if (= (count-windows) 2)
+      (let* ((this-win-buffer (window-buffer))
+             (next-win-buffer (window-buffer (next-window)))
+             (this-win-edges (window-edges (selected-window)))
+             (next-win-edges (window-edges (next-window)))
+             (this-win-2nd (not (and (<= (car this-win-edges)
+                                         (car next-win-edges))
+                                     (<= (cadr this-win-edges)
+                                         (cadr next-win-edges)))))
+             (splitter
+              (if (= (car this-win-edges)
+                     (car (window-edges (next-window))))
+                  'split-window-horizontally
+                'split-window-vertically)))
+        (delete-other-windows)
+        (let ((first-win (selected-window)))
+          (funcall splitter)
+          (if this-win-2nd (other-window 1))
+          (set-window-buffer (selected-window) this-win-buffer)
+          (set-window-buffer (next-window) next-win-buffer)
+          (select-window first-win)
+          (if this-win-2nd (other-window 1))))))
+
+(global-set-key (kbd "C-c |") 'asm/toggle-window-split)
+
 (setq help-window-select t)
 
 (line-number-mode t)
@@ -111,6 +141,7 @@
 (size-indication-mode t)
 
 (fset 'yes-or-no-p 'y-or-n-p)
+(setq confirm-kill-emacs 'y-or-n-p)
 
 ;; Bind C-S-SPC to mark the whole line (similar to
 ;; `evil-visual-line')
@@ -123,7 +154,11 @@
 (global-set-key (kbd "C-S-SPC") 'asm/select-current-line)
 
 ;; font config
-(set-frame-font "Operator Mono 13")
+(let ((font-size (if (eq system-type 'darwin)
+                     16
+                   13)))
+  (set-frame-font (format "Operator Mono %d" font-size)))
+
 (custom-set-faces
  '(font-lock-comment-face ((t (:foreground "#6d7a96" :slant italic))))
  '(font-lock-doc-face ((t (:foreground "#6d7a96" :slant italic))))
@@ -180,6 +215,7 @@ Repeated invocations toggle between the two most recently open buffers."
 (setq tab-always-indent 'complete)
 
 (setq frame-title-format nil)
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 ;; platform-specific
 (if (eq system-type 'darwin)
@@ -491,7 +527,8 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (setq-default ein:complete-on-dot -1
                 ein:use-auto-complete 1
-                ein:query-timeout 1000))
+                ein:query-timeout 1000)
+  (setq-default request--curl-cookie-jar (concat user-emacs-directory "request/curl-cookie-jar")))
 
 ;; universal code-related
 (use-package hl-todo
