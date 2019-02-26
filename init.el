@@ -179,6 +179,8 @@ Repeated invocations toggle between the two most recently open buffers."
 ;; smart tab behavior - indent or complete
 (setq tab-always-indent 'complete)
 
+(setq frame-title-format nil)
+
 ;; platform-specific
 (if (eq system-type 'darwin)
       (progn (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
@@ -309,7 +311,10 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package magit
   :ensure t
-  :bind (("C-x g" . magit-status)))
+  :bind (("C-x g" . magit-status))
+  :config
+  (add-hook 'after-save-hook #'magit-after-save-refresh-status)
+  (setq magit-repository-directories '("~/proj/")))
 
 (use-package forge
   :ensure t
@@ -436,11 +441,57 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package pyenv-mode-auto
   :ensure t)
 
+(use-package pipenv
+  :ensure t)
+
+(defun asm/python-mode-hook ()
+  "Initialize `python-mode'."
+  (when (fboundp #'python-imenu-create-flat-index)
+    (setq-local imenu-create-index-function
+                #'python-imenu-create-flat-index)))
+
 (use-package python
   :mode ("\\.py'" . python-mode)
   :interpreter ("python" . python-mode)
   :config
-  (setq-default python-fill-docstring-style 'django))
+  (setq-default python-fill-docstring-style 'django)
+  (add-hook 'python-mode-hook 'asm/python-mode-hook))
+
+(use-package jedi
+  :ensure t)
+
+(use-package company-jedi
+  :ensure t
+  :after (company jedi)
+  :config
+  (add-to-list 'company-backends 'company-jedi)
+  (setq-default company-jedi-python-bin "~/.pyenv/shims/python"))
+
+(use-package anaconda-mode
+  :ensure t
+  :config
+  (add-hook 'python-mode-hook 'anaconda-mode)
+  (add-hook 'python-mode-hook 'anaconda-eldoc-mode))
+
+(use-package company-anaconda
+  :ensure t
+  :after (company anaconda-mode)
+  :config
+  (add-to-list 'company-backends
+               '(company-anaconda :with company-capf)))
+
+(use-package blacken
+  :ensure t
+  :config
+  (setq blacken-executable "~/.pyenv/shims/black")
+  (define-key python-mode-map (kbd "C-c C-b") 'blacken-buffer))
+
+(use-package ein
+  :ensure t
+  :config
+  (setq-default ein:complete-on-dot -1
+                ein:use-auto-complete 1
+                ein:query-timeout 1000))
 
 ;; universal code-related
 (use-package hl-todo
@@ -533,7 +584,9 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq enable-recursive-minibuffers t)
   (setq ivy-initial-inputs-alist nil)
   (setq ivy-sort-matches-functions-alist
-        '((t . asm/ivy-sort-by-length)))
+        '((t)
+          (counsel-find-file . asm/ivy-sort-by-length)
+          (projectile-completing-read . asm/ivy-sort-by-length)))
   (global-set-key (kbd "C-c C-r") 'ivy-resume))
 
 (use-package swiper
@@ -584,6 +637,36 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (define-key json-mode-map (kbd "C-c C-b") 'json-pretty-print-buffer))
 
+(use-package yaml-mode
+  :ensure t)
+
+(use-package web-mode
+  :ensure t
+  :mode "\\.html$"
+  :config
+  (setq-default web-mode-markup-indent-offset 2
+                web-mode-code-indent-offset 2
+                web-mode-css-indent-offset 2
+                web-mode-sql-indent-offset 2
+                web-mode-enable-auto-indentation nil)
+  (add-hook 'web-mode-hook (lambda () (web-mode-set-engine "django"))))
+
+(use-package js2-mode
+  :ensure t
+  :mode "//.js$"
+  :config
+  (setq-default js2-basic-indent 2
+                js2-basic-offset 2
+                js2-auto-indent-p t
+                js2-cleanup-whitespace t
+                js2-enter-indents-newline t
+                js2-indent-on-enter-key t
+                js2-global-externs (list "window" "setTimeout" "clearTimeout" "setInterval"
+                                         "clearInterval" "location" "console" "JSON"
+                                         "jQuery" "$"))
+
+  (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode)))
+
 (bind-keys :map global-map
            :prefix-map asm/ctrl-z-prefix-map
            :prefix "C-z"
@@ -596,6 +679,7 @@ Repeated invocations toggle between the two most recently open buffers."
            ("p" . projectile-switch-project)
            ("R" . anzu-query-replace-regexp)
            ("f" . projectile-find-file)
+           ("s" . projectile-ag)
            ("i" . imenu))
 
 ;;; init.el ends here

@@ -22,3 +22,5 @@ tramp
 var/prescient-save.el
 custom.el
 transient/*
+anaconda-mode/*
+.python-environments/*
