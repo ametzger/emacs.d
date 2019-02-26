@@ -179,6 +179,13 @@ Repeated invocations toggle between the two most recently open buffers."
 ;; smart tab behavior - indent or complete
 (setq tab-always-indent 'complete)
 
+;; platform-specific
+(if (eq system-type 'darwin)
+      (progn (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+             (add-to-list 'default-frame-alist '(ns-appearance . dark))
+             (setq-default ns-use-srgb-colorspace t
+                           ns-use-proxy-icon nil)))
+
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
 
@@ -279,10 +286,11 @@ Repeated invocations toggle between the two most recently open buffers."
 ;;; third-party
 (use-package doom-themes
   :ensure t
+  :after (rainbow-delimiters)
   :config
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
-  (load-theme 'doom-nord))
+  (load-theme 'doom-nord t))
 
 (use-package doom-modeline
   :ensure t
@@ -511,24 +519,8 @@ Repeated invocations toggle between the two most recently open buffers."
   (global-set-key (kbd "C-/") 'undo-tree-undo)
   (global-set-key (kbd "C-?") 'undo-tree-redo))
 
-(use-package prescient
-  :ensure t
-  :config
-  (prescient-persist-mode +1))
-
-(use-package ivy-prescient
-  :ensure t
-  :after (ivy prescient)
-  :config
-  (ivy-prescient-mode +1))
-
-(use-package company-prescient
-  :ensure t
-  :after (company prescient)
-  :config
-  (company-prescient-mode +1))
-
 (defun asm/ivy-sort-by-length (_name candidates)
+  "Sort `CANDIDATES' matching `_NAME' by length."
   (cl-sort (copy-sequence candidates)
            (lambda (f1 f2)
              (< (length f1) (length f2)))))
@@ -541,9 +533,7 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq enable-recursive-minibuffers t)
   (setq ivy-initial-inputs-alist nil)
   (setq ivy-sort-matches-functions-alist
-        '((t)
-          (ivy-switch-buffer . ivy-sort-function-buffer)
-          (counsel-find-file . asm/ivy-sort-by-length)))
+        '((t . asm/ivy-sort-by-length)))
   (global-set-key (kbd "C-c C-r") 'ivy-resume))
 
 (use-package swiper
@@ -551,7 +541,6 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (global-set-key "\C-s" 'swiper)
   (global-set-key "\C-r" 'swiper))
-
 
 (use-package ace-window
   :ensure t
@@ -590,6 +579,11 @@ Repeated invocations toggle between the two most recently open buffers."
      (list (line-beginning-position)
            (line-beginning-position 2))))))
 
+(use-package json-mode
+  :ensure t
+  :config
+  (define-key json-mode-map (kbd "C-c C-b") 'json-pretty-print-buffer))
+
 (bind-keys :map global-map
            :prefix-map asm/ctrl-z-prefix-map
            :prefix "C-z"
@@ -603,12 +597,5 @@ Repeated invocations toggle between the two most recently open buffers."
            ("R" . anzu-query-replace-regexp)
            ("f" . projectile-find-file)
            ("i" . imenu))
-
-;;; platform-specific
-(if (eq system-type 'darwin)
-      (progn (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-             (add-to-list 'default-frame-alist '(ns-appearance . dark))
-             (setq-default ns-use-srgb-colorspace t
-                           ns-use-proxy-icon nil)))
 
 ;;; init.el ends here

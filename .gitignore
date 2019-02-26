@@ -21,3 +21,4 @@ tramp
 /var/pcache
 var/prescient-save.el
 custom.el
+transient/*
