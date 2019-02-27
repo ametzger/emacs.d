@@ -47,10 +47,15 @@
 
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/") t)
+
 ;; keep the installed packages in .emacs.d
 (setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
 
-(package-initialize)
+;; emacs 27+ will throw "Warning (package): Unnecessary call to
+;; ‘package-initialize’ in init file" error if this is called, but
+;; older versions require it.
+(when (version< emacs-version "27.0")
+  (package-initialize))
 
 (setq-default use-package-enable-imenu-support t)
 (unless (package-installed-p 'use-package)
@@ -58,11 +63,13 @@
   (package-install 'use-package))
 
 (require 'use-package)
-(setq use-package-verbose t)
+(setq use-package-verbose nil) ;; set to t for info about what
+                               ;; use-package is doing
 
 ;; vanity
-(setq user-full-name "Alex Metzger"
-      user-mail-address "asm@asm.io")
+(setq user-full-name    "Alex Metzger"
+      user-mail-address "asm@asm.io"
+      user-login-name   "asm")
 
 ;; emacs baseline + annoyances
 (setq load-prefer-newer t)
@@ -154,7 +161,7 @@
 
 ;; font config
 (let ((font-size (if (eq system-type 'darwin)
-                     16
+                     17
                    13)))
   (set-frame-font (format "Operator Mono %d" font-size)))
 
@@ -404,32 +411,19 @@ Repeated invocations toggle between the two most recently open buffers."
   :bind
   ("C-M-y" . browse-kill-ring))
 
-(use-package paredit
-  :ensure t
-  :config
-  (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
-  ;; enable in the *scratch* buffer
-  (add-hook 'lisp-interaction-mode-hook #'paredit-mode)
-  (add-hook 'ielm-mode-hook #'paredit-mode)
-  (add-hook 'lisp-mode-hook #'paredit-mode)
-  (add-hook 'eval-expression-minibuffer-setup-hook #'paredit-mode))
-
 (use-package multiple-cursors
   :ensure t
   :bind
-   ("C-M-S-s-l" . mc/edit-lines)
-   ("H-l"       . mc/edit-lines)
-   ("C-;"       . mc/mark-all-like-this-dwim)
-   ("C-c C-<"   . mc/mark-all-like-this)
-   ("C->"       . mc/mark-next-like-this)
-   ("C-<"       . mc/mark-previous-like-this)
+   ("C-M-S-s-l"     . mc/edit-lines)
+   ("H-l"           . mc/edit-lines)
+   ("C-;"           . mc/mark-all-like-this-dwim)
+   ("C-c C-<"       . mc/mark-all-like-this)
+   ("C->"           . mc/mark-next-like-this)
+   ("C-<"           . mc/mark-previous-like-this)
+   ("C-S-<mouse-1>" . mc/add-cursor-on-click)
    :config
    ;; unmap return when in multi-cursor
-   (define-key mc/keymap (kbd "<return>") nil)
-
-   ;; sometimes alt-click is just easier than marking
-   (global-unset-key (kbd "M-<down-mouse-1>"))
-   (global-set-key (kbd "M-<mouse-1>") 'mc/add-cursor-on-click))
+   (define-key mc/keymap (kbd "<return>") nil))
 
 (use-package anzu
   :ensure t
@@ -461,10 +455,6 @@ Repeated invocations toggle between the two most recently open buffers."
          ("M-Z" . zop-to-char)))
 
 ;; imenu
-;; add use-package as imenu entries
-(add-to-list 'imenu-generic-expression
-             '("Used Packages"
-               "\\(^\\s-*(use-package +\\)\\(\\_<.+\\_>\\)" 2))
 ;; recenter around selected imenu items
 (defun asm/imenu-select-hook ()
   (recenter scroll-margin))
@@ -478,6 +468,14 @@ Repeated invocations toggle between the two most recently open buffers."
   :ensure t
   :bind (("C-c i" . imenu-anywhere)
          ("s-i" . imenu-anywhere)))
+
+(use-package imenu-list
+  :ensure t
+  :defer t
+  :functions (imenu-list-smart-toggle)
+  :bind (("C-." . imenu-list-smart-toggle))
+  :config
+  (setq imenu-list-focus-after-activation t))
 
 ;; universal code-related
 (use-package hl-todo
@@ -573,7 +571,8 @@ Repeated invocations toggle between the two most recently open buffers."
         `((".*" . ,temporary-file-directory)))
   (setq undo-tree-auto-save-history t)
   (global-set-key (kbd "C-/") 'undo-tree-undo)
-  (global-set-key (kbd "C-?") 'undo-tree-redo))
+  (global-set-key (kbd "C-?") 'undo-tree-redo)
+  (global-set-key (kbd "C-c u") 'undo-tree-visualize))
 
 (use-package prescient
   :ensure t)
@@ -602,6 +601,7 @@ Repeated invocations toggle between the two most recently open buffers."
         '((t)
           (counsel-find-file . asm/ivy-sort-by-length)
           (projectile-completing-read . asm/ivy-sort-by-length)))
+  (setq ivy-on-del-error-function #'ignore)
   (global-set-key (kbd "C-c C-r") 'ivy-resume))
 
 (use-package swiper
@@ -613,21 +613,21 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package counsel
   :ensure t
   :config
-  (global-set-key (kbd "M-x") 'counsel-M-x)
+  (global-set-key (kbd "M-x")     'counsel-M-x)
   (global-set-key (kbd "C-x C-b") 'counsel-ibuffer)
-  (global-set-key (kbd "C-x b") 'counsel-ibuffer)
+  (global-set-key (kbd "C-x b")   'counsel-ibuffer)
   (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-  (global-set-key (kbd "<f1> f") 'counsel-describe-function)
-  (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-  (global-set-key (kbd "<f1> l") 'counsel-find-library)
-  (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
-  (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
-  (global-set-key (kbd "C-c g") 'counsel-git)
-  (global-set-key (kbd "C-c j") 'counsel-git-grep)
-  (global-set-key (kbd "C-c a") 'counsel-ag)
-  (global-set-key (kbd "C-x l") 'counsel-locate)
-  (global-set-key (kbd "C-x i") 'counsel-imenu)
-  (global-set-key (kbd "C-c i") 'counsel-imenu)
+  (global-set-key (kbd "<f1> f")  'counsel-describe-function)
+  (global-set-key (kbd "<f1> v")  'counsel-describe-variable)
+  (global-set-key (kbd "<f1> l")  'counsel-find-library)
+  (global-set-key (kbd "<f2> i")  'counsel-info-lookup-symbol)
+  (global-set-key (kbd "<f2> u")  'counsel-unicode-char)
+  (global-set-key (kbd "C-c g")   'counsel-git)
+  (global-set-key (kbd "C-c j")   'counsel-git-grep)
+  (global-set-key (kbd "C-c a")   'counsel-ag)
+  (global-set-key (kbd "C-x l")   'counsel-locate)
+  (global-set-key (kbd "C-x i")   'counsel-imenu)
+  (global-set-key (kbd "C-c i")   'counsel-imenu)
   (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
   (define-key counsel-find-file-map (kbd "C-l") 'ivy-backward-delete-char))
 
@@ -671,7 +671,33 @@ Repeated invocations toggle between the two most recently open buffers."
   (add-hook 'before-save-hook #'whitespace-cleanup)
   :config
   (setq whitespace-line-column 100) ;; limit line length
-  (setq whitespace-style '(face tabs empty trailing lines-tail)))
+  (setq whitespace-style '(face tabs empty trailing)))
+
+(use-package smartparens
+  :ensure t
+  :init
+  (smartparens-global-mode 1)
+  :config
+  (setq smartparens-strict-mode t)
+  (sp-local-pair 'emacs-lisp-mode "`" nil :when '(sp-in-string-p))
+  :bind
+  (("C-M-k" . sp-kill-sexp-with-a-twist-of-lime)
+   ("C-M-f" . sp-forward-sexp)
+   ("C-M-b" . sp-backward-sexp)
+   ("C-M-n" . sp-up-sexp)
+   ("C-M-d" . sp-down-sexp)
+   ("C-M-u" . sp-backward-up-sexp)
+   ("C-M-p" . sp-backward-down-sexp)
+   ("C-M-w" . sp-copy-sexp)
+   ("M-s" . sp-splice-sexp)
+   ("M-r" . sp-splice-sexp-killing-around)
+   ("C-)" . sp-forward-slurp-sexp)
+   ("C-}" . sp-forward-barf-sexp)
+   ("C-(" . sp-backward-slurp-sexp)
+   ("C-{" . sp-backward-barf-sexp)
+   ("M-S" . sp-split-sexp)
+   ("M-J" . sp-join-sexp)
+   ("C-M-t" . sp-transpose-sexp)))
 
 ;; ruby
 (use-package ruby-mode
@@ -757,24 +783,41 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package ein
   :ensure t
+  :defer t
+  :commands (ein:login)
   :config
   (setq-default ein:complete-on-dot nil
-                ein:completion-backend 'ein:use-company-backend
+                ein:completion-backend 'ein:use-none-backend
                 ein:query-timeout 1000
                 ein:default-url-or-port "http://localhost:8888"
-                ein:worksheet-enable-undo 'full)
-  (setq-default request--curl-cookie-jar (concat user-emacs-directory "request/curl-cookie-jar")))
+                ein:worksheet-enable-undo 'yes)
+  (cond
+   ((eq system-type 'darwin)    (setq-default ein:console-args '("--gui=osx" "--matplotlib=osx" "--colors=Linux")))
+   ((eq system-type 'gnu/linux) (setq-default ein:console-args '("--gui=gtk3" "--matplotlib=gtk3" "--colors=Linux"))))
+
+  ;; Not sure if this is necessary - seems to make ein work on OS X.
+  (setq-default request--curl-cookie-jar (concat user-emacs-directory "request/curl-cookie-jar"))
+
+  (add-hook 'ein:notebook-mode-hook
+            (lambda ()
+              (whitespace-mode -1)
+              (company-mode -1)
+              (bind-key "C-/" 'undo))))
 
 (use-package json-mode
   :ensure t
+  :defer t
   :config
   (define-key json-mode-map (kbd "C-c C-b") 'json-pretty-print-buffer))
 
 (use-package yaml-mode
-  :ensure t)
+  :ensure t
+  :defer t
+  :mode "\\.yaml$")
 
 (use-package web-mode
   :ensure t
+  :defer t
   :mode "\\.html$"
   :config
   (setq-default web-mode-markup-indent-offset 2
@@ -786,6 +829,7 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package js2-mode
   :ensure t
+  :defer t
   :mode "//.js$"
   :config
   (setq-default js2-basic-indent 2
@@ -814,7 +858,8 @@ Repeated invocations toggle between the two most recently open buffers."
            ("f" . projectile-find-file)
            ("s" . projectile-ag)
            ("i" . counsel-imenu)
-           ("d" . dash-at-point))
+           ("d" . dash-at-point)
+           ("n" . ein:login))
 
 ;; load custom.el
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
