@@ -184,6 +184,24 @@
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 
+(defun asm/comment-sanely ()
+  (interactive)
+  (if (region-active-p)
+      (comment-dwim nil)
+    (let (($lbp (line-beginning-position))
+          ($lep (line-end-position)))
+      (if (eq $lbp $lep)
+          (progn
+            (comment-dwim nil))
+        (if (eq (point) $lep)
+            (progn
+              (comment-dwim nil))
+          (progn
+            (comment-or-uncomment-region $lbp $lep)
+            (forward-line )))))))
+
+(global-set-key (kbd "M-;") 'asm/comment-sanely)
+
 ;; hippie expand is dabbrev expand on steroids
 (setq hippie-expand-try-functions-list '(try-expand-dabbrev
                                          try-expand-dabbrev-all-buffers
@@ -200,7 +218,6 @@
 (global-set-key (kbd "M-/") #'hippie-expand)
 (global-set-key (kbd "s-/") #'hippie-expand)
 
-(global-set-key (kbd "C-x C-b") #'ibuffer)
 (global-set-key (kbd "C-x \\") #'align-regexp)
 
 (defun asm/switch-to-previous-buffer ()
@@ -580,6 +597,7 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq ivy-use-virtual-buffers t)
   (setq enable-recursive-minibuffers t)
   (setq ivy-initial-inputs-alist nil)
+  (setq ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
   (setq ivy-sort-matches-functions-alist
         '((t)
           (counsel-find-file . asm/ivy-sort-by-length)
@@ -592,16 +610,12 @@ Repeated invocations toggle between the two most recently open buffers."
   (global-set-key "\C-s" 'swiper)
   (global-set-key "\C-r" 'swiper))
 
-(use-package ace-window
-  :ensure t
-  :config
-  (global-set-key (kbd "s-w") 'ace-window)
-  (global-set-key [remap other-window] 'ace-window))
-
 (use-package counsel
   :ensure t
   :config
   (global-set-key (kbd "M-x") 'counsel-M-x)
+  (global-set-key (kbd "C-x C-b") 'counsel-ibuffer)
+  (global-set-key (kbd "C-x b") 'counsel-ibuffer)
   (global-set-key (kbd "C-x C-f") 'counsel-find-file)
   (global-set-key (kbd "<f1> f") 'counsel-describe-function)
   (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
@@ -612,8 +626,21 @@ Repeated invocations toggle between the two most recently open buffers."
   (global-set-key (kbd "C-c j") 'counsel-git-grep)
   (global-set-key (kbd "C-c a") 'counsel-ag)
   (global-set-key (kbd "C-x l") 'counsel-locate)
+  (global-set-key (kbd "C-x i") 'counsel-imenu)
+  (global-set-key (kbd "C-c i") 'counsel-imenu)
   (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
   (define-key counsel-find-file-map (kbd "C-l") 'ivy-backward-delete-char))
+
+(use-package ace-window
+  :ensure t
+  :config
+  (global-set-key (kbd "s-w") 'ace-window)
+  (global-set-key [remap other-window] 'ace-window))
+
+(use-package eyebrowse
+  :ensure t
+  :config
+  (eyebrowse-mode +1))
 
 (use-package volatile-highlights
   :ensure t
@@ -786,7 +813,7 @@ Repeated invocations toggle between the two most recently open buffers."
            ("R" . anzu-query-replace-regexp)
            ("f" . projectile-find-file)
            ("s" . projectile-ag)
-           ("i" . imenu)
+           ("i" . counsel-imenu)
            ("d" . dash-at-point))
 
 ;; load custom.el
