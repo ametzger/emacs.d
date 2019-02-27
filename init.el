@@ -52,15 +52,13 @@
 
 (package-initialize)
 
+(setq-default use-package-enable-imenu-support t)
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
 
 (require 'use-package)
 (setq use-package-verbose t)
-
-
-
 
 ;; vanity
 (setq user-full-name "Alex Metzger"
@@ -223,7 +221,8 @@ Repeated invocations toggle between the two most recently open buffers."
       (progn (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
              (add-to-list 'default-frame-alist '(ns-appearance . dark))
              (setq-default ns-use-srgb-colorspace t
-                           ns-use-proxy-icon nil)))
+                           ns-use-proxy-icon nil)
+             (global-set-key (kbd "s-n") nil)))
 
 ;;; built-in packages
 ;; disable version control, magit forever
@@ -383,6 +382,11 @@ Repeated invocations toggle between the two most recently open buffers."
   :ensure t
   :bind ("C-=" . er/expand-region))
 
+(use-package browse-kill-ring
+  :ensure t
+  :bind
+  ("C-M-y" . browse-kill-ring))
+
 (use-package paredit
   :ensure t
   :config
@@ -392,6 +396,23 @@ Repeated invocations toggle between the two most recently open buffers."
   (add-hook 'ielm-mode-hook #'paredit-mode)
   (add-hook 'lisp-mode-hook #'paredit-mode)
   (add-hook 'eval-expression-minibuffer-setup-hook #'paredit-mode))
+
+(use-package multiple-cursors
+  :ensure t
+  :bind
+   ("C-M-S-s-l" . mc/edit-lines)
+   ("H-l"       . mc/edit-lines)
+   ("C-;"       . mc/mark-all-like-this-dwim)
+   ("C-c C-<"   . mc/mark-all-like-this)
+   ("C->"       . mc/mark-next-like-this)
+   ("C-<"       . mc/mark-previous-like-this)
+   :config
+   ;; unmap return when in multi-cursor
+   (define-key mc/keymap (kbd "<return>") nil)
+
+   ;; sometimes alt-click is just easier than marking
+   (global-unset-key (kbd "M-<down-mouse-1>"))
+   (global-set-key (kbd "M-<mouse-1>") 'mc/add-cursor-on-click))
 
 (use-package anzu
   :ensure t
@@ -421,6 +442,20 @@ Repeated invocations toggle between the two most recently open buffers."
   :ensure t
   :bind (("M-z" . zop-up-to-char)
          ("M-Z" . zop-to-char)))
+
+;; imenu
+;; add use-package as imenu entries
+(add-to-list 'imenu-generic-expression
+             '("Used Packages"
+               "\\(^\\s-*(use-package +\\)\\(\\_<.+\\_>\\)" 2))
+;; recenter around selected imenu items
+(defun asm/imenu-select-hook ()
+  (recenter scroll-margin))
+(add-hook 'imenu-after-jump-hook 'asm/imenu-select-hook)
+;; always be scanning
+(setq imenu-auto-rescan t
+      imenu-auto-rescan-maxout (* 1024 1024)
+      imenu--rescan-item '("" . -99))
 
 (use-package imenu-anywhere
   :ensure t
@@ -453,12 +488,13 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (add-hook 'after-init-hook (lambda ()
                                (flymake-mode -1)
-                               (global-flycheck-mode))))
+                               (global-flycheck-mode)))
+  (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 
 (use-package company
   :ensure t
   :config
-  (setq company-idle-delay 0.3)
+  (setq company-idle-delay 0.4)
   (setq company-show-numbers t)
   (setq company-tooltip-limit 10)
   (setq company-minimum-prefix-length 2)
