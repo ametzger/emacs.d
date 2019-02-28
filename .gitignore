@@ -26,3 +26,5 @@ anaconda-mode/*
 .python-environments/*
 ac-comphist.dat
 request/*
+/.mc-lists.el
+/projectile.cache
