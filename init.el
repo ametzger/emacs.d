@@ -84,6 +84,8 @@
 (unless (file-exists-p asm/savefile-dir)
   (make-directory asm/savefile-dir))
 
+(setq auto-window-vscroll nil)
+
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
 (blink-cursor-mode -1)
@@ -371,11 +373,9 @@ Repeated invocations toggle between the two most recently open buffers."
   :bind (("C-x g" . magit-status))
   :config
   (add-hook 'after-save-hook #'magit-after-save-refresh-status)
-  (setq magit-repository-directories '("~/proj/")))
-
-(use-package forge
-  :ensure t
-  :requires magit)
+  (setq magit-repository-directories '(("~/proj/" . 2)))
+  (use-package forge
+    :ensure t))
 
 (use-package git-timemachine
   :ensure t
@@ -400,7 +400,8 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-  (projectile-mode +1))
+  (projectile-mode +1)
+  (setq projectile-enable-caching t))
 
 (use-package expand-region
   :ensure t
@@ -517,6 +518,7 @@ Repeated invocations toggle between the two most recently open buffers."
   ;; invert the navigation direction if the the completion popup-isearch-match
   ;; is displayed on top (happens near the bottom of windows)
   (setq company-tooltip-flip-when-above t)
+  (setq company-global-modes '(not ein:notebook-mode))
   (global-company-mode))
 
 (use-package super-save
@@ -642,6 +644,14 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (eyebrowse-mode +1))
 
+;; resizes buffers using the golden ratio
+;; (use-package zoom
+;;   :ensure t
+;;   :init
+;;   (zoom-mode +1)
+;;   :config
+;;   (setq zoom-size '(0.618 . 0.618)))
+
 (use-package volatile-highlights
   :ensure t
   :config
@@ -678,8 +688,8 @@ Repeated invocations toggle between the two most recently open buffers."
   :init
   (smartparens-global-mode 1)
   :config
-  (setq smartparens-strict-mode t)
   (sp-local-pair 'emacs-lisp-mode "`" nil :when '(sp-in-string-p))
+  (sp-local-pair 'emacs-lisp-mode "'" nil)
   :bind
   (("C-M-k" . sp-kill-sexp-with-a-twist-of-lime)
    ("C-M-f" . sp-forward-sexp)
@@ -792,11 +802,16 @@ Repeated invocations toggle between the two most recently open buffers."
                 ein:default-url-or-port "http://localhost:8888"
                 ein:worksheet-enable-undo 'yes)
   (cond
-   ((eq system-type 'darwin)    (setq-default ein:console-args '("--gui=osx" "--matplotlib=osx" "--colors=Linux")))
-   ((eq system-type 'gnu/linux) (setq-default ein:console-args '("--gui=gtk3" "--matplotlib=gtk3" "--colors=Linux"))))
+   ((eq system-type 'darwin)
+    (setq-default ein:console-args
+                  '("--gui=osx" "--matplotlib=osx" "--colors=Linux")))
+   ((eq system-type 'gnu/linux)
+    (setq-default ein:console-args
+                  '("--gui=gtk3" "--matplotlib=gtk3" "--colors=Linux"))))
 
   ;; Not sure if this is necessary - seems to make ein work on OS X.
-  (setq-default request--curl-cookie-jar (concat user-emacs-directory "request/curl-cookie-jar"))
+  (setq-default request--curl-cookie-jar (concat user-emacs-directory
+                                                 "request/curl-cookie-jar"))
 
   (add-hook 'ein:notebook-mode-hook
             (lambda ()
@@ -804,6 +819,15 @@ Repeated invocations toggle between the two most recently open buffers."
               (company-mode -1)
               (bind-key "C-/" 'undo))))
 
+;; golang
+(use-package go-mode
+  :ensure t
+  :init
+  (add-hook 'before-save-hook 'gofmt-before-save)
+  :config
+  (add-hook 'go-mode-hook 'electric-pair-mode))
+
+;; misc languages
 (use-package json-mode
   :ensure t
   :defer t
