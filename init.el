@@ -79,6 +79,8 @@
 
 (setq large-file-warning-threshold 50000000)
 
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+
 (defconst asm/savefile-dir
   (expand-file-name "savefile" user-emacs-directory))
 (unless (file-exists-p asm/savefile-dir)
@@ -103,16 +105,24 @@
   "Open a new vertical window and switch to it."
   (interactive)
   (split-window-vertically)
+  (balance-windows)
   (other-window 1))
 
 (defun asm/split-window-horizontally ()
   "Open a new horizontal window and switch to it."
   (interactive)
   (split-window-horizontally)
+  (balance-windows)
   (other-window 1))
+
+(defun asm/delete-windows-and-rebalance ()
+  (interactive)
+  (delete-window)
+  (balance-windows))
 
 (global-set-key (kbd "C-x 2") 'asm/split-window-vertically)
 (global-set-key (kbd "C-x 3") 'asm/split-window-horizontally)
+(global-set-key (kbd "C-x 0") 'asm/delete-windows-and-rebalance)
 
 (defun asm/toggle-window-split ()
   "Toggle how windows are split."
@@ -312,19 +322,16 @@ Repeated invocations toggle between the two most recently open buffers."
   (windmove-default-keybindings))
 
 (use-package dired
+  :bind
+  ("C-c C-j" . dired-jump)
   :config
-  ;; dired - reuse current buffer by pressing 'a'
   (put 'dired-find-alternate-file 'disabled nil)
 
-  ;; always delete and copy recursively
   (setq dired-recursive-deletes 'always)
   (setq dired-recursive-copies 'always)
 
-  ;; if there is a dired buffer displayed in the next window, use its
-  ;; current subdir, instead of the current subdir of this dired buffer
   (setq dired-dwim-target t)
 
-  ;; enable some really cool extensions like C-x C-j(dired-jump)
   (require 'dired-x))
 
 (use-package lisp-mode
@@ -364,7 +371,8 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package avy
   :ensure t
   :bind (("s-." . avy-goto-word-or-subword-1)
-         ("s-," . avy-goto-char))
+         ("s-," . avy-goto-char)
+         ("C-'" . avy-goto-line))
   :config
   (setq avy-background t))
 
@@ -402,6 +410,9 @@ Repeated invocations toggle between the two most recently open buffers."
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   (projectile-mode +1)
   (setq projectile-enable-caching t))
+
+(use-package counsel-projectile
+  :ensure t)
 
 (use-package expand-region
   :ensure t
@@ -478,7 +489,10 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (setq imenu-list-focus-after-activation t))
 
-;; universal code-related
+;; general code-related
+;; semantic mode is slow, disable it
+(semantic-mode -1)
+
 (use-package hl-todo
   :ensure t
   :config
@@ -518,7 +532,12 @@ Repeated invocations toggle between the two most recently open buffers."
   ;; invert the navigation direction if the the completion popup-isearch-match
   ;; is displayed on top (happens near the bottom of windows)
   (setq company-tooltip-flip-when-above t)
-  (setq company-global-modes '(not ein:notebook-mode))
+  (setq company-global-modes '(not org-mode
+                                   text-mode
+                                   fundamental-mode
+                                   ein:notebook-mode
+                                   git-commit-mode))
+  (setq company-backends ())
   (global-company-mode))
 
 (use-package super-save
@@ -608,15 +627,17 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package swiper
   :ensure t
-  :config
-  (global-set-key "\C-s" 'swiper)
-  (global-set-key "\C-r" 'swiper))
+  :bind
+  ("C-s"   . swiper)
+  ("C-r"   . swiper)
+  ("C-S-s" . isearch-forward)
+  ("C-S-r" . isearch-backwards))
+
 
 (use-package counsel
   :ensure t
   :config
   (global-set-key (kbd "M-x")     'counsel-M-x)
-  (global-set-key (kbd "C-x C-b") 'counsel-ibuffer)
   (global-set-key (kbd "C-x b")   'counsel-ibuffer)
   (global-set-key (kbd "C-x C-f") 'counsel-find-file)
   (global-set-key (kbd "<f1> f")  'counsel-describe-function)
@@ -820,12 +841,41 @@ Repeated invocations toggle between the two most recently open buffers."
               (bind-key "C-/" 'undo))))
 
 ;; golang
+(use-package go-projectile
+  :ensure t)
+
 (use-package go-mode
   :ensure t
   :init
   (add-hook 'before-save-hook 'gofmt-before-save)
   :config
-  (add-hook 'go-mode-hook 'electric-pair-mode))
+  (add-hook 'go-mode-hook 'electric-pair-mode)
+  (defun asm/go-mode-hook ()
+    ;; call gofmt before saving
+    (add-hook 'before-save-hook 'gofmt-before-save)
+    (add-to-list 'exec-path "~/proj/go/bin")
+    ;; Customize compile command to run go build
+    (if (not (string-match "go" compile-command))
+        (set (make-local-variable 'compile-command)
+             "go build -v && go vet"))
+    (local-set-key (kbd "C-c C-c") 'compile)
+    (set (make-local-variable 'company-backends) '(company-go))
+    (company-mode)
+
+    (setenv "GOPATH" (expand-file-name "~/proj/go")))
+
+  (add-hook 'go-mode-hook 'company-mode)
+  (add-hook 'go-mode-hook 'go-eldoc-setup)
+  (add-hook 'go-mode-hook 'asm/go-mode-hook))
+
+(use-package company-go
+  :ensure t
+  :after go
+  :config
+  (setq tab-width 4)
+
+  :bind (:map go-mode-map
+              ("M-." . godef-jump)))
 
 ;; misc languages
 (use-package json-mode
@@ -868,6 +918,20 @@ Repeated invocations toggle between the two most recently open buffers."
 
   (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode)))
 
+(use-package terraform-mode
+  :ensure t
+  :defer t)
+
+(use-package dockerfile-mode
+  :ensure t
+  :defer t)
+
+(defun asm/three-window-split ()
+  (interactive)
+  (command-execute 'split-window-horizontally)
+  (command-execute 'split-window-horizontally)
+  (command-execute 'balance-windows))
+
 (bind-keys :map global-map
            :prefix-map asm/ctrl-z-prefix-map
            :prefix "C-z"
@@ -880,10 +944,11 @@ Repeated invocations toggle between the two most recently open buffers."
            ("p" . projectile-switch-project)
            ("R" . anzu-query-replace-regexp)
            ("f" . projectile-find-file)
-           ("s" . projectile-ag)
+           ("s" . counsel-projectile-rg)
            ("i" . counsel-imenu)
            ("d" . dash-at-point)
-           ("n" . ein:login))
+           ("n" . ein:login)
+           ("3" . asm/three-window-split))
 
 ;; load custom.el
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
