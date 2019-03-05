@@ -80,6 +80,7 @@
 (setq large-file-warning-threshold 50000000)
 
 (global-set-key (kbd "C-x C-b") 'ibuffer)
+(global-set-key (kbd "C-c k") 'kill-this-buffer)
 
 (defconst asm/savefile-dir
   (expand-file-name "savefile" user-emacs-directory))
@@ -382,6 +383,15 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (add-hook 'after-save-hook #'magit-after-save-refresh-status)
   (setq magit-repository-directories '(("~/proj/" . 2)))
+
+  ;; use full-screen magit
+  (defadvice magit-status (around magit-fullscreen activate)
+    (window-configuration-to-register :magit-fullscreen)
+    ad-do-it
+    (delete-other-windows))
+  (defadvice magit-quit-window (after magit-restore-screen activate)
+    (jump-to-register :magit-fullscreen))
+
   (use-package forge
     :ensure t))
 
@@ -846,6 +856,7 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package go-mode
   :ensure t
+  :defer t
   :init
   (add-hook 'before-save-hook 'gofmt-before-save)
   :config
@@ -866,16 +877,54 @@ Repeated invocations toggle between the two most recently open buffers."
 
   (add-hook 'go-mode-hook 'company-mode)
   (add-hook 'go-mode-hook 'go-eldoc-setup)
-  (add-hook 'go-mode-hook 'asm/go-mode-hook))
+  (add-hook 'go-mode-hook 'asm/go-mode-hook)
+  :bind
+  (:map go-mode-map
+        ("C-c g a" . go-imports-insert-import)
+        ("C-c g p" . go-direx-pop-to-buffer)
+        ("C-c g b" . go-direx-switch-to-buffer)
+        ("C-c g i" . go-impl)
+        ("C-c g f" . go-fill-struct)
+        ("C-c g r" . go-rename)
+        ("C-c g l" . go-imports-reload-packages-list)
+        ("C-c g t" . go-tag-add)
+        ("C-c g v" . go-tag-remove)
+        ("C-c t g" . go-gen-test-dwim)
+        ("C-c t a" . go-gen-test-all)
+        ("C-c t e" . go-gen-test-exported)
+        ("C-c t f" . go-test-current-file)
+        ("C-c t t" . go-test-current-test)
+        ("C-c t p" . go-test-current-project)
+        ("C-c t b" . go-test-current-benchmark)
+        ("C-c t x" . go-run)))
 
 (use-package company-go
   :ensure t
   :after go
   :config
   (setq tab-width 4)
-
+  (setq company-go-gocode-command (expand-file-name "~/proj/go/bin/gocode"))
+  ;; (setq company-go-insert-arguments -1)
+  (setq company-go-show-annotation t)
   :bind (:map go-mode-map
               ("M-." . godef-jump)))
+
+(use-package go-eldoc
+  :ensure t
+  :after go
+  :hook
+  (go-mode . go-eldoc-setup))
+
+(use-package go-guru
+  :ensure t
+  :after go
+  :hook
+  (go-mode . go-guru-hl-identifier-mode))
+(use-package gorepl-mode
+  :ensure t
+  :after go
+  :hook
+  (go-mode . gorepl-mode))
 
 ;; misc languages
 (use-package json-mode
