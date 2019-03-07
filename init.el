@@ -176,7 +176,7 @@
 (let ((font-size (if (eq system-type 'darwin)
                      17
                    13)))
-  (set-frame-font (format "Operator Mono %d" font-size)))
+  (set-frame-font (format "Operator Mono %d" font-size) t t))
 
 (custom-set-faces
  '(font-lock-comment-face ((t (:foreground "#6d7a96" :slant italic))))
