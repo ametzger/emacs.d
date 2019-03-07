@@ -926,6 +926,29 @@ Repeated invocations toggle between the two most recently open buffers."
   :hook
   (go-mode . gorepl-mode))
 
+;; rust
+(use-package rust-mode
+  :ensure t
+  :defer t
+  :mode "\\.rs$"
+  :config
+  (setq rust-format-on-save t))
+
+(use-package racer
+  :ensure t
+  :after rust-mode
+  :config
+  (setq racer-rust-src-path (expand-file-name "~/.rustup/toolchains/stable-x86_64-apple-darwin/lib/rustlib/src/rust/src")
+        racer-cmd (expand-file-name "~/.cargo/bin/racer")))
+
+(use-package flycheck-rust
+  :ensure t
+  :config
+  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+
+(add-hook 'rust-mode-hook #'racer-mode)
+(add-hook 'rust-mode-hook #'electric-pair-mode)
+
 ;; misc languages
 (use-package json-mode
   :ensure t
