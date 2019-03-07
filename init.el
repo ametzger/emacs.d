@@ -533,22 +533,18 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package company
   :ensure t
+  :init (global-company-mode)
   :config
   (setq company-idle-delay 0.4)
   (setq company-show-numbers t)
   (setq company-tooltip-limit 10)
   (setq company-minimum-prefix-length 2)
   (setq company-tooltip-align-annotations t)
-  ;; invert the navigation direction if the the completion popup-isearch-match
-  ;; is displayed on top (happens near the bottom of windows)
-  (setq company-tooltip-flip-when-above t)
   (setq company-global-modes '(not org-mode
                                    text-mode
                                    fundamental-mode
                                    ein:notebook-mode
-                                   git-commit-mode))
-  (setq company-backends ())
-  (global-company-mode))
+                                   git-commit-mode)))
 
 (use-package super-save
   :ensure t
@@ -610,7 +606,7 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package ivy-prescient
   :ensure t
-  :requires (prescient ivy)
+  :after (prescient ivy)
   :config
   (ivy-prescient-mode))
 
@@ -846,6 +842,7 @@ Repeated invocations toggle between the two most recently open buffers."
 
   (add-hook 'ein:notebook-mode-hook
             (lambda ()
+              (visual-line-mode +1)
               (whitespace-mode -1)
               (company-mode -1)
               (bind-key "C-/" 'undo))))
@@ -871,7 +868,6 @@ Repeated invocations toggle between the two most recently open buffers."
              "go build -v && go vet"))
     (local-set-key (kbd "C-c C-c") 'compile)
     (set (make-local-variable 'company-backends) '(company-go))
-    (company-mode)
 
     (setenv "GOPATH" (expand-file-name "~/proj/go")))
 
