@@ -663,6 +663,7 @@ Repeated invocations toggle between the two most recently open buffers."
           (counsel-find-file . asm/ivy-sort-by-length)
           (projectile-completing-read . asm/ivy-sort-by-length)))
   (setq ivy-on-del-error-function #'ignore)
+  (setq ivy-use-selectable-prompt t)
   (global-set-key (kbd "C-c C-r") 'ivy-resume))
 
 (use-package swiper
@@ -678,7 +679,7 @@ Repeated invocations toggle between the two most recently open buffers."
   :ensure t
   :config
   (global-set-key (kbd "M-x")     'counsel-M-x)
-  (global-set-key (kbd "C-x b")   'counsel-ibuffer)
+  (global-set-key (kbd "C-x b")   'counsel-switch-buffer)
   (global-set-key (kbd "C-x C-f") 'counsel-find-file)
   (global-set-key (kbd "<f1> f")  'counsel-describe-function)
   (global-set-key (kbd "<f1> v")  'counsel-describe-variable)
@@ -1034,6 +1035,10 @@ Repeated invocations toggle between the two most recently open buffers."
   (command-execute 'split-window-horizontally)
   (command-execute 'balance-windows))
 
+(defun asm/open-init-file ()
+  (interactive)
+  (find-file user-init-file))
+
 (bind-keys :map global-map
            :prefix-map asm/ctrl-z-prefix-map
            :prefix "C-z"
@@ -1050,6 +1055,7 @@ Repeated invocations toggle between the two most recently open buffers."
            ("i" . counsel-imenu)
            ("d" . dash-at-point)
            ("n" . ein:login)
+           ("i" . asm/open-init-file)
            ("3" . asm/three-window-split))
 
 ;; load custom.el
