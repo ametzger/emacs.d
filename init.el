@@ -1066,3 +1066,6 @@ Repeated invocations toggle between the two most recently open buffers."
   (load custom-file))
 
 ;;; init.el ends here
+;; Local Variables:
+;; byte-compile-warnings: (not free-vars noruntime)
+;; End:
