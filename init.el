@@ -48,7 +48,6 @@
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/") t)
 
-;; keep the installed packages in .emacs.d
 (setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
 
 ;; emacs 27+ will throw "Warning (package): Unnecessary call to
@@ -57,14 +56,19 @@
 (when (version< emacs-version "27.0")
   (package-initialize))
 
-(setq-default use-package-enable-imenu-support t)
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
 
+(setq-default use-package-enable-imenu-support t
+              use-package-verbose nil)
 (require 'use-package)
-(setq use-package-verbose nil) ;; set to t for info about what
-                               ;; use-package is doing
+
+;; (use-package auto-package-update
+;;   :config
+;;   (setq-default auto-package-update-delete-old-versions t
+;;                 auto-package-update-hide-results t)
+;;   (auto-package-update-maybe))
 
 ;; vanity
 (setq user-full-name    "Alex Metzger"
@@ -75,7 +79,8 @@
 (setq load-prefer-newer t)
 
 (setq gc-cons-threshold 64000000)
-(add-hook 'after-init-hook (lambda () (setq gc-cons-threshold 800000)))
+(add-hook 'after-init-hook
+          (lambda () (setq gc-cons-threshold 800000)))
 
 (setq large-file-warning-threshold 50000000)
 
