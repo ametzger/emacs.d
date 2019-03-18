@@ -331,15 +331,43 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package dired
   :bind
   ("C-c C-j" . dired-jump)
+  ("C-c j"   . dired-jump)
   :config
+  ;; dired ls config, disabled for now. Using `ls-lisp' instead.
+  ;; OS X uses BSD ls by default, `brew install coreutils` puts GNU ls
+  ;; as gls. Use that for dired if it's present
+  ;; (setq dired-listing-switches "-aBhl")
+  ;; (let ((coreutils-ls-path (executable-find "gls")))
+  ;;   (if (and (eq system-type 'darwin)
+  ;;            coreutils-ls-path)
+  ;;       (setq insert-directory-program coreutils-ls-path))))
+
+  (require 'ls-lisp)
+  (setq ls-lisp-dirs-first t
+        ls-lisp-use-insert-directory-program nil)
+
   (put 'dired-find-alternate-file 'disabled nil)
 
-  (setq dired-recursive-deletes 'always)
-  (setq dired-recursive-copies 'always)
+  (setq dired-recursive-deletes 'always
+        dired-recursive-copies 'always
+        dired-dwim-target t))
 
-  (setq dired-dwim-target t)
+(use-package dired-x
+  :after (dired)
+  :config
+  (progn
+    (setq dired-omit-verbose nil)
+    ;; toggle `dired-omit-mode' with C-x M-o
+    (add-hook 'dired-mode-hook #'dired-omit-mode)
+    (setq dired-omit-files
+          "^\\.?#\\|^.DS_STORE$\\|^.projectile$\\|^.git$\\|^.CFUserTextEncoding$\\|^.Trash$\\|^__pycache__$")))
 
-  (require 'dired-x))
+;; (use-package peep-dired
+;;   :ensure t
+;;   :bind
+;;   (:map dired-mode-map ("P" . peep-dired))
+;;   :config
+;;   (setq peep-dired-cleanup-eagerly t))
 
 (use-package lisp-mode
   :config
@@ -658,7 +686,7 @@ Repeated invocations toggle between the two most recently open buffers."
   (global-set-key (kbd "<f2> i")  'counsel-info-lookup-symbol)
   (global-set-key (kbd "<f2> u")  'counsel-unicode-char)
   (global-set-key (kbd "C-c g")   'counsel-git)
-  (global-set-key (kbd "C-c j")   'counsel-git-grep)
+  ;; (global-set-key (kbd "C-c j")   'counsel-git-grep)
   (global-set-key (kbd "C-c a")   'counsel-ag)
   (global-set-key (kbd "C-x l")   'counsel-locate)
   (global-set-key (kbd "C-x i")   'counsel-imenu)
