@@ -190,7 +190,8 @@
 
 ;; indentation
 (setq-default indent-tabs-mode nil
-              tab-width 4)
+              tab-width 4
+              sh-basic-offset 2)
 
 ;; Newline at end of file
 (setq require-final-newline t)
