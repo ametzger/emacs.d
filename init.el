@@ -751,7 +751,8 @@ Repeated invocations toggle between the two most recently open buffers."
   (smartparens-global-mode 1)
   :config
   (sp-local-pair 'emacs-lisp-mode "`" nil :when '(sp-in-string-p))
-  (sp-local-pair 'emacs-lisp-mode "'" nil)
+  (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
+  (sp-pair "'" nil :unless '(sp-point-after-word-p))
   :bind
   (("C-M-k" . sp-kill-sexp-with-a-twist-of-lime)
    ("C-M-f" . sp-forward-sexp)
@@ -761,14 +762,14 @@ Repeated invocations toggle between the two most recently open buffers."
    ("C-M-u" . sp-backward-up-sexp)
    ("C-M-p" . sp-backward-down-sexp)
    ("C-M-w" . sp-copy-sexp)
-   ("M-s" . sp-splice-sexp)
-   ("M-r" . sp-splice-sexp-killing-around)
-   ("C-)" . sp-forward-slurp-sexp)
-   ("C-}" . sp-forward-barf-sexp)
-   ("C-(" . sp-backward-slurp-sexp)
-   ("C-{" . sp-backward-barf-sexp)
-   ("M-S" . sp-split-sexp)
-   ("M-J" . sp-join-sexp)
+   ("M-s"   . sp-splice-sexp)
+   ("M-r"   . sp-splice-sexp-killing-around)
+   ("C-)"   . sp-forward-slurp-sexp)
+   ("C-}"   . sp-forward-barf-sexp)
+   ("C-("   . sp-backward-slurp-sexp)
+   ("C-{"   . sp-backward-barf-sexp)
+   ("M-S"   . sp-split-sexp)
+   ("M-J"   . sp-join-sexp)
    ("C-M-t" . sp-transpose-sexp)))
 
 ;; ruby
