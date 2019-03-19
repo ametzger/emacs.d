@@ -1,0 +1,28 @@
+* emacs.d
+  My Emacs configuration files and associated accoutrement. Works best
+  for Python (specifically Django), Go, Rust, JavaScript and various
+  devops tools (Docker, Terraform, Ansible).
+
+** Installation
+   First, install Emacs from Homebrew:
+   #+BEGIN_SRC shell
+   brew install emacs --HEAD --with-cocoa --with-librsvg --with-imagemagick@6 --with-mailutils
+   #+END_SRC
+
+   Then, clone this repo to =~/.emacs.d=:
+   #+BEGIN_SRC shell
+   git clone https://github.com/ametzger/emacs.d.git ~/.emacs.d
+   #+END_SRC
+
+   The first time Emacs starts it will fizzle around a while as
+   =use-package= downloads and compiles packages. Generally, startup
+   is reasonably fast but it will start an Emacs server if one isn't
+   running so using =emacsclient= as the shell's =$EDITOR= is usable.
+
+** Credits
+   The config in this repo is specific to me, but I took a lot of
+   inspiration (and quite a bit of code) from [[https://github.com/bbatsov/emacs.d][bbatsov/emacs.d]],
+   [[https://github.com/Atman50/emacs-config][Atman50/emacs-config]], [[https://github.com/kaushalmodi/.emacs.d][kaushalmodi/.emacs.d]] and countless others
+   linked from StackOverflow posts and elsewhere.  Big thanks to those
+   people and others who are still using this weird editor from the
+   1970's.
