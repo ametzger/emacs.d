@@ -414,8 +414,11 @@ Repeated invocations toggle between the two most recently open buffers."
   :bind (("C-c c" . org-capture))
   :config
   (progn
-    (setq org-startup-folded "content"
-          org-confirm-babel-evaluate nil)
+    (setq org-directory "~/org"
+          org-startup-folded "content"
+          org-default-notes-file (contcat org-directory "/scratch.org")
+          org-confirm-babel-evaluate nil
+          org-default-notes-file (expand-file-name))
     (add-hook 'org-mode-hook #'asm/org-mode-hook)
 
     ;; support windmove keybinds without breaking heading shift
@@ -666,8 +669,7 @@ Repeated invocations toggle between the two most recently open buffers."
         company-global-modes '(not org-mode
                                    text-mode
                                    fundamental-mode
-                                   ein:notebook-mode
-                                   git-commit-mode))
+                                   ein:notebook-mode))
   (global-company-mode t))
 
 (use-package yasnippet
