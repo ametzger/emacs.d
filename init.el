@@ -85,8 +85,8 @@
 
 (setq large-file-warning-threshold 50000000)
 
-(global-set-key (kbd "C-x C-b") 'ibuffer)
-(global-set-key (kbd "C-c k") 'kill-this-buffer)
+(global-set-key (kbd "C-x C-b") #'ibuffer)
+(global-set-key (kbd "C-c k") #'kill-this-buffer)
 
 (defconst asm/savefile-dir
   (expand-file-name "savefile" user-emacs-directory))
@@ -128,9 +128,9 @@
   (delete-window)
   (balance-windows))
 
-(global-set-key (kbd "C-x 2") 'asm/split-window-vertically)
-(global-set-key (kbd "C-x 3") 'asm/split-window-horizontally)
-(global-set-key (kbd "C-x 0") 'asm/delete-windows-and-rebalance)
+(global-set-key (kbd "C-x 2") #'asm/split-window-vertically)
+(global-set-key (kbd "C-x 3") #'asm/split-window-horizontally)
+(global-set-key (kbd "C-x 0") #'asm/delete-windows-and-rebalance)
 
 (defun asm/toggle-window-split ()
   "Toggle how windows are split."
@@ -158,7 +158,7 @@
           (select-window first-win)
           (if this-win-2nd (other-window 1))))))
 
-(global-set-key (kbd "C-c |") 'asm/toggle-window-split)
+(global-set-key (kbd "C-c |") #'asm/toggle-window-split)
 
 (setq help-window-select t)
 
@@ -177,7 +177,7 @@
   (end-of-line) ; move to end of line
   (set-mark (line-beginning-position))
   (forward-line))
-(global-set-key (kbd "C-S-SPC") 'asm/select-current-line)
+(global-set-key (kbd "C-S-SPC") #'asm/select-current-line)
 
 ;; font config
 (let ((font-size (if (eq system-type 'darwin)
@@ -230,7 +230,7 @@
             (comment-or-uncomment-region $lbp $lep)
             (forward-line )))))))
 
-(global-set-key (kbd "M-;") 'asm/comment-sanely)
+(global-set-key (kbd "M-;") #'asm/comment-sanely)
 
 ;; hippie expand is dabbrev expand on steroids
 (setq hippie-expand-try-functions-list '(try-expand-dabbrev
@@ -279,7 +279,7 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package server
   :config
   (progn
-    (defun asm/server/enable ()
+    (defun asm/server-enable ()
       (unless (server-running-p)
         (server-start)))
     (add-hook 'after-init-hook 'asm/server-enable t)))
@@ -402,12 +402,7 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package flyspell
   :init
   (progn
-    (setq flyspell-use-meta-tab nil)
-    (bind-keys
-     :map flyspell-mode-map
-     ;; Stop flyspell overriding other key bindings
-     ("C-," . nil)
-     ("C-." . nil))))
+    (setq-default flyspell-use-meta-tab nil)))
 
 (defun asm/org-mode-hook ()
   (auto-fill-mode t)
@@ -538,16 +533,16 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package multiple-cursors
   :ensure t
   :bind
-   ("C-M-S-s-l"     . mc/edit-lines)
-   ("H-l"           . mc/edit-lines)
-   ("C-;"           . mc/mark-all-like-this-dwim)
-   ("C-c C-<"       . mc/mark-all-like-this)
-   ("C->"           . mc/mark-next-like-this)
-   ("C-<"           . mc/mark-previous-like-this)
-   ("C-S-<mouse-1>" . mc/add-cursor-on-click)
-   :config
-   ;; unmap return when in multi-cursor
-   (define-key mc/keymap (kbd "<return>") nil))
+  ("C-M-S-s-l"     . mc/edit-lines)
+  ("H-l"           . mc/edit-lines)
+  ("C-;"           . mc/mark-all-like-this-dwim)
+  ("C-c C-<"       . mc/mark-all-like-this)
+  ("C->"           . mc/mark-next-like-this)
+  ("C-<"           . mc/mark-previous-like-this)
+  ("C-S-<mouse-1>" . mc/add-cursor-on-click)
+  :config
+  ;; unmap return when in multi-cursor
+  (define-key mc/keymap (kbd "<return>") nil))
 
 (use-package anzu
   :ensure t
@@ -559,7 +554,7 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package easy-kill
   :ensure t
   :config
-  (global-set-key [remap kill-ring-save] 'easy-kill))
+  (global-set-key [remap kill-ring-save] #'easy-kill))
 
 (use-package exec-path-from-shell
   :ensure t
@@ -616,13 +611,13 @@ Repeated invocations toggle between the two most recently open buffers."
   :if (memq window-system '(mac ns))
   :config
   (add-to-list 'dash-at-point-mode-alist '(python-mode . "asmdj"))
-  (global-set-key (kbd "s-d") 'dash-at-point))
+  (global-set-key (kbd "s-d") #'dash-at-point))
 
 (use-package zeal-at-point
   :ensure t
   :if (memq window-system '(x))
   :config
-  (global-set-key (kbd "s-d") 'zeal-at-point))
+  (global-set-key (kbd "s-d") #'zeal-at-point))
 
 (use-package flycheck
   :after pyenv-mode
@@ -653,12 +648,11 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (progn
     (setq yas-prompt-functions '(yas-ido-prompt
-                                 yas-completing-prompt)
-          )
+                                 yas-completing-prompt))
     (yas-reload-all)
     (yas-global-mode)
     (defhydra hydra-yas (:color blue
-                         :hint nil)
+                                :hint nil)
       "
 [yasnippet]        _i_nsert        _n_ew        _v_isit snippet file        _r_eload all        e_x_pand        _?_ list snippets        "
       ("i" yas-insert-snippet)
@@ -668,7 +662,7 @@ Repeated invocations toggle between the two most recently open buffers."
       ("x" yas-expand)
       ("?" yas-describe-tables)
       ("q" nil "cancel" :color blue))
-    (global-set-key (kbd "C-c y") 'hydra-yas/body)
+    (global-set-key (kbd "C-c y") #'hydra-yas/body)
     (advice-add 'company-complete-common :before
                 (lambda () (setq my-company-point (point))))
     (advice-add 'company-complete-common :after
@@ -732,9 +726,9 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq undo-tree-history-directory-alist
         `((".*" . ,temporary-file-directory)))
   (setq undo-tree-auto-save-history t)
-  (global-set-key (kbd "C-/") 'undo-tree-undo)
-  (global-set-key (kbd "C-?") 'undo-tree-redo)
-  (global-set-key (kbd "C-c u") 'undo-tree-visualize))
+  (global-set-key (kbd "C-/") #'undo-tree-undo)
+  (global-set-key (kbd "C-?") #'undo-tree-redo)
+  (global-set-key (kbd "C-c u") #'undo-tree-visualize))
 
 (use-package prescient
   :ensure t)
@@ -764,7 +758,7 @@ Repeated invocations toggle between the two most recently open buffers."
                                            (projectile-completing-read . asm/ivy-sort-by-length))
         ivy-on-del-error-function #'ignore
         ivy-use-selectable-prompt t)
-  (global-set-key (kbd "C-c C-r") 'ivy-resume))
+  (global-set-key (kbd "C-c C-r") #'ivy-resume))
 
 (use-package swiper
   :ensure t
@@ -785,28 +779,28 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package counsel
   :ensure t
   :config
-  (global-set-key (kbd "M-x")     'counsel-M-x)
-  (global-set-key (kbd "C-x b")   'asm/contextual-switch-buffer)
-  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-  (global-set-key (kbd "<f1> f")  'counsel-describe-function)
-  (global-set-key (kbd "<f1> v")  'counsel-describe-variable)
-  (global-set-key (kbd "<f1> l")  'counsel-find-library)
-  (global-set-key (kbd "<f2> i")  'counsel-info-lookup-symbol)
-  (global-set-key (kbd "<f2> u")  'counsel-unicode-char)
-  (global-set-key (kbd "C-c g")   'counsel-git)
-  ;; (global-set-key (kbd "C-c j")   'counsel-git-grep)
-  (global-set-key (kbd "C-c a")   'counsel-ag)
-  (global-set-key (kbd "C-x l")   'counsel-locate)
-  (global-set-key (kbd "C-x i")   'counsel-imenu)
-  (global-set-key (kbd "C-c i")   'counsel-imenu)
-  (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
-  (define-key counsel-find-file-map (kbd "C-l") 'ivy-backward-delete-char))
+  (global-set-key (kbd "M-x")     #'counsel-M-x)
+  (global-set-key (kbd "C-x b")   #'asm/contextual-switch-buffer)
+  (global-set-key (kbd "C-x C-f") #'counsel-find-file)
+  (global-set-key (kbd "<f1> f")  #'counsel-describe-function)
+  (global-set-key (kbd "<f1> v")  #'counsel-describe-variable)
+  (global-set-key (kbd "<f1> l")  #'counsel-find-library)
+  (global-set-key (kbd "<f2> i")  #'counsel-info-lookup-symbol)
+  (global-set-key (kbd "<f2> u")  #'counsel-unicode-char)
+  (global-set-key (kbd "C-c g")   #'counsel-git)
+  ;; (global-set-key (kbd "C-c j")  #'counsel-git-grep)
+  (global-set-key (kbd "C-c a")   #'counsel-ag)
+  (global-set-key (kbd "C-x l")   #'counsel-locate)
+  (global-set-key (kbd "C-x i")   #'counsel-imenu)
+  (global-set-key (kbd "C-c i")   #'counsel-imenu)
+  (define-key minibuffer-local-map (kbd "C-r") #'counsel-minibuffer-history)
+  (define-key counsel-find-file-map (kbd "C-l") #'ivy-backward-delete-char))
 
 (use-package ace-window
   :ensure t
   :config
-  (global-set-key (kbd "s-w") 'ace-window)
-  (global-set-key [remap other-window] 'ace-window))
+  (global-set-key (kbd "s-w") #'ace-window)
+  (global-set-key [remap other-window] #'ace-window))
 
 (use-package eyebrowse
   :ensure t
@@ -828,20 +822,20 @@ Repeated invocations toggle between the two most recently open buffers."
 
   ;; Have `kill-region' delete the current line if no region is active
   (defadvice kill-region (before smart-cut activate compile)
-  "When called interactively with no active region, kill a single line instead."
-  (interactive
-   (if mark-active (list (region-beginning) (region-end))
-     (list (line-beginning-position)
-           (line-beginning-position 2))))))
+    "When called interactively with no active region, kill a single line instead."
+    (interactive
+     (if mark-active (list (region-beginning) (region-end))
+       (list (line-beginning-position)
+             (line-beginning-position 2))))))
 
 (use-package rainbow-delimiters
   :ensure t)
 
 ;; show hex colors with background, e.g. #0000ff
-(use-package rainbow-mode
-  :ensure t
-  :config
-  (add-hook 'prog-mode-hook #'rainbow-mode))
+;; (use-package rainbow-mode
+;;   :ensure t
+;;   :config
+;;   (add-hook 'prog-mode-hook #'rainbow-mode))
 
 (use-package whitespace
   :init
@@ -913,8 +907,6 @@ Repeated invocations toggle between the two most recently open buffers."
   :ensure t)
 
 (defun asm/python-mode-hook ()
-  "Initialize `python-mode'."
-
   ;; use flat imenu
   (when (fboundp #'python-imenu-create-flat-index)
     (setq-local imenu-create-index-function
@@ -1089,6 +1081,11 @@ Repeated invocations toggle between the two most recently open buffers."
 (add-hook 'rust-mode-hook #'electric-pair-mode)
 
 ;; misc languages
+(use-package fish-mode
+  :ensure t
+  :defer t
+  :mode "\\.fish$")
+
 (use-package json-mode
   :ensure t
   :defer t
@@ -1136,6 +1133,16 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package dockerfile-mode
   :ensure t
   :defer t)
+
+(use-package nginx-mode
+  :ensure t
+  :defer t
+  :config
+  (setq nginx-indent-level 2))
+
+(use-package company-nginx
+  :ensure t
+  :after (company))
 
 (defun asm/three-window-split ()
   (interactive)
