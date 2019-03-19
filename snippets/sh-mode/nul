@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: null pipe
+# key: nul
+# --
+ >/dev/null 2>&1
