@@ -467,9 +467,7 @@ Repeated invocations toggle between the two most recently open buffers."
   :after (company)
   :hook
   ((markdown-mode   . company-mode)
-   (git-commit-mode . company-mode))
-  :config
-  (add-to-list 'company-backends 'company-emoji))
+   (git-commit-mode . company-mode)))
 
 (use-package emojify
   :ensure t
@@ -505,6 +503,11 @@ Repeated invocations toggle between the two most recently open buffers."
 
   (use-package forge
     :ensure t))
+
+(defun asm/git-commit-hook ()
+  (set (make-local-variable 'company-backends)
+       '(company-emoji)))
+(add-hook 'git-commit-mode-hook #'asm/git-commit-hook)
 
 (use-package git-timemachine
   :ensure t
