@@ -76,9 +76,10 @@
       user-login-name   "asm")
 
 ;; emacs baseline + annoyances
-(setq load-prefer-newer t)
+(setq load-prefer-newer t
+      save-interprogram-paste-before-kill t
+      gc-cons-threshold 64000000)
 
-(setq gc-cons-threshold 64000000)
 (add-hook 'after-init-hook
           (lambda () (setq gc-cons-threshold 800000)))
 
@@ -92,20 +93,21 @@
 (unless (file-exists-p asm/savefile-dir)
   (make-directory asm/savefile-dir))
 
-(setq auto-window-vscroll nil)
-
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
 (blink-cursor-mode -1)
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
-(setq ring-bell-function 'ignore)
-(setq inhibit-startup-screen t)
-(setq initial-scratch-message (format ";; Hola!\n\n"))
-
-(setq scroll-margin 3
+(when (fboundp 'menu-bar-mode)
+  (menu-bar-mode -1))
+(setq ring-bell-function 'ignore
+      inhibit-startup-screen t
+      initial-scratch-message (format ";; Hola!\n\n")
+      scroll-margin 3
       scroll-conservatively 100000
-      scroll-preserve-screen-position 1)
+      scroll-preserve-screen-position 1
+      auto-window-vscroll nil)
+
 
 (defun asm/split-window-vertically ()
   "Open a new vertical window and switch to it."
@@ -193,6 +195,8 @@
               tab-width 4
               sh-basic-offset 2)
 
+(put 'upcase-region 'disabled nil)
+
 ;; Newline at end of file
 (setq require-final-newline t)
 
@@ -271,6 +275,14 @@ Repeated invocations toggle between the two most recently open buffers."
 ;; disable version control, magit forever
 (remove-hook 'find-file-hook 'vc-find-file-hook)
 (setq vc-handled-backends nil)
+
+(use-package server
+  :config
+  (progn
+    (defun asm/server/enable ()
+      (unless (server-running-p)
+        (server-start)))
+    (add-hook 'after-init-hook 'asm/server-enable t)))
 
 (use-package paren
   :config
@@ -362,13 +374,6 @@ Repeated invocations toggle between the two most recently open buffers."
     (setq dired-omit-files
           "^\\.?#\\|^.DS_STORE$\\|^.projectile$\\|^.git$\\|^.CFUserTextEncoding$\\|^.Trash$\\|^__pycache__$")))
 
-;; (use-package peep-dired
-;;   :ensure t
-;;   :bind
-;;   (:map dired-mode-map ("P" . peep-dired))
-;;   :config
-;;   (setq peep-dired-cleanup-eagerly t))
-
 (use-package lisp-mode
   :config
   (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
@@ -386,6 +391,9 @@ Repeated invocations toggle between the two most recently open buffers."
 ;;; third-party
 
 ;; theme, modeline
+(use-package all-the-icons
+  :ensure t)
+
 (use-package doom-themes
   :ensure t
   :after (rainbow-delimiters)
@@ -583,6 +591,7 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package super-save
   :ensure t
   :config
+  (setq auto-save-default nil)
   ;; add integration with ace-window
   (add-to-list 'super-save-triggers 'ace-window)
   (super-save-mode +1))
