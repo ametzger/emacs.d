@@ -392,6 +392,49 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (setq ibuffer-default-sorting-mode 'major-mode))
 
+(use-package ispell
+  :config
+  (when (executable-find "aspell")
+    (setq ispell-program-name (executable-find "aspell")
+          ispell-extra-args '("--sug-mode=ultra" "--lang=en_US")
+          ispell-silently-savep t)))
+
+(use-package flyspell
+  :init
+  (progn
+    (setq flyspell-use-meta-tab nil)
+    (bind-keys
+     :map flyspell-mode-map
+     ;; Stop flyspell overriding other key bindings
+     ("C-," . nil)
+     ("C-." . nil))))
+
+(defun asm/org-mode-hook ()
+  (auto-fill-mode t)
+  (visual-line-mode t)
+  (flyspell-mode t))
+
+(use-package org
+  :ensure t
+  :mode ("\\.org\\'" . org-mode)
+  :bind (("C-c c" . org-capture))
+  :config
+  (progn
+    (setq org-startup-folded "content"
+          org-confirm-babel-evaluate nil)
+    (add-hook 'org-mode-hook #'asm/org-mode-hook)
+
+    ;; support windmove keybinds without breaking heading shift
+    (add-hook 'org-shiftup-final-hook 'windmove-up)
+    (add-hook 'org-shiftleft-final-hook 'windmove-left)
+    (add-hook 'org-shiftdown-final-hook 'windmove-down)
+    (add-hook 'org-shiftright-final-hook 'windmove-right)))
+
+(use-package org-bullets
+  :ensure t
+  :after (org)
+  :commands (org-bullets-mode)
+  :init (add-hook 'org-mode-hook #'org-bullets-mode))
 
 ;; theme, modeline
 (use-package all-the-icons
