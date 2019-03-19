@@ -680,16 +680,15 @@ Repeated invocations toggle between the two most recently open buffers."
   :ensure t
   :config
   (ivy-mode 1)
-  (setq ivy-use-virtual-buffers t)
-  (setq enable-recursive-minibuffers t)
-  (setq ivy-initial-inputs-alist nil)
-  (setq ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
-  (setq ivy-sort-matches-functions-alist
-        '((t)
-          (counsel-find-file . asm/ivy-sort-by-length)
-          (projectile-completing-read . asm/ivy-sort-by-length)))
-  (setq ivy-on-del-error-function #'ignore)
-  (setq ivy-use-selectable-prompt t)
+  (setq ivy-use-virtual-buffers t
+        enable-recursive-minibuffers t
+        ivy-initial-inputs-alist nil
+        ivy-re-builders-alist '((t . ivy--regex-ignore-order))
+        ivy-sort-matches-functions-alist '((t)
+                                           (counsel-find-file . asm/ivy-sort-by-length)
+                                           (projectile-completing-read . asm/ivy-sort-by-length))
+        ivy-on-del-error-function #'ignore
+        ivy-use-selectable-prompt t)
   (global-set-key (kbd "C-c C-r") 'ivy-resume))
 
 (use-package swiper
