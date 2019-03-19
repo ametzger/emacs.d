@@ -109,7 +109,15 @@
       scroll-margin 3
       scroll-conservatively 100000
       scroll-preserve-screen-position 1
-      auto-window-vscroll nil)
+      auto-window-vscroll nil
+      frame-resize-pixelwise t)
+
+(defun asm/window-left ()
+  (interactive)
+  (let ((frame (selected-frame))
+        (one-half-display-pixel-width (/ (display-pixel-width) 3)))
+  (set-frame-width frame one-half-display-pixel-width nil 'pixelwise)
+  (set-frame-position frame 0 0)))
 
 (defun asm/split-window-vertically ()
   (interactive)
@@ -1201,7 +1209,8 @@ Repeated invocations toggle between the two most recently open buffers."
            ("d" . dash-at-point)
            ("n" . ein:login)
            ("i" . asm/open-init-file)
-           ("3" . asm/three-window-split))
+           ("3" . asm/three-window-split)
+           ("l" . asm/window-left))
 
 ;; load custom.el
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
