@@ -939,7 +939,10 @@ Repeated invocations toggle between the two most recently open buffers."
     (setq-local imenu-create-index-function
                 #'python-imenu-create-flat-index))
   (subword-mode +1)
-  (setq indent-tabs-mode nil))
+  (setq indent-tabs-mode nil)
+  (set (make-local-variable 'company-backends)
+       '(company-jedi
+         '(company-anaconda :with company-capf))))
 
 (use-package python
   :mode ("\\.py'" . python-mode)
@@ -955,7 +958,6 @@ Repeated invocations toggle between the two most recently open buffers."
   :ensure t
   :after (company jedi)
   :config
-  (add-to-list 'company-backends 'company-jedi)
   (setq-default company-jedi-python-bin "~/.pyenv/shims/python"))
 
 (use-package anaconda-mode
@@ -966,13 +968,12 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package company-anaconda
   :ensure t
-  :after (company anaconda-mode)
-  :config
-  (add-to-list 'company-backends
-               '(company-anaconda :with company-capf)))
+  :after (company anaconda-mode))
 
 (use-package blacken
   :ensure t
+  :hook
+  ((python-mode . blacken-mode))
   :config
   (setq blacken-executable "~/.pyenv/shims/black")
   (define-key python-mode-map (kbd "C-c C-b") 'blacken-buffer))
