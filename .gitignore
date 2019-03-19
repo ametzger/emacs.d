@@ -28,3 +28,4 @@ ac-comphist.dat
 request/*
 /.mc-lists.el
 /projectile.cache
+/emojis

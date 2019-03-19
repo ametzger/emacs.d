@@ -450,6 +450,25 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq doom-modeline-lsp nil)
   (setq doom-modeline-mu4e nil))
 
+;; emoji
+(use-package company-emoji
+  :ensure t
+  :demand
+  :after (company)
+  :hook
+  ((markdown-mode   . company-mode)
+   (git-commit-mode . company-mode))
+  :config
+  (add-to-list 'company-backends 'company-emoji))
+
+(use-package emojify
+  :ensure t
+  :hook
+  ((markdown-mode     . emojify-mode)
+   (git-commit-mode   . emojify-mode)
+   (magit-status-mode . emojify-mode)
+   (magit-log-mode    . emojify-mode)))
+
 ;; usability (abo-abo, bbatsov and tarsius are gods)
 (use-package avy
   :ensure t
