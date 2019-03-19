@@ -424,9 +424,8 @@ Repeated invocations toggle between the two most recently open buffers."
   (progn
     (setq org-directory "~/org"
           org-startup-folded "content"
-          org-default-notes-file (contcat org-directory "/scratch.org")
-          org-confirm-babel-evaluate nil
-          org-default-notes-file (expand-file-name))
+          org-default-notes-file (concat org-directory "/scratch.org")
+          org-confirm-babel-evaluate nil)
     (add-hook 'org-mode-hook #'asm/org-mode-hook)
 
     ;; support windmove keybinds without breaking heading shift
@@ -439,7 +438,7 @@ Repeated invocations toggle between the two most recently open buffers."
   :ensure t
   :after (org)
   :commands (org-bullets-mode)
-  :init (add-hook 'org-mode-hook #'org-bullets-mode))
+  :hook (org-mode . org-bullets-mode))
 
 ;; theme, modeline
 (use-package all-the-icons
