@@ -93,12 +93,15 @@
 (unless (file-exists-p asm/savefile-dir)
   (make-directory asm/savefile-dir))
 
+;; Disable visual cruft
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
 (blink-cursor-mode -1)
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
-(when (fboundp 'menu-bar-mode)
+;; Disable menu bar on Linux, looks weird on OS X
+(when (and (fboundp 'menu-bar-mode)
+           (memq window-system '(x)))
   (menu-bar-mode -1))
 (setq ring-bell-function 'ignore
       inhibit-startup-screen t
@@ -108,16 +111,13 @@
       scroll-preserve-screen-position 1
       auto-window-vscroll nil)
 
-
 (defun asm/split-window-vertically ()
-  "Open a new vertical window and switch to it."
   (interactive)
   (split-window-vertically)
   (balance-windows)
   (other-window 1))
 
 (defun asm/split-window-horizontally ()
-  "Open a new horizontal window and switch to it."
   (interactive)
   (split-window-horizontally)
   (balance-windows)
@@ -133,7 +133,6 @@
 (global-set-key (kbd "C-x 0") #'asm/delete-windows-and-rebalance)
 
 (defun asm/toggle-window-split ()
-  "Toggle how windows are split."
   (interactive)
   (if (= (count-windows) 2)
       (let* ((this-win-buffer (window-buffer))
