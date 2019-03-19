@@ -592,18 +592,50 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package company
   :ensure t
-  :init (global-company-mode)
   :config
-  (setq company-idle-delay 0.4)
-  (setq company-show-numbers t)
-  (setq company-tooltip-limit 10)
-  (setq company-minimum-prefix-length 2)
-  (setq company-tooltip-align-annotations t)
-  (setq company-global-modes '(not org-mode
+  (setq company-idle-delay 0.4
+        company-show-numbers t
+        company-tooltip-limit 10
+        company-minimum-prefix-length 2
+        company-tooltip-align-annotations t
+        company-global-modes '(not org-mode
                                    text-mode
                                    fundamental-mode
                                    ein:notebook-mode
-                                   git-commit-mode)))
+                                   git-commit-mode))
+  (global-company-mode t))
+
+(use-package yasnippet
+  :ensure t
+  :config
+  (progn
+    (setq yas-prompt-functions '(yas-ido-prompt
+                                 yas-completing-prompt)
+          )
+    (yas-reload-all)
+    (yas-global-mode)
+    (defhydra hydra-yas (:color blue
+                         :hint nil)
+      "
+[yasnippet]        _i_nsert        _n_ew        _v_isit snippet file        _r_eload all        e_x_pand        _?_ list snippets        "
+      ("i" yas-insert-snippet)
+      ("n" yas-new-snippet)
+      ("v" yas-visit-snippet-file)
+      ("r" yas-reload-all)
+      ("x" yas-expand)
+      ("?" yas-describe-tables)
+      ("q" nil "cancel" :color blue))
+    (global-set-key (kbd "C-c y") 'hydra-yas/body)
+    (advice-add 'company-complete-common :before
+                (lambda () (setq my-company-point (point))))
+    (advice-add 'company-complete-common :after
+                (lambda ()
+                  (when (equal my-company-point (point))
+                    (yas-expand))))))
+
+(use-package yasnippet-snippets
+  :ensure t
+  :after (yasnippet))
 
 (use-package super-save
   :ensure t
