@@ -700,12 +700,19 @@ Repeated invocations toggle between the two most recently open buffers."
   ("C-S-s" . isearch-forward)
   ("C-S-r" . isearch-backwards))
 
+(defun asm/contextual-switch-buffer ()
+  "Switch to projectile buffers if in a counsel project,
+  otherwise do a normal `counsel-switch-buffer'."
+  (interactive)
+  (if (projectile-project-p)
+      (counsel-projectile-switch-to-buffer)
+    (counsel-switch-buffer)))
 
 (use-package counsel
   :ensure t
   :config
   (global-set-key (kbd "M-x")     'counsel-M-x)
-  (global-set-key (kbd "C-x b")   'counsel-switch-buffer)
+  (global-set-key (kbd "C-x b")   'asm/contextual-switch-buffer)
   (global-set-key (kbd "C-x C-f") 'counsel-find-file)
   (global-set-key (kbd "<f1> f")  'counsel-describe-function)
   (global-set-key (kbd "<f1> v")  'counsel-describe-variable)
