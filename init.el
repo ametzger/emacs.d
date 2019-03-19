@@ -388,7 +388,10 @@ Repeated invocations toggle between the two most recently open buffers."
   (add-hook 'ielm-mode-hook #'eldoc-mode)
   (add-hook 'ielm-mode-hook #'rainbow-delimiters-mode))
 
-;;; third-party
+(use-package ibuffer
+  :config
+  (setq ibuffer-default-sorting-mode 'major-mode))
+
 
 ;; theme, modeline
 (use-package all-the-icons
@@ -465,6 +468,20 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package counsel-projectile
   :ensure t)
+
+(use-package ibuffer-projectile
+  :ensure t
+  :after (projectile ibuffer)
+  :config
+  (progn
+    (defun asm/ibuffer-hook ()
+      (ibuffer-projectile-set-filter-groups)
+      ;; sort alphabetically then by major mode
+      (unless (eq ibuffer-sorting-mode 'alphabetic)
+        (ibuffer-do-sort-by-alphabetic)
+        (ibuffer-do-sort-by-major-mode)))
+
+    (add-hook 'ibuffer-hook #'asm/ibuffer-hook)))
 
 (use-package expand-region
   :ensure t
