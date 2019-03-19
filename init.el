@@ -500,6 +500,15 @@ Repeated invocations toggle between the two most recently open buffers."
   :ensure t
   :bind (("s-g" . git-timemachine)))
 
+(use-package browse-at-remote
+  :ensure t
+  :defer t
+  :commands (browse-at-remote)
+  :bind (("C-c g" . browse-at-remote))
+  :custom
+  ;; Use full commit hashes for long-lived links
+  (browse-at-remote-prefer-symbolic nil))
+
 (use-package ag
   :if (executable-find "ag")
   :ensure t)
@@ -805,7 +814,7 @@ Repeated invocations toggle between the two most recently open buffers."
   (global-set-key (kbd "<f1> l")  #'counsel-find-library)
   (global-set-key (kbd "<f2> i")  #'counsel-info-lookup-symbol)
   (global-set-key (kbd "<f2> u")  #'counsel-unicode-char)
-  (global-set-key (kbd "C-c g")   #'counsel-git)
+  ;; (global-set-key (kbd "C-c g")   #'counsel-git)
   ;; (global-set-key (kbd "C-c j")  #'counsel-git-grep)
   (global-set-key (kbd "C-c a")   #'counsel-ag)
   (global-set-key (kbd "C-x l")   #'counsel-locate)
