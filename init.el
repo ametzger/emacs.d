@@ -439,7 +439,11 @@ Repeated invocations toggle between the two most recently open buffers."
     (add-hook 'org-shiftup-final-hook 'windmove-up)
     (add-hook 'org-shiftleft-final-hook 'windmove-left)
     (add-hook 'org-shiftdown-final-hook 'windmove-down)
-    (add-hook 'org-shiftright-final-hook 'windmove-right)))
+    (add-hook 'org-shiftright-final-hook 'windmove-right)
+
+    ;; Re-enable "<s" and other expansions after org 9.2
+    (when (version<= "9.2" (org-version))
+      (require 'org-tempo))))
 
 (use-package org-bullets
   :ensure t
