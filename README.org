@@ -4,26 +4,47 @@
   devops tools (Docker, Terraform, Ansible).
 
 ** Installation
-   First, install Emacs from Homebrew using the [[https://github.com/d12frosted/homebrew-emacs-plus][emacs-plus]] package:
-   #+BEGIN_SRC shell
-   brew tap d12frosted/emacs-plus
-   brew install emacs-plus --HEAD --without-spacemacs-icon --with-modern-icon
-   #+END_SRC
 
-   Then, clone this repo to =~/.emacs.d=:
-   #+BEGIN_SRC shell
-   git clone https://gitlab.com/ametzger/emacs.d.git ~/.emacs.d
-   #+END_SRC
+*** MacOS
+    First, install Emacs from Homebrew using the [[https://github.com/d12frosted/homebrew-emacs-plus][emacs-plus]] package:
+    #+BEGIN_SRC shell
+    brew tap d12frosted/emacs-plus
+    brew install emacs-plus --HEAD --without-spacemacs-icon
+    ln -s /usr/local/opt/emacs-plus/Emacs.app /Applications
+    #+END_SRC
 
-   The first time Emacs starts it will fizzle around a while as
-   =use-package= downloads and compiles packages. Generally, startup
-   is reasonably fast but it will start an Emacs server if one isn't
-   running so using =emacsclient= as the shell's =$EDITOR= is usable.
+    Then, clone this repo to =~/.emacs.d=:
+    #+BEGIN_SRC shell
+    git clone https://gitlab.com/ametzger/emacs.d.git ~/.emacs.d
+    #+END_SRC
 
-** Credits
+    The first time Emacs starts it will fizzle around a while as
+    =use-package= downloads and compiles packages.  Generally, startup
+    is reasonably fast but it will start an Emacs server if one isn't
+    running so using =emacsclient= as the shell's =$EDITOR= is usable.
+
+**** Icon
+     On OS X, instead of the stock icon or the Spacemacs icon that is
+     the default for the =emacs-plus= homebrew formula, I use the
+     subdued icon found in this repo.  To install it:
+     #+BEGIN_SRC shell
+     cd /usr/local/opt/emacs-plus/Emacs.app/Contents/Resources/
+     rm Emacs.icns
+     cp $path-to-repo/Emacs.icns ./Emacs.icns
+     cd ../../..
+     touch Emacs.app  # Weird OS X magic - no idea why this works
+     sudo killall Finder
+     sudo killall Dock
+     #+END_SRC
+
+*** Linux
+    Nothing too fancy on Linux, usually I'll just use the =emacs=
+    package of whatever distro I'm using.
+
+** Thanks
    The config in this repo is specific to me, but I took a lot of
    inspiration (and quite a bit of code) from [[https://github.com/bbatsov/emacs.d][bbatsov/emacs.d]],
-   [[https://github.com/Atman50/emacs-config][Atman50/emacs-config]], [[https://github.com/kaushalmodi/.emacs.d][kaushalmodi/.emacs.d]] and countless others
+   [[https://github.com/Atman50/emacs-config][Atman50/emacs-config]], [[https://github.com/kaushalmodi/.emacs.d][kaushalmodi/.emacs.d]] and many others
    linked from StackOverflow posts and elsewhere.  Big thanks to those
    people and others who are still using this weird editor from the
-   1970's.
+   1970's.  The subdued icon is from [[https://github.com/jeffd/emacs-cfg][jeffd/emacs-cfg]].
