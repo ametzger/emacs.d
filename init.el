@@ -353,7 +353,6 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package dired
   :bind
   ("C-c C-j" . dired-jump)
-  ("C-c j"   . dired-jump)
   :config
   ;; dired ls config, disabled for now. Using `ls-lisp' instead.
   ;; OS X uses BSD ls by default, `brew install coreutils` puts GNU ls
@@ -487,7 +486,7 @@ Repeated invocations toggle between the two most recently open buffers."
    (magit-status-mode . emojify-mode)
    (magit-log-mode    . emojify-mode)))
 
-;; usability (abo-abo, bbatsov and tarsius are gods)
+;; usability
 (use-package avy
   :ensure t
   :bind (("s-." . avy-goto-word-or-subword-1)
@@ -542,6 +541,24 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package pt
   :ensure t)
+
+(use-package dumb-jump
+  :ensure t
+  :bind
+  ("C-M-g" . dumb-jump-go)
+  ("C-c j" . hydra-dumb-jump/body)
+  :config
+  (setq dumb-jump-selector 'ivy)
+  (defhydra hydra-dumb-jump (:color blue
+                                    :hint nil)
+          "
+[dumb-jump]        _j_ump        _b_ack        _p_review        _J_ump in other window        _q_uit        "
+
+    ("j" dumb-jump-go)
+    ("b" dumb-jump-back)
+    ("p" dumb-jump-quick-look)
+    ("J" dumb-jump-go-other-window)
+    ("q" nil)))
 
 (use-package projectile
   :ensure t
