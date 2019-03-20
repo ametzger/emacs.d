@@ -43,7 +43,8 @@
 
 ;; packaging
 (require 'package)
-(setq package-enable-at-startup nil)
+(setq package-enable-at-startup nil
+      load-prefer-newer t)
 
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/") t)
@@ -76,12 +77,11 @@
       user-login-name   "asm")
 
 ;; emacs baseline + annoyances
-(setq load-prefer-newer t
-      save-interprogram-paste-before-kill t
+(setq save-interprogram-paste-before-kill t
       gc-cons-threshold 64000000)
 
 (add-hook 'after-init-hook
-          (lambda () (setq gc-cons-threshold 800000)))
+          (lambda () (setq gc-cons-threshold 200000)))
 
 (setq large-file-warning-threshold 50000000)
 
@@ -105,7 +105,10 @@
   (menu-bar-mode -1))
 (setq ring-bell-function 'ignore
       inhibit-startup-screen t
-      initial-scratch-message (format ";; Hola!\n\n")
+      initial-scratch-message (format ";; Welcome to Emacs %s (started %s, startup took %s)\n\n"
+                                      emacs-version
+                                      (current-time-string)
+                                      (emacs-init-time))
       scroll-margin 3
       scroll-conservatively 100000
       scroll-preserve-screen-position 1
@@ -281,15 +284,15 @@ Repeated invocations toggle between the two most recently open buffers."
 ;;; built-in packages
 ;; disable version control, magit forever
 (remove-hook 'find-file-hook 'vc-find-file-hook)
-(setq vc-handled-backends nil)
+(setq vc-handled-backends ())
 
 (use-package server
+  :defer 2
+  :init
+  (server-mode t)
   :config
-  (progn
-    (defun asm/server-enable ()
-      (unless (server-running-p)
-        (server-start)))
-    (add-hook 'after-init-hook 'asm/server-enable t)))
+  (unless (server-running-p)
+    (server-start)))
 
 (use-package paren
   :config
@@ -439,6 +442,13 @@ Repeated invocations toggle between the two most recently open buffers."
   :after (org)
   :commands (org-bullets-mode)
   :hook (org-mode . org-bullets-mode))
+
+;; emacs tools
+(use-package esup
+  :ensure t
+  :init
+  (setq esup-user-init-file
+        (file-truename "~/.emacs.d/init.el")))
 
 ;; theme, modeline
 (use-package all-the-icons
@@ -1192,7 +1202,7 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (defun asm/open-init-file ()
   (interactive)
-  (find-file user-init-file))
+  (find-file (expand-file-name "~/proj/emacs.d/init.el")))
 
 (bind-keys :map global-map
            :prefix-map asm/ctrl-z-prefix-map
