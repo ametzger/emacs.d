@@ -1223,7 +1223,18 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package terraform-mode
   :ensure t
-  :defer t)
+  :mode "\\.tf$"
+  :hook
+  (terraform-mode . company-mode))
+
+(use-package company-terraform
+  :ensure t)
+
+(defun asm/terraform-mode-hook ()
+  (terraform-format-on-save-mode t)
+  (set (make-local-variable 'company-backends)
+       '(company-terraform)))
+(add-hook 'terraform-mode-hook #'asm/terraform-mode-hook)
 
 (use-package dockerfile-mode
   :ensure t
