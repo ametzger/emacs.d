@@ -4,14 +4,15 @@
   devops tools (Docker, Terraform, Ansible).
 
 ** Installation
-   First, install Emacs from Homebrew:
+   First, install Emacs from Homebrew using the [[https://github.com/d12frosted/homebrew-emacs-plus][emacs-plus]] package:
    #+BEGIN_SRC shell
-   brew install emacs --HEAD --with-cocoa --with-librsvg --with-imagemagick@6 --with-mailutils
+   brew tap d12frosted/emacs-plus
+   brew install emacs-plus --HEAD --without-spacemacs-icon --with-modern-icon
    #+END_SRC
 
    Then, clone this repo to =~/.emacs.d=:
    #+BEGIN_SRC shell
-   git clone https://github.com/ametzger/emacs.d.git ~/.emacs.d
+   git clone https://gitlab.com/ametzger/emacs.d.git ~/.emacs.d
    #+END_SRC
 
    The first time Emacs starts it will fizzle around a while as
