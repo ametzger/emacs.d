@@ -1184,6 +1184,7 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package json-mode
   :ensure t
   :defer t
+  :mode "\\.json$"
   :config
   (define-key json-mode-map (kbd "C-c C-b") 'json-pretty-print-buffer))
 
@@ -1207,7 +1208,7 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package js2-mode
   :ensure t
   :defer t
-  :mode "//.js$"
+  :mode "\\.js$"
   :config
   (setq-default js2-basic-indent 2
                 js2-basic-offset 2
@@ -1243,12 +1244,15 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package nginx-mode
   :ensure t
   :defer t
-  :config
-  (setq nginx-indent-level 2))
+  :init (setq nginx-indent-level 2))
 
 (use-package company-nginx
   :ensure t
   :after (company))
+
+(use-package crontab-mode
+  :ensure t
+  :mode "crontab.*")
 
 (defun asm/three-window-split ()
   (interactive)
