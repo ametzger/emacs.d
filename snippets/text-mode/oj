@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: jellyfish commit
+# key: oj
+# --
+[OJ-${1:issuekey}] $0
