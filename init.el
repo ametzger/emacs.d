@@ -77,6 +77,8 @@
       user-login-name   "asm")
 
 ;; emacs baseline + annoyances
+(setq custom-file (make-temp-file ""))
+
 (setq save-interprogram-paste-before-kill t
       gc-cons-threshold 64000000)
 
@@ -219,10 +221,13 @@
 
 (global-auto-revert-mode t)
 
-(prefer-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
+(set-charset-priority 'unicode)
+(set-terminal-coding-system  'utf-8)
+(set-keyboard-coding-system  'utf-8)
+(set-selection-coding-system 'utf-8)
+(prefer-coding-system        'utf-8)
+(setq default-process-coding-system '(utf-8-unix . utf-8-unix)
+      locale-coding-system   'utf-8)
 
 (defun asm/comment-sanely ()
   (interactive)
@@ -550,7 +555,8 @@ Repeated invocations toggle between the two most recently open buffers."
   :ensure t
   :defer t
   :commands (browse-at-remote)
-  :bind (("C-c g" . browse-at-remote))
+  :bind (("C-c g" . browse-at-remote-kill)
+         ("C-c G" . browse-at-remote))
   :custom
   ;; Use full commit hashes for long-lived links
   (browse-at-remote-prefer-symbolic nil))
@@ -1283,12 +1289,6 @@ Repeated invocations toggle between the two most recently open buffers."
            ("i" . asm/open-init-file)
            ("3" . asm/three-window-split)
            ("l" . asm/window-left))
-
-;; load custom.el
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-
-(when (file-exists-p custom-file)
-  (load custom-file))
 
 ;;; init.el ends here
 ;; Local Variables:
