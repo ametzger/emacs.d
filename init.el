@@ -453,13 +453,22 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package all-the-icons
   :ensure t)
 
+(use-package all-the-icons-dired
+  :ensure t
+  :after (all-the-icons)
+  :hook
+  (dired-mode . all-the-icons-dired-mode))
+
 (use-package doom-themes
   :ensure t
   :after (rainbow-delimiters)
-  :config
+  :init
   (setq doom-themes-enable-bold t
-        doom-themes-enable-italic t)
-  (load-theme 'doom-nord t))
+        doom-themes-enable-italic t
+        doom-neotree-file-icons t)
+  (load-theme 'doom-nord t)
+  :config
+  (doom-themes-neotree-config))
 
 (use-package doom-modeline
   :ensure t
@@ -468,6 +477,19 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq doom-modeline-python-executable (expand-file-name "~/.pyenv/shims/python"))
   (setq doom-modeline-lsp nil)
   (setq doom-modeline-mu4e nil))
+
+(use-package neotree
+  :ensure t
+  :defer t
+  :commands (neotree-toggle)
+  :bind (("C-c t" . neotree-toggle))
+  :init
+  (progn
+    ;; Every time when the neotree window is opened, it will try to find current
+    ;; file and jump to node.
+    (setq-default neo-smart-open t)
+    ;; Do not allow neotree to be the only open window
+    (setq-default neo-dont-be-alone t)))
 
 ;; emoji
 (use-package company-emoji
