@@ -530,10 +530,12 @@ Repeated invocations toggle between the two most recently open buffers."
     ad-do-it
     (delete-other-windows))
   (defadvice magit-quit-window (after magit-restore-screen activate)
-    (jump-to-register :magit-fullscreen))
+    (jump-to-register :magit-fullscreen)))
 
-  (use-package forge
-    :ensure t))
+(use-package forge
+  :ensure t
+  :demand t
+  :after magit)
 
 (defun asm/git-commit-hook ()
   (set (make-local-variable 'company-backends)
@@ -552,6 +554,10 @@ Repeated invocations toggle between the two most recently open buffers."
   :custom
   ;; Use full commit hashes for long-lived links
   (browse-at-remote-prefer-symbolic nil))
+
+(use-package gitconfig-mode
+  :ensure t
+  :defer t)
 
 (use-package ag
   :if (executable-find "ag")
