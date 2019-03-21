@@ -464,7 +464,10 @@ Repeated invocations toggle between the two most recently open buffers."
           org-capture-templates '(("t" "Todo" entry
                                    (file+headline "~/org/todo.org" "Tasks"))
                                   ("l" "Link" item (file "~/org/links.org")
-                                    "[[%^{URL}][%^{Description}]] %?%U\n" :prepend t))
+                                   "[[%^{URL}][%^{Description}]] %?%U\n" :prepend t)
+                                  ("n" "Note" item
+                                   (file+headline "~/org/scratch.org" "Notes")
+                                   "%? %U\n" :prepend t))
           org-confirm-babel-evaluate nil)
     (add-hook 'org-mode-hook #'asm/org-mode-hook)
 
