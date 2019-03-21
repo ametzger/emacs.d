@@ -1341,25 +1341,39 @@ Repeated invocations toggle between the two most recently open buffers."
   (interactive)
   (find-file (expand-file-name "~/proj/emacs.d/init.el")))
 
-(bind-keys :map global-map
-           :prefix-map asm/ctrl-z-prefix-map
-           :prefix "C-z"
-           ("r" . anzu-query-replace)
-           ("e" . flycheck-list-errors)
-           ("w" . ace-window)
-           ("R" . anzu-query-replace-regexp)
-           ("f" . projectile-find-file)
-           ("F" . projectile-find-file-other-window)
-           ("p" . projectile-switch-project)
-           ("R" . anzu-query-replace-regexp)
-           ("f" . projectile-find-file)
-           ("s" . counsel-projectile-rg)
-           ("i" . counsel-imenu)
-           ("d" . dash-at-point)
-           ("n" . ein:login)
-           ("i" . asm/open-init-file)
-           ("3" . asm/three-window-split)
-           ("l" . asm/window-left))
+(defun asm/empty-buffer ()
+  (interactive)
+  (command-execute 'asm/split-window-horizontally)
+  (let ((buf (generate-new-buffer "untitled")))
+    (switch-to-buffer buf)
+    (funcall initial-major-mode)
+    (setq buffer-offer-save t)
+    buf))
+
+(defun asm/org-open-file ()
+  (interactive)
+  (let ((file-to-open
+         (read-file-name
+          "Open org file: "
+          (expand-file-name "~/org/"))))
+    (find-file file-to-open)))
+
+(defhydra ctrl-z-hydra (:color blue)
+  ("b" asm/empty-buffer "empty buffer")
+  ("d" dash-at-point "dash")
+  ("e" flycheck-list-errors "list errors")
+  ("i" asm/open-init-file "open init")
+  ("l" asm/window-left "window left")
+  ("m" asm/window-max "window maximize")
+  ("n" ein:login "EIN")
+  ("o" asm/org-open-file "find org file")
+  ("r" anzu-query-replace-regexp "regex replace")
+  ("s" counsel-rg "ripgrep")
+  ("w" ace-window "ace window")
+  ("C-s" deadgrep "deadgrep")
+  ("q" nil "quit"))
+
+(global-set-key (kbd "C-z") #'ctrl-z-hydra/body)
 
 ;;; init.el ends here
 ;; Local Variables:
