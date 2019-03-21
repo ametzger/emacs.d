@@ -849,6 +849,11 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq which-key-idle-delay 0.4)
   (which-key-mode +1))
 
+(use-package discover-my-major
+  :ensure t
+  :bind (("C-h M-m" . discover-my-major)
+         ("C-h M-M" . discover-my-mode)))
+
 (use-package undo-tree
   :ensure t
   :config
@@ -934,18 +939,45 @@ Repeated invocations toggle between the two most recently open buffers."
   (global-set-key (kbd "s-w") #'ace-window)
   (global-set-key [remap other-window] #'ace-window))
 
-(use-package eyebrowse
+(use-package neotree
   :ensure t
-  :config
-  (eyebrowse-mode +1))
+  :defer t
+  :commands (neotree-toggle)
+  :bind (("C-c t" . neotree-toggle))
+  :init
+  (progn
+    ;; Every time when the neotree window is opened, it will try to find current
+    ;; file and jump to node.
+    (setq-default neo-smart-open t)
+    ;; Do not allow neotree to be the only open window
+    (setq-default neo-dont-be-alone t)))
 
-;; resizes buffers using the golden ratio
-;; (use-package zoom
-;;   :ensure t
-;;   :init
-;;   (zoom-mode +1)
-;;   :config
-;;   (setq zoom-size '(0.618 . 0.618)))
+(use-package perspective
+  :ensure t
+  :init (persp-mode))
+
+(use-package persp-projectile
+  :ensure t
+  :after (perspective)
+  :bind
+  ("C-c x" . hydra-persp/body)
+  :config
+  (defhydra hydra-persp (:columns 4
+                         :color blue)
+    "Perspective"
+    ("a" persp-add-buffer "Add Buffer")
+    ("i" persp-import "Import")
+    ("c" persp-kill "Close")
+    ("n" persp-next "Next")
+    ("p" persp-prev "Prev")
+    ("k" persp-remove-buffer "Kill Buffer")
+    ("r" persp-rename "Rename")
+    ("A" persp-set-buffer "Set Buffer")
+    ("s" persp-switch "Switch")
+    ("C-x" persp-switch-last "Switch Last")
+    ("b" persp-switch-to-buffer "Switch to Buffer")
+    ("P" projectile-persp-switch-project "Switch Project")
+    ("q" nil "Quit")))
 
 (use-package volatile-highlights
   :ensure t
