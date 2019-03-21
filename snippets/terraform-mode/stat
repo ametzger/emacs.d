@@ -1,0 +1,15 @@
+# -*- mode: snippet -*-
+# name: statement
+# key: stat
+# --
+$0statement {
+  effect = "${1:$$(yas-choose-value '("Allow" "Deny"))}"
+
+  actions = [
+    "${2:*}",
+  ]
+
+  resources = [
+    "${3:*}",
+  ]
+}
