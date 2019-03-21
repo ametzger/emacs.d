@@ -591,6 +591,14 @@ Repeated invocations toggle between the two most recently open buffers."
   :if (executable-find "rg")
   :ensure t)
 
+(use-package deadgrep
+  :ensure t
+  :after ripgrep
+  :bind ("<f5>" . deadgrep))
+
+(use-package wgrep
+  :ensure t)
+
 (use-package pt
   :ensure t)
 
@@ -662,6 +670,10 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   ;; unmap return when in multi-cursor
   (define-key mc/keymap (kbd "<return>") nil))
+
+(use-package iedit
+  :ensure t
+  :bind (("C-c ;" . iedit-mode)))
 
 (use-package anzu
   :ensure t
@@ -802,23 +814,23 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package crux
   :ensure t
-  :bind (("C-c d" . crux-duplicate-current-line-or-region)
-         ("M-o" . crux-smart-open-line)
-         ("C-c n" . crux-cleanup-buffer-or-region)
-         ("C-c f" . crux-recentf-find-file)
-         ("C-M-z" . crux-indent-defun)
-         ("C-c e" . crux-eval-and-replace)
-         ("C-c w" . crux-swap-windows)
-         ("C-c D" . crux-delete-file-and-buffer)
-         ("C-c r" . crux-rename-buffer-and-file)
-         ("C-c TAB" . crux-indent-rigidly-and-copy-to-clipboard)
-         ("C-c I" . crux-find-user-init-file)
-         ("s-r" . crux-recentf-find-file)
-         ("s-j" . crux-top-join-line)
-         ("C-^" . crux-top-join-line)
-         ("s-k" . crux-kill-whole-line)
+  :bind (("C-c d"         . crux-duplicate-current-line-or-region)
+         ("M-o"           . crux-smart-open-line)
+         ("C-c n"         . crux-cleanup-buffer-or-region)
+         ("C-c f"         . crux-recentf-find-file)
+         ("C-M-z"         . crux-indent-defun)
+         ("C-c e"         . crux-eval-and-replace)
+         ("C-c w"         . crux-swap-windows)
+         ("C-c D"         . crux-delete-file-and-buffer)
+         ("C-c r"         . crux-rename-buffer-and-file)
+         ("C-c TAB"       . crux-indent-rigidly-and-copy-to-clipboard)
+         ("C-c I"         . crux-find-user-init-file)
+         ("s-r"           . crux-recentf-find-file)
+         ("s-j"           . crux-top-join-line)
+         ("C-^"           . crux-top-join-line)
+         ("s-k"           . crux-kill-whole-line)
          ("C-<backspace>" . crux-kill-line-backwards)
-         ("s-o" . crux-smart-open-line-above)
+         ("s-o"           . crux-smart-open-line-above)
          ([remap move-beginning-of-line] . crux-move-beginning-of-line)
          ([(shift return)] . crux-smart-open-line)
          ([(control shift return)] . crux-smart-open-line-above)
@@ -909,7 +921,7 @@ Repeated invocations toggle between the two most recently open buffers."
   (global-set-key (kbd "<f2> u")  #'counsel-unicode-char)
   ;; (global-set-key (kbd "C-c g")   #'counsel-git)
   ;; (global-set-key (kbd "C-c j")  #'counsel-git-grep)
-  (global-set-key (kbd "C-c a")   #'counsel-ag)
+  ;; (global-set-key (kbd "C-c a")   #'counsel-ag)
   (global-set-key (kbd "C-x l")   #'counsel-locate)
   (global-set-key (kbd "C-x i")   #'counsel-imenu)
   (global-set-key (kbd "C-c i")   #'counsel-imenu)
