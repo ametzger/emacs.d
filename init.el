@@ -88,7 +88,11 @@
 (setq large-file-warning-threshold 50000000)
 
 (global-set-key (kbd "C-x C-b") #'ibuffer)
-(global-set-key (kbd "C-c k") #'kill-this-buffer)
+(global-set-key (kbd "C-c k")
+                (lambda ()
+                  (interactive)
+                  (kill-this-buffer)
+                  (asm/delete-windows-and-rebalance)))
 
 (defconst asm/savefile-dir
   (expand-file-name "savefile" user-emacs-directory))
@@ -105,6 +109,7 @@
 (when (and (fboundp 'menu-bar-mode)
            (memq window-system '(x)))
   (menu-bar-mode -1))
+
 (setq ring-bell-function 'ignore
       inhibit-startup-screen t
       initial-scratch-message (format ";; Welcome to Emacs %s (started %s, startup took %s)\n\n"
@@ -115,14 +120,30 @@
       scroll-conservatively 100000
       scroll-preserve-screen-position 1
       auto-window-vscroll nil
-      frame-resize-pixelwise t)
+      frame-resize-pixelwise t
+      initial-major-mode 'text-mode)
 
+;; TODO(asm,2019-03-21): these don't work correctly with multiple
+;; monitors.
 (defun asm/window-left ()
   (interactive)
   (let ((frame (selected-frame))
         (one-half-display-pixel-width (/ (display-pixel-width) 3)))
-  (set-frame-width frame one-half-display-pixel-width nil 'pixelwise)
-  (set-frame-position frame 0 0)))
+    (set-frame-width frame one-half-display-pixel-width nil 'pixelwise)
+    (set-frame-height frame (display-pixel-height) nil 'pixelwise)
+    (set-frame-position frame 0 0)))
+
+;; leften the window when starting emacs
+(add-hook 'after-init-hook #'asm/window-left)
+
+(defun asm/window-max ()
+  (interactive)
+  (toggle-frame-maximized))
+
+  ;; (let ((frame (selected-frame)))
+  ;;   (set-frame-position frame 0 0)
+  ;;   (set-frame-width frame (display-pixel-width) nil 'pixelwise)
+  ;;   (set-frame-height frame (display-pixel-height) nil 'pixelwise)))
 
 (defun asm/split-window-vertically ()
   (interactive)
@@ -276,15 +297,15 @@ Repeated invocations toggle between the two most recently open buffers."
 (setq tab-always-indent 'complete)
 
 (setq frame-title-format nil)
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 ;; platform-specific
 (if (eq system-type 'darwin)
-      (progn (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-             (add-to-list 'default-frame-alist '(ns-appearance . dark))
-             (setq-default ns-use-srgb-colorspace t
-                           ns-use-proxy-icon nil)
-             (global-set-key (kbd "s-n") nil)))
+    (progn
+      (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+      (add-to-list 'default-frame-alist '(ns-appearance . dark))
+      (setq-default ns-use-srgb-colorspace t
+                    ns-use-proxy-icon nil)
+      (global-set-key (kbd "s-n") #'make-frame-command)))
 
 ;;; built-in packages
 ;; disable version control, magit forever
@@ -474,31 +495,24 @@ Repeated invocations toggle between the two most recently open buffers."
   :init
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t
-        doom-neotree-file-icons t)
+        doom-neotree-file-icons t
+        doom-nord-brighter-comments nil
+        doom-nord-region-highlight 'frost
+        doom-nord-padded-modeline nil)
   (load-theme 'doom-nord t)
   :config
-  (doom-themes-neotree-config))
+  (doom-themes-neotree-config)
+  (doom-themes-org-config))
 
 (use-package doom-modeline
   :ensure t
   :hook (after-init . doom-modeline-mode)
   :init
-  (setq doom-modeline-python-executable (expand-file-name "~/.pyenv/shims/python"))
-  (setq doom-modeline-lsp nil)
-  (setq doom-modeline-mu4e nil))
-
-(use-package neotree
-  :ensure t
-  :defer t
-  :commands (neotree-toggle)
-  :bind (("C-c t" . neotree-toggle))
-  :init
-  (progn
-    ;; Every time when the neotree window is opened, it will try to find current
-    ;; file and jump to node.
-    (setq-default neo-smart-open t)
-    ;; Do not allow neotree to be the only open window
-    (setq-default neo-dont-be-alone t)))
+  (setq doom-modeline-python-executable (expand-file-name "~/.pyenv/shims/python")
+        doom-modeline-lsp nil
+        doom-modeline-mu4e nil
+        doom-modeline-irc nil
+        doom-modeline-env-version nil))
 
 ;; emoji
 (use-package company-emoji
@@ -844,7 +858,6 @@ Repeated invocations toggle between the two most recently open buffers."
   (ivy-prescient-mode))
 
 (defun asm/ivy-sort-by-length (_name candidates)
-  "Sort `CANDIDATES' matching `_NAME' by length."
   (cl-sort (copy-sequence candidates)
            (lambda (f1 f2)
              (< (length f1) (length f2)))))
@@ -852,8 +865,8 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package ivy
   :ensure t
   :config
-  (ivy-mode 1)
-  (setq ivy-use-virtual-buffers t
+  (setq ivy-count-format ""
+        ivy-use-virtual-buffers t
         enable-recursive-minibuffers t
         ivy-initial-inputs-alist nil
         ivy-re-builders-alist '((t . ivy--regex-ignore-order))
@@ -861,7 +874,10 @@ Repeated invocations toggle between the two most recently open buffers."
                                            (counsel-find-file . asm/ivy-sort-by-length)
                                            (projectile-completing-read . asm/ivy-sort-by-length))
         ivy-on-del-error-function #'ignore
-        ivy-use-selectable-prompt t)
+        ivy-use-selectable-prompt t
+        ivy-format-function 'ivy-format-function-arrow)
+  (set-face-attribute 'ivy-current-match nil :foreground "#242832")
+  (ivy-mode 1)
   (global-set-key (kbd "C-c C-r") #'ivy-resume))
 
 (use-package swiper
@@ -924,22 +940,15 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (volatile-highlights-mode +1)
 
-  ;; Have `kill-region' delete the current line if no region is active
   (defadvice kill-region (before smart-cut activate compile)
-    "When called interactively with no active region, kill a single line instead."
     (interactive
      (if mark-active (list (region-beginning) (region-end))
        (list (line-beginning-position)
              (line-beginning-position 2))))))
 
+
 (use-package rainbow-delimiters
   :ensure t)
-
-;; show hex colors with background, e.g. #0000ff
-;; (use-package rainbow-mode
-;;   :ensure t
-;;   :config
-;;   (add-hook 'prog-mode-hook #'rainbow-mode))
 
 (use-package whitespace
   :init
@@ -953,6 +962,7 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package smartparens
   :ensure t
   :init
+  (setq sp-highlight-pair-overlay nil)
   (smartparens-global-mode 1)
   :config
   (sp-local-pair 'emacs-lisp-mode "`" nil :when '(sp-in-string-p))
@@ -1156,6 +1166,7 @@ Repeated invocations toggle between the two most recently open buffers."
   :after go
   :hook
   (go-mode . go-guru-hl-identifier-mode))
+
 (use-package gorepl-mode
   :ensure t
   :after go
