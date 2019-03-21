@@ -447,12 +447,24 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package org
   :ensure t
   :mode ("\\.org\\'" . org-mode)
-  :bind (("C-c c" . org-capture))
+  :bind (("C-c l" . org-store-link)
+         ("C-c c" . org-capture)
+         ("C-c a" . org-agenda))
   :config
   (progn
     (setq org-directory "~/org"
-          org-startup-folded "content"
           org-default-notes-file (concat org-directory "/scratch.org")
+          org-agenda-files (mapcar
+                            (lambda (path)
+                              (concat org-directory "/" path))
+                            '("scratch.org"
+                              "main.org"
+                              "todo.org"))
+          org-use-speed-commands t
+          org-capture-templates '(("t" "Todo" entry
+                                   (file+headline "~/org/todo.org" "Tasks"))
+                                  ("l" "Link" item (file "~/org/links.org")
+                                    "[[%^{URL}][%^{Description}]] %?%U\n" :prepend t))
           org-confirm-babel-evaluate nil)
     (add-hook 'org-mode-hook #'asm/org-mode-hook)
 
