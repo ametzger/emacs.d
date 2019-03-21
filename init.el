@@ -1262,6 +1262,8 @@ Repeated invocations toggle between the two most recently open buffers."
   :ensure t
   :defer t
   :mode "\\.json$"
+  :init
+  (setq js-indent-level 2)
   :config
   (define-key json-mode-map (kbd "C-c C-b") 'json-pretty-print-buffer))
 
