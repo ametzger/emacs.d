@@ -71,6 +71,11 @@
 ;;                 auto-package-update-hide-results t)
 ;;   (auto-package-update-maybe))
 
+(use-package paradox
+  :ensure t
+  :config
+  (paradox-enable))
+
 ;; vanity
 (setq user-full-name    "Alex Metzger"
       user-mail-address "asm@asm.io"
@@ -112,7 +117,7 @@
 
 (setq ring-bell-function 'ignore
       inhibit-startup-screen t
-      initial-scratch-message (format ";; Welcome to Emacs %s (started %s, startup took %s)\n\n"
+      initial-scratch-message (format "Welcome to Emacs %s (started %s, startup took %s)\n\n"
                                       emacs-version
                                       (current-time-string)
                                       (emacs-init-time))
@@ -122,6 +127,9 @@
       auto-window-vscroll nil
       frame-resize-pixelwise t
       initial-major-mode 'text-mode)
+
+;; indent on RET
+(global-set-key (kbd "RET") #'newline-and-indent)
 
 ;; TODO(asm,2019-03-21): these don't work correctly with multiple
 ;; monitors.
@@ -216,7 +224,7 @@
 (let ((font-size (if (eq system-type 'darwin)
                      17
                    13)))
-  (set-frame-font (format "Operator Mono %d" font-size) t t))
+  (set-frame-font (format "Operator Mono Medium %d" font-size) t t))
 
 (custom-set-faces
  '(font-lock-comment-face ((t (:foreground "#6d7a96" :slant italic))))
@@ -460,14 +468,19 @@ Repeated invocations toggle between the two most recently open buffers."
                             '("scratch.org"
                               "main.org"
                               "todo.org"))
-          org-use-speed-commands t
           org-capture-templates '(("t" "Todo" entry
-                                   (file+headline "~/org/todo.org" "Tasks"))
+                                   (file+headline "~/org/todo.org" "Tasks")
+                                   "* TODO %^{Description}
+   :LOGBOOK:
+   - Added: %U
+   :END:")
                                   ("l" "Link" item (file "~/org/links.org")
                                    "[[%^{URL}][%^{Description}]] %?%U\n" :prepend t)
                                   ("n" "Note" item
                                    (file+headline "~/org/scratch.org" "Notes")
-                                   "%? %U\n" :prepend t))
+                                   "%? %U\n%a\n" :prepend t))
+          org-use-speed-commands t
+          org-return-follows-link t
           org-confirm-babel-evaluate nil)
     (add-hook 'org-mode-hook #'asm/org-mode-hook)
 
@@ -513,7 +526,7 @@ Repeated invocations toggle between the two most recently open buffers."
         doom-neotree-file-icons t
         doom-nord-brighter-comments nil
         doom-nord-region-highlight 'frost
-        doom-nord-padded-modeline nil)
+        doom-nord-padded-modeline t)
   (load-theme 'doom-nord t)
   :config
   (doom-themes-neotree-config)
@@ -573,7 +586,9 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package forge
   :ensure t
   :demand t
-  :after magit)
+  :after magit
+  :init
+  (setq forge-topic-list-limit '(10 . 0)))
 
 (defun asm/git-commit-hook ()
   (set (make-local-variable 'company-backends)
@@ -606,10 +621,17 @@ Repeated invocations toggle between the two most recently open buffers."
   :if (executable-find "rg")
   :ensure t)
 
+(defun asm/deadgrep-project-root ()
+  (if (projectile-project-p)
+      (projectile-project-root)
+    default-directory))
+
 (use-package deadgrep
   :ensure t
-  :after ripgrep
-  :bind ("<f5>" . deadgrep))
+  :after (ripgrep projectile)
+  :bind ("<f5>" . deadgrep)
+  :init
+  (setq deadgrep-project-root-function #'asm/deadgrep-project-root))
 
 (use-package wgrep
   :ensure t)
@@ -639,15 +661,59 @@ Repeated invocations toggle between the two most recently open buffers."
   :ensure t
   :after (ivy)
   :init
-  (setq projectile-completion-system 'ivy)
+  (setq projectile-completion-system 'ivy
+        projectile-enable-caching t)
+  :bind
+  (:map projectile-mode-map
+        ("C-c p" . projectile-command-map))
   :config
-  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   (projectile-mode +1)
   (setq projectile-enable-caching t))
 
 (use-package counsel-projectile
-  :ensure t)
+  :ensure t
+  :bind
+  ("C-c p SPC" . counsel-projectile)
+  :config
+  (global-set-key
+   (kbd "C-c C-p")
+   (defhydra hydra-projectile (:color teal
+                                      :hint nil)
+     "
+     PROJECTILE: %(projectile-project-root)
+
+     Find File            Search/Tags          Buffers                Cache
+------------------------------------------------------------------------------------------
+_s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache clear
+ _ff_: file dwim       _g_: update gtags      _b_: switch to buffer  _x_: remove known project
+ _fd_: file curr dir   _o_: multi-occur     _s-k_: Kill all buffers  _X_: cleanup non-existing
+  _r_: recent file                                               ^^^^_z_: cache current
+  _d_: dir
+
+"
+     ("a"   projectile-ag)
+     ("b"   projectile-switch-to-buffer)
+     ("c"   projectile-invalidate-cache)
+     ("d"   projectile-find-dir)
+     ("s-f" projectile-find-file)
+     ("ff"  projectile-find-file-dwim)
+     ("fd"  projectile-find-file-in-directory)
+     ("g"   ggtags-update-tags)
+     ("s-g" ggtags-update-tags)
+     ("i"   projectile-ibuffer)
+     ("K"   projectile-kill-buffers)
+     ("s-k" projectile-kill-buffers)
+     ("m"   projectile-multi-occur)
+     ("o"   projectile-multi-occur)
+     ("s-p" projectile-switch-project "switch project")
+     ("p"   projectile-switch-project)
+     ("s"   projectile-switch-project)
+     ("r"   projectile-recentf)
+     ("x"   projectile-remove-known-project)
+     ("X"   projectile-cleanup-known-projects)
+     ("z"   projectile-cache-current-file)
+     ("`"   hydra-projectile-other-window/body "other window")
+     ("q"   nil "cancel" :color blue))))
 
 (use-package ibuffer-projectile
   :ensure t
@@ -864,6 +930,17 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq which-key-idle-delay 0.4)
   (which-key-mode +1))
 
+(use-package cheatsheet
+  :ensure t
+  :bind
+  (:map cheatsheet-mode-map
+        ("q" . kill-buffer-and-window))
+  :config
+  (progn
+    (cheatsheet-add :group 'Common
+                    :key "C-z"
+                    :description "Open shorties")))
+
 (use-package discover-my-major
   :ensure t
   :bind (("C-h M-m" . discover-my-major)
@@ -961,11 +1038,13 @@ Repeated invocations toggle between the two most recently open buffers."
   :bind (("C-c t" . neotree-toggle))
   :init
   (progn
-    ;; Every time when the neotree window is opened, it will try to find current
-    ;; file and jump to node.
-    (setq-default neo-smart-open t)
-    ;; Do not allow neotree to be the only open window
-    (setq-default neo-dont-be-alone t)))
+    (setq neo-smart-open t
+          neo-dont-be-alone t)
+    (add-hook 'neotree-mode-hook
+              (lambda ()
+                (setq-local mode-line-format nil)
+                (local-set-key (kbd "C-s") #'isearch-forward)
+                (local-set-key (kbd "C-r") #'isearch-backward)))))
 
 (use-package perspective
   :ensure t
@@ -994,6 +1073,13 @@ Repeated invocations toggle between the two most recently open buffers."
     ("P" projectile-persp-switch-project "Switch Project")
     ("q" nil "Quit")))
 
+(use-package zoom
+  :disabled
+  :init
+  (zoom-mode +1)
+  :config
+  (setq zoom-size '(0.618 . 0.618)))
+
 (use-package volatile-highlights
   :ensure t
   :config
@@ -1005,9 +1091,14 @@ Repeated invocations toggle between the two most recently open buffers."
        (list (line-beginning-position)
              (line-beginning-position 2))))))
 
-
 (use-package rainbow-delimiters
   :ensure t)
+
+(use-package rainbow-mode
+  :disabled
+  :ensure t
+  :config
+  (add-hook 'prog-mode-hook #'rainbow-mode))
 
 (use-package whitespace
   :init
@@ -1022,19 +1113,24 @@ Repeated invocations toggle between the two most recently open buffers."
   :ensure t
   :init
   (setq sp-highlight-pair-overlay nil)
-  (smartparens-global-mode 1)
   :config
   (sp-local-pair 'emacs-lisp-mode "`" nil :when '(sp-in-string-p))
   (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
   (sp-pair "'" nil :unless '(sp-point-after-word-p))
+  (smartparens-global-mode 1)
+  (require 'smartparens-config)
   :bind
-  (("C-M-k" . sp-kill-sexp-with-a-twist-of-lime)
-   ("C-M-f" . sp-forward-sexp)
+  (("C-M-f" . sp-forward-sexp)
    ("C-M-b" . sp-backward-sexp)
-   ("C-M-n" . sp-up-sexp)
    ("C-M-d" . sp-down-sexp)
+   ("C-M-a" . sp-backward-down-sexp)
+   ("C-S-d" . sp-beginning-of-sexp)
+   ("C-S-a" . sp-end-of-sexp)
+   ("C-M-e" . sp-up-sexp)
    ("C-M-u" . sp-backward-up-sexp)
-   ("C-M-p" . sp-backward-down-sexp)
+   ("C-M-n" . sp-next-sexp)
+   ("C-M-p" . sp-previous-sexp)
+   ("C-M-k" . sp-kill-sexp)
    ("C-M-w" . sp-copy-sexp)
    ("M-s"   . sp-splice-sexp)
    ("M-r"   . sp-splice-sexp-killing-around)
@@ -1275,6 +1371,12 @@ Repeated invocations toggle between the two most recently open buffers."
   :defer t
   :mode "\\.yaml$")
 
+(use-package toml-mode
+  :ensure t
+  :defer t
+  :mode (("\\.toml$" . toml-mode)
+         ("Pipfile$" . toml-mode)))
+
 (use-package web-mode
   :ensure t
   :defer t
@@ -1363,22 +1465,25 @@ Repeated invocations toggle between the two most recently open buffers."
           (expand-file-name "~/org/"))))
     (find-file file-to-open)))
 
-(defhydra ctrl-z-hydra (:color blue)
-  ("b" asm/empty-buffer "empty buffer")
-  ("d" dash-at-point "dash")
-  ("e" flycheck-list-errors "list errors")
-  ("i" asm/open-init-file "open init")
-  ("l" asm/window-left "window left")
-  ("m" asm/window-max "window maximize")
-  ("n" ein:login "EIN")
-  ("o" asm/org-open-file "find org file")
-  ("r" anzu-query-replace-regexp "regex replace")
-  ("s" counsel-rg "ripgrep")
-  ("w" ace-window "ace window")
-  ("C-s" deadgrep "deadgrep")
-  ("q" nil "quit"))
-
-(global-set-key (kbd "C-z") #'ctrl-z-hydra/body)
+(global-set-key
+ (kbd "C-z")
+ (defhydra ctrl-z-hydra (:color blue
+                         :columns 4)
+   "Shorties"
+   ("b" asm/empty-buffer "empty buffer")
+   ("c" cheatsheet-show "cheatsheet")
+   ("d" dash-at-point "dash")
+   ("e" flycheck-list-errors "list errors")
+   ("i" asm/open-init-file "open init")
+   ("l" asm/window-left "window left")
+   ("m" asm/window-max "window maximize")
+   ("n" ein:login "EIN")
+   ("o" asm/org-open-file "find org file")
+   ("r" anzu-query-replace-regexp "regex replace")
+   ("s" counsel-rg "ripgrep")
+   ("w" ace-window "ace window")
+   ("C-s" deadgrep "deadgrep")
+   ("q" nil "quit")))
 
 ;;; init.el ends here
 ;; Local Variables:
