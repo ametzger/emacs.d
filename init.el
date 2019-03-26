@@ -560,6 +560,11 @@ Repeated invocations toggle between the two most recently open buffers."
    (magit-log-mode    . emojify-mode)))
 
 ;; usability
+(use-package hungry-delete
+  :ensure t
+  :config
+  (global-hungry-delete-mode))
+
 (use-package avy
   :ensure t
   :bind (("s-." . avy-goto-word-or-subword-1)
@@ -567,6 +572,22 @@ Repeated invocations toggle between the two most recently open buffers."
          ("C-'" . avy-goto-line))
   :config
   (setq avy-background t))
+
+(use-package editorconfig
+  :ensure t
+  :config
+  (add-to-list 'editorconfig-indentation-alist '(web-mode web-mode-attr-indent-offset))
+  (add-to-list 'editorconfig-indentation-alist '(web-mode web-mode-attr-value-indent-offset))
+  (add-to-list 'editorconfig-indentation-alist '(web-mode web-mode-code-indent-offset))
+  (add-to-list 'editorconfig-indentation-alist '(web-mode web-mode-css-indent-offset))
+  (add-to-list 'editorconfig-indentation-alist '(web-mode web-mode-markup-indent-offset))
+  (add-to-list 'editorconfig-indentation-alist '(web-mode web-mode-sql-indent-offset))
+  (add-to-list 'editorconfig-indentation-alist '(web-mode js2-basic-offset))
+  (add-to-list 'editorconfig-indentation-alist '(js-mode js-indent-level js2-basic-offset))
+  (add-to-list 'editorconfig-indentation-alist '(js2-mode js-indent-level js2-basic-offset))
+  (add-to-list 'editorconfig-indentation-alist '(js2-minor-mode js-indent-level js2-basic-offset))
+  (add-to-list 'editorconfig-indentation-alist '(nginx-mode nginx-indent-level nginx-indent-level))
+  (editorconfig-mode 1))
 
 (use-package magit
   :ensure t
