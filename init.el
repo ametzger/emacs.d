@@ -507,6 +507,13 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq esup-user-init-file
         (file-truename "~/.emacs.d/init.el")))
 
+(use-package keyfreq
+  :ensure t
+  :commands (keyfreq-mode keyfreq-autosave-mode)
+  :init
+  (keyfreq-mode 1)
+  (keyfreq-autosave-mode 1))
+
 ;; theme, modeline
 (use-package all-the-icons
   :ensure t)
