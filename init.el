@@ -110,10 +110,15 @@
 (blink-cursor-mode -1)
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
-;; Disable menu bar on Linux, looks weird on OS X
-(when (and (fboundp 'menu-bar-mode)
-           (memq window-system '(x)))
-  (menu-bar-mode -1))
+
+;; Disable menu bar on Linux and in terminal, enable on grapical OS X.
+(defun asm/menubar-config (&optional frame)
+  (interactive)
+  (set-frame-parameter frame 'menu-bar-lines
+    (if (and (display-graphic-p frame)
+          (memq window-system '(mac ns)))
+      1 0)))
+(add-hook 'after-make-frame-functions 'asm/menubar-config)
 
 (setq ring-bell-function 'ignore
       inhibit-startup-screen t
@@ -538,6 +543,12 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (doom-themes-neotree-config)
   (doom-themes-org-config))
+
+(defun asm/modeline-config (&optional frame)
+  (interactive)
+  (unless (display-graphic-p frame)
+    (setq doom-modeline-icon nil)))
+(add-hook 'after-make-frame-functions 'asm/modeline-config)
 
 (use-package doom-modeline
   :ensure t
