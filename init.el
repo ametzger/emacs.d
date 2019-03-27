@@ -582,6 +582,13 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package editorconfig
   :ensure t
+  :hook
+  ((mardown-mode . editorconfig-mode)
+   (python-mode  . editorconfig-mode)
+   (web-mode     . editorconfig-mode)
+   (js2-mode     . editorconfig-mode)
+   (sh-mode      . editorconfig-mode)
+   (ruby-mode    . editorconfig-mode))
   :config
   (add-to-list 'editorconfig-indentation-alist '(web-mode web-mode-attr-indent-offset))
   (add-to-list 'editorconfig-indentation-alist '(web-mode web-mode-attr-value-indent-offset))
@@ -593,8 +600,7 @@ Repeated invocations toggle between the two most recently open buffers."
   (add-to-list 'editorconfig-indentation-alist '(js-mode js-indent-level js2-basic-offset))
   (add-to-list 'editorconfig-indentation-alist '(js2-mode js-indent-level js2-basic-offset))
   (add-to-list 'editorconfig-indentation-alist '(js2-minor-mode js-indent-level js2-basic-offset))
-  (add-to-list 'editorconfig-indentation-alist '(nginx-mode nginx-indent-level nginx-indent-level))
-  (editorconfig-mode 1))
+  (add-to-list 'editorconfig-indentation-alist '(nginx-mode nginx-indent-level nginx-indent-level)))
 
 (use-package magit
   :ensure t
