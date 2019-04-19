@@ -120,6 +120,9 @@
       1 0)))
 (add-hook 'after-make-frame-functions 'asm/menubar-config)
 
+(defun display-startup-echo-area-message ()
+  (message "Howdy!"))
+
 (setq ring-bell-function 'ignore
       inhibit-startup-screen t
       initial-scratch-message (format "Welcome to Emacs %s (started %s, startup took %s)\n\n"
@@ -358,6 +361,7 @@ Repeated invocations toggle between the two most recently open buffers."
 
 ;; saveplace remembers your location in a file when saving files
 (use-package saveplace
+  :disabled
   :config
   (setq save-place-file (expand-file-name "saveplace" asm/savefile-dir))
   ;; activate it for all buffers
@@ -547,7 +551,7 @@ Repeated invocations toggle between the two most recently open buffers."
 (defun asm/modeline-config (&optional frame)
   (interactive)
   (unless (display-graphic-p frame)
-    (setq doom-modeline-icon nil)))
+    (set-frame-parameter frame doom-modeline-icon nil)))
 (add-hook 'after-make-frame-functions 'asm/modeline-config)
 
 (use-package doom-modeline
@@ -579,6 +583,7 @@ Repeated invocations toggle between the two most recently open buffers."
 
 ;; usability
 (use-package hungry-delete
+  :disabled
   :ensure t
   :config
   (global-hungry-delete-mode))
@@ -592,6 +597,7 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq avy-background t))
 
 (use-package editorconfig
+  :disabled
   :ensure t
   :hook
   ((mardown-mode . editorconfig-mode)
@@ -931,6 +937,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :after (yasnippet))
 
 (use-package super-save
+  :disabled
   :ensure t
   :config
   (setq auto-save-default nil)
@@ -1158,12 +1165,12 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :ensure t
   :init
   (setq sp-highlight-pair-overlay nil)
+  (smartparens-global-mode t)
+  (require 'smartparens-config)
   :config
   (sp-local-pair 'emacs-lisp-mode "`" nil :when '(sp-in-string-p))
   (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
   (sp-pair "'" nil :unless '(sp-point-after-word-p))
-  (smartparens-global-mode 1)
-  (require 'smartparens-config)
   :bind
   (("C-M-f" . sp-forward-sexp)
    ("C-M-b" . sp-backward-sexp)
