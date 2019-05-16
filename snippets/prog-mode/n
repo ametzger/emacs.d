@@ -2,4 +2,4 @@
 # name: note
 # key: n
 # --
-`comment-start`NOTE(asm,`(format-time-string "%Y-%m-%d")`): $0`comment-end`
+`comment-start` NOTE(asm,`(format-time-string "%Y-%m-%d")`): $0`comment-end`
