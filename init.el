@@ -664,6 +664,11 @@ Repeated invocations toggle between the two most recently open buffers."
   :ensure t
   :defer t)
 
+(use-package direnv
+  :ensure t
+  :config
+  (direnv-mode))
+
 (use-package ag
   :if (executable-find "ag")
   :ensure t)
