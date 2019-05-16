@@ -726,15 +726,8 @@ Repeated invocations toggle between the two most recently open buffers."
   (projectile-mode +1)
   (setq projectile-enable-caching t))
 
-(use-package counsel-projectile
-  :ensure t
-  :bind
-  ("C-c p SPC" . counsel-projectile)
-  :config
-  (global-set-key
-   (kbd "C-c C-p")
-   (defhydra hydra-projectile (:color teal
-                                      :hint nil)
+(defhydra hydra-projectile (:color teal
+                            :hint nil)
      "
      PROJECTILE: %(projectile-project-root)
 
@@ -769,7 +762,14 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
      ("X"   projectile-cleanup-known-projects)
      ("z"   projectile-cache-current-file)
      ("`"   hydra-projectile-other-window/body "other window")
-     ("q"   nil "cancel" :color blue))))
+     ("q"   nil "cancel" :color blue))
+
+(use-package counsel-projectile
+  :ensure t
+  :bind
+  ("C-c p SPC" . counsel-projectile)
+  :init
+  (global-set-key (kbd "C-c C-p") #'hydra-projectile/body))
 
 (use-package ibuffer-projectile
   :ensure t
