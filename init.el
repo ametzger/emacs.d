@@ -396,6 +396,10 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package dired
   :bind
   ("C-c C-j" . dired-jump)
+  (:map dired-mode-map
+        ("RET" . dired-find-alternate-file)
+        ("^" . (lambda () (interactive) (find-alternate-file ".."))))
+
   :config
   ;; dired ls config, disabled for now. Using `ls-lisp' instead.
   ;; OS X uses BSD ls by default, `brew install coreutils` puts GNU ls
