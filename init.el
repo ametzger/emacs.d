@@ -1506,6 +1506,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (defun asm/open-init-file ()
   (interactive)
+  (projectile-persp-switch-project "~/proj/emacs.d")
   (find-file (expand-file-name "~/proj/emacs.d/init.el")))
 
 (defun asm/empty-buffer ()
