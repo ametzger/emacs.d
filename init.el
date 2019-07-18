@@ -1542,6 +1542,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
    ("r" anzu-query-replace-regexp "regex replace")
    ("s" counsel-rg "ripgrep")
    ("w" ace-window "ace window")
+   ("z" counsel-bookmark "bookmarks")
    ("C-s" deadgrep "deadgrep")
    ("q" nil "quit")))
 
