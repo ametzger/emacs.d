@@ -546,17 +546,15 @@ Repeated invocations toggle between the two most recently open buffers."
         doom-neotree-file-icons t
         doom-nord-brighter-comments nil
         doom-nord-region-highlight 'frost
-        doom-nord-padded-modeline t)
-  (load-theme 'doom-nord t)
+        doom-nord-padded-modeline t
+        doom-solarized-light-brighter-comments nil
+        doom-solarized-light-brighter-modeline nil
+        doom-solarized-light-padded-modeline t)
+  (let ((active-theme 'doom-solarized-light))
+    (load-theme active-theme t))
   :config
   (doom-themes-neotree-config)
   (doom-themes-org-config))
-
-(defun asm/modeline-config (&optional frame)
-  (interactive)
-  (unless (display-graphic-p frame)
-    (set-frame-parameter frame doom-modeline-icon nil)))
-(add-hook 'after-make-frame-functions 'asm/modeline-config)
 
 (use-package doom-modeline
   :ensure t
