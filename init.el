@@ -593,7 +593,7 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package avy
   :ensure t
   :bind (("s-." . avy-goto-word-or-subword-1)
-         ("s-," . avy-goto-char)
+         ("s-," . avy-goto-char-2)
          ("C-'" . avy-goto-line))
   :config
   (setq avy-background t))
@@ -1475,6 +1475,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :ensure t)
 
 (defun asm/terraform-mode-hook ()
+  (subword-mode +1)
   (terraform-format-on-save-mode t)
   (set (make-local-variable 'company-backends)
        '(company-terraform)))
