@@ -527,6 +527,16 @@ Repeated invocations toggle between the two most recently open buffers."
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 
+(use-package helpful
+  :ensure t
+  :bind
+  (("C-h f" . helpful-callable)
+   ("C-h v" . helpful-variable)
+   ("C-h k" . helpful-key)
+   ("C-c C-d" . helpful-at-point)
+   ("C-h F" . helpful-function)
+   ("C-h C" . helpful-command)))
+
 ;; theme, modeline
 (use-package all-the-icons
   :ensure t)
