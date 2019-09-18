@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: tf environment
+# key: env
+# --
+\$\{data.template_file.env_plus_workspace.rendered\}

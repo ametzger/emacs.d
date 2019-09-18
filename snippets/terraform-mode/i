@@ -2,4 +2,4 @@
 # name: interpolation
 # key: i
 # --
-\$\{$0\}
+"\$\{$0\}"
