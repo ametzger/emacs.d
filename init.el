@@ -603,7 +603,7 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package avy
   :ensure t
   :bind (("s-." . avy-goto-word-or-subword-1)
-         ("s-," . avy-goto-char-2)
+         ("s-," . avy-goto-char-timer)
          ("C-'" . avy-goto-line))
   :config
   (setq avy-background t))
@@ -1225,6 +1225,18 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :config
   (setq markdown-fontify-code-blocks-natively t))
 
+;; LSP
+(use-package eglot
+  :ensure t
+  :disabled
+  :config
+  (setq eglot-ignored-server-capabilites '(:documentHighlightProvider)
+        eglot--mode-line-format "LSP"
+        eglot-workspace-configuration '((pyls.configurationSources . ["flake8"])))
+  :hook ((python-mode . eglot-ensure))
+  :bind (:map eglot-mode-map
+              ("C-c h" . eglot-help-at-point)))
+
 ;; python
 (use-package pyenv-mode
   :ensure t
@@ -1274,8 +1286,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 (use-package anaconda-mode
   :ensure t
   :config
-  (add-hook 'python-mode-hook 'anaconda-mode)
-  (add-hook 'python-mode-hook 'anaconda-eldoc-mode))
+  (add-hook 'python-mode-hook 'anaconda-mode))
 
 (use-package company-anaconda
   :ensure t
@@ -1297,11 +1308,13 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :defer t
   :commands (ein:login)
   :config
-  (setq-default ein:complete-on-dot nil
-                ein:completion-backend 'ein:use-none-backend
-                ein:query-timeout 1000
-                ein:default-url-or-port "http://localhost:8888"
-                ein:worksheet-enable-undo 'yes)
+  (setq ein:complete-on-dot -1
+        ein:completion-backend 'ein:use-none-backend
+        ein:query-timeout 1000
+        ein:default-url-or-port "http://localhost:8888"
+        ein:worksheet-enable-undo 'full
+        ein:notebook-modes '(ein:notebook-python-mode ein:notebook-plain-mode))
+
   (cond
    ((eq system-type 'darwin)
     (setq-default ein:console-args
@@ -1318,8 +1331,9 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
             (lambda ()
               (visual-line-mode +1)
               (whitespace-mode -1)
-              (company-mode -1)
-              (bind-key "C-/" 'undo))))
+              (company-mode +1)
+              (undo-tree-mode +1)
+              (bind-key "C-/" 'undo-tree-undo))))
 
 ;; golang
 (use-package go-projectile
@@ -1463,8 +1477,8 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :defer t
   :mode "\\.js$"
   :config
-  (setq-default js2-basic-indent 2
-                js2-basic-offset 2
+  (setq-default js2-basic-indent 4
+                js2-basic-offset 4
                 js2-auto-indent-p t
                 js2-cleanup-whitespace t
                 js2-enter-indents-newline t
