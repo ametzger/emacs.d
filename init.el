@@ -1522,6 +1522,12 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :ensure t
   :mode "crontab.*")
 
+(use-package restclient
+  :ensure t
+  :defer t
+  :commands (restclient-mode)
+  :mode ("\\.\\(http\\|rest\\)$" . restclient-mode))
+
 (defun asm/three-window-split ()
   (interactive)
   (command-execute 'split-window-horizontally)
