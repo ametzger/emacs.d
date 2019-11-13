@@ -878,6 +878,8 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package exec-path-from-shell
   :ensure t
+  :init
+  (setq exec-path-from-shell-check-startup-files nil)
   :config
   (when (memq window-system '(mac ns))
     (exec-path-from-shell-initialize)))
@@ -1028,6 +1030,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package diff-hl
   :ensure t
+  :disabled
   :config
   (global-diff-hl-mode +1)
   (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
@@ -1098,7 +1101,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   (set-face-attribute 'ivy-current-match nil :foreground "#242832")
   (ivy-mode 1)
   :bind
-  ("C-c C-r" .ivy-resume))
+  ("C-c C-r" . ivy-resume))
 
 (use-package swiper
   :ensure t
