@@ -1551,6 +1551,21 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
   (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode)))
 
+(use-package coffee-mode
+  :ensure t
+  :mode
+  ("\\.coffee\\'" . coffee-mode)
+  :init
+  (setq coffee-tab-width 2))
+
+
+(use-package typescript-mode
+  :ensure t
+  :mode
+  ("\\.ts\\'" . typescript-mode)
+  :init
+  (setq typescript-indent-level 2))
+
 (use-package terraform-mode
   :ensure t
   :mode "\\.tf$"
