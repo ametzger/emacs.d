@@ -394,8 +394,8 @@ Repeated invocations toggle between the two most recently open buffers."
   (windmove-default-keybindings))
 
 (use-package dired
-  :bind
-  ("C-c C-j" . dired-jump)
+  ;; :bind
+  ;; ("C-c C-j" . dired-jump)
   (:map dired-mode-map
         ("RET" . dired-find-alternate-file)
         ("^" . (lambda () (interactive) (find-alternate-file ".."))))
@@ -513,9 +513,34 @@ Repeated invocations toggle between the two most recently open buffers."
   :commands (org-bullets-mode)
   :hook (org-mode . org-bullets-mode))
 
+(use-package org-journal
+  :ensure t
+  :after (org)
+  :init
+  (defun asm/org-journal-done ()
+    "Simple convenience function.
+    Saves the buffer of the current day's entry and kills the window
+    Similar to org-capture like behavior"
+    (interactive)
+    (save-buffer)
+    (kill-buffer-and-window))
+  :custom
+  (org-journal-dir (concat (file-name-as-directory org-directory) "journal"))
+  (org-journal-file-format "%Y/%m/%Y%m%d")
+  (org-journal-date-format "%A, %Y-%m-%d")
+  (org-journal-enable-agenda-integration t)
+  (org-journal-hide-entries-p nil)
+  (org-journal-time-format "%R
+   ")
+  :bind
+  (("C-c C-j" . org-journal-new-entry)
+   :map org-journal-mode-map
+   ("C-c C-c" . asm/org-journal-done)))
+
 ;; emacs tools
 (use-package esup
   :ensure t
+  :disabled
   :init
   (setq esup-user-init-file
         (file-truename "~/.emacs.d/init.el")))

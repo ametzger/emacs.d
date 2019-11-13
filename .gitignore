@@ -30,3 +30,4 @@ request/*
 /projectile.cache
 /emojis
 /bookmarks
+*.cache
