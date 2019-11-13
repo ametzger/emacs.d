@@ -1293,7 +1293,8 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
                 flycheck-python-flake8-executable (expand-file-name
                                                    "~/.pyenv/shims/flake8")
                 flycheck-python-mypy-executable (expand-file-name
-                                                 "~/.pyenv/shims/mypy")))
+                                                 "~/.pyenv/shims/mypy")
+                flycheck-flake8rc ".flake8"))
 
 (use-package pyenv-mode-auto
   :ensure t)
@@ -1344,6 +1345,22 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :config
   (setq blacken-executable "~/.pyenv/shims/black")
   (define-key python-mode-map (kbd "C-c C-b") 'blacken-buffer))
+
+(use-package py-isort
+  :ensure t
+  :config
+  (setq py-isort-options '("--lines=100" "--multi-line=3" "--trailing-comma")))
+
+(defun asm/toggle-isort ()
+  "Toggle isort before-save-hook."
+  (interactive)
+  (if (member 'py-isort-before-save before-save-hook)
+      (progn
+        (remove-hook 'before-save-hook 'py-isort-before-save)
+        (message "isort disabled"))
+    (progn
+      (add-hook 'before-save-hook 'py-isort-before-save)
+      (message "isort enabled"))))
 
 (use-package flycheck-mypy
   :ensure t)
@@ -1566,6 +1583,11 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 (use-package crontab-mode
   :ensure t
   :mode "crontab.*")
+
+(use-package jinja2-mode
+  :ensure t
+  :mode ((".*\\.jinja" . jinja2-mode)
+         (".*\\.jinja2" . jinja2-mode)))
 
 (use-package restclient
   :ensure t
