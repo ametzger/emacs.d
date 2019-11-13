@@ -1082,10 +1082,12 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
                                            (projectile-completing-read . asm/ivy-sort-by-length))
         ivy-on-del-error-function #'ignore
         ivy-use-selectable-prompt t
-        ivy-format-function 'ivy-format-function-arrow)
+        ivy-format-function 'ivy-format-function-arrow
+        ivy-initial-inputs-alist nil)
   (set-face-attribute 'ivy-current-match nil :foreground "#242832")
   (ivy-mode 1)
-  (global-set-key (kbd "C-c C-r") #'ivy-resume))
+  :bind
+  ("C-c C-r" .ivy-resume))
 
 (use-package swiper
   :ensure t
@@ -1105,23 +1107,26 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package counsel
   :ensure t
-  :config
-  (global-set-key (kbd "M-x")     #'counsel-M-x)
-  (global-set-key (kbd "C-x b")   #'asm/contextual-switch-buffer)
-  (global-set-key (kbd "C-x C-f") #'counsel-find-file)
-  (global-set-key (kbd "<f1> f")  #'counsel-describe-function)
-  (global-set-key (kbd "<f1> v")  #'counsel-describe-variable)
-  (global-set-key (kbd "<f1> l")  #'counsel-find-library)
-  (global-set-key (kbd "<f2> i")  #'counsel-info-lookup-symbol)
-  (global-set-key (kbd "<f2> u")  #'counsel-unicode-char)
-  ;; (global-set-key (kbd "C-c g")   #'counsel-git)
-  ;; (global-set-key (kbd "C-c j")  #'counsel-git-grep)
-  ;; (global-set-key (kbd "C-c a")   #'counsel-ag)
-  (global-set-key (kbd "C-x l")   #'counsel-locate)
-  (global-set-key (kbd "C-x i")   #'counsel-imenu)
-  (global-set-key (kbd "C-c i")   #'counsel-imenu)
-  (define-key minibuffer-local-map (kbd "C-r") #'counsel-minibuffer-history)
-  (define-key counsel-find-file-map (kbd "C-l") #'ivy-backward-delete-char))
+  ;; setting `ivy-initial-inputs-alist' in `ivy' above takes care of
+  ;; this.
+  ;; :config
+  ;; (setcdr (assoc 'counsel-M-x ivy-initial-inputs-alist) "")
+  :bind
+  (("M-x" . counsel-M-x)
+   ("C-x b" . asm/contextual-switch-buffer)
+   ("C-x C-f" . counsel-find-file)
+   ("<f1> f" . counsel-describe-function)
+   ("<f1> v" . counsel-describe-variable)
+   ("<f1> l" . counsel-find-library)
+   ("<f2> i" . counsel-info-lookup-symbol)
+   ("<f2> u" . counsel-unicode-char)
+   ("C-x l" . counsel-locate)
+   ("C-x i" . counsel-imenu)
+   ("C-c i" . counsel-imenu)
+   :map minibuffer-local-map
+   ("C-r" . counsel-minibuffer-history)
+   :map counsel-find-file-map
+   ("C-l" . ivy-backward-delete-char)))
 
 (use-package ace-window
   :ensure t
