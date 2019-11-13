@@ -150,7 +150,7 @@
     (set-frame-position frame 0 0)))
 
 ;; leften the window when starting emacs
-(add-hook 'after-init-hook #'asm/window-left)
+(add-hook 'after-init-hook #'asm/window-max)
 
 (defun asm/window-max ()
   (interactive)
@@ -229,11 +229,19 @@
 (global-set-key (kbd "C-S-SPC") #'asm/select-current-line)
 
 ;; font config
-(let ((font-size (if (eq system-type 'darwin)
-                     17
+(let ((font-name
+       ;; "IBM Plex Mono Medium"
+       "Operator Mono Medium"
+       ;; "SF Mono"
+       ;; "Go Mono"
+       ;; "Cascadia Code"
+       )
+      (font-size (if (eq system-type 'darwin)
+                     18
                    13)))
-  (set-frame-font (format "Operator Mono Medium %d" font-size) t t))
+  (set-frame-font (format "%s %d" font-name font-size) t t))
 
+;; italics for comments, keywords. Prettiest in Operator Mono.
 (custom-set-faces
  '(font-lock-comment-face ((t (:foreground "#6d7a96" :slant italic))))
  '(font-lock-doc-face ((t (:foreground "#6d7a96" :slant italic))))
@@ -589,7 +597,10 @@ Repeated invocations toggle between the two most recently open buffers."
         doom-solarized-light-brighter-comments nil
         doom-solarized-light-brighter-modeline nil
         doom-solarized-light-padded-modeline t)
-  (let ((active-theme 'doom-solarized-light))
+  (let (
+        ;; (active-theme 'doom-solarized-light)
+        (active-theme 'doom-nord)
+        )
     (load-theme active-theme t))
   :config
   (doom-themes-neotree-config)
