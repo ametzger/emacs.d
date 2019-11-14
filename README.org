@@ -9,7 +9,7 @@
     First, install Emacs from Homebrew using the [[https://github.com/d12frosted/homebrew-emacs-plus][emacs-plus]] package:
     #+BEGIN_SRC shell
     brew tap d12frosted/emacs-plus
-    brew install emacs-plus --HEAD --without-spacemacs-icon
+    brew install emacs-plus --without-spacemacs-icon
     ln -s /usr/local/opt/emacs-plus/Emacs.app /Applications
     #+END_SRC
 
