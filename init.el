@@ -1093,6 +1093,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package ivy
   :ensure t
+  :demand
   :config
   (setq ivy-count-format ""
         ivy-use-virtual-buffers t
@@ -1101,11 +1102,11 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
         ivy-re-builders-alist '((t . ivy--regex-ignore-order))
         ivy-sort-matches-functions-alist '((t)
                                            (counsel-find-file . asm/ivy-sort-by-length)
-                                           (projectile-completing-read . asm/ivy-sort-by-length))
+                                           (projectile-completing-read . asm/ivy-sort-by-length)
+                                           )
         ivy-on-del-error-function #'ignore
         ivy-use-selectable-prompt t
-        ivy-format-function 'ivy-format-function-arrow
-        ivy-initial-inputs-alist nil)
+        ivy-format-function 'ivy-format-function-arrow)
   (set-face-attribute 'ivy-current-match nil :foreground "#242832")
   (ivy-mode 1)
   :bind
@@ -1129,10 +1130,8 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package counsel
   :ensure t
-  ;; setting `ivy-initial-inputs-alist' in `ivy' above takes care of
-  ;; this.
-  ;; :config
-  ;; (setcdr (assoc 'counsel-M-x ivy-initial-inputs-alist) "")
+  :config
+  (setcdr (assoc 'counsel-M-x ivy-initial-inputs-alist) "")
   :bind
   (("M-x" . counsel-M-x)
    ("C-x b" . asm/contextual-switch-buffer)
