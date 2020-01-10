@@ -96,6 +96,10 @@
 (global-set-key (kbd "C-c k")
                 (lambda ()
                   (interactive)
+                  (kill-this-buffer)))
+(global-set-key (kbd "C-c C-k")
+                (lambda ()
+                  (interactive)
                   (kill-this-buffer)
                   (asm/delete-windows-and-rebalance)))
 
@@ -175,8 +179,9 @@
 
 (defun asm/delete-windows-and-rebalance ()
   (interactive)
-  (delete-window)
-  (balance-windows))
+  (unless (one-window-p)
+    (delete-window)
+    (balance-windows)))
 
 (global-set-key (kbd "C-x 2") #'asm/split-window-vertically)
 (global-set-key (kbd "C-x 3") #'asm/split-window-horizontally)
@@ -402,7 +407,7 @@ Repeated invocations toggle between the two most recently open buffers."
   (windmove-default-keybindings))
 
 (use-package dired
-  ;; :bind
+  :bind
   ;; ("C-c C-j" . dired-jump)
   (:map dired-mode-map
         ("RET" . dired-find-alternate-file)
@@ -527,7 +532,7 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package org-journal
   :ensure t
-  :after (org)
+  :defer 2
   :init
   (defun asm/org-journal-done ()
     "Simple convenience function.
@@ -737,9 +742,9 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package deadgrep
   :ensure t
   :after (ripgrep projectile)
-  :bind ("<f5>" . deadgrep)
-  :init
-  (setq deadgrep-project-root-function #'asm/deadgrep-project-root))
+  ;; :init
+  ;; (setq deadgrep-project-root-function #'asm/deadgrep-project-root)
+  )
 
 (use-package wgrep
   :ensure t)
@@ -823,6 +828,8 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :init
   (global-set-key (kbd "C-c C-p") #'hydra-projectile/body))
 
+; TODO: this is slow, see
+; https://github.com/purcell/ibuffer-projectile/issues/11
 (use-package ibuffer-projectile
   :ensure t
   :after (projectile ibuffer)
