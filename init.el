@@ -1171,6 +1171,8 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
                 (local-set-key (kbd "C-s") #'isearch-forward)
                 (local-set-key (kbd "C-r") #'isearch-backward)))))
 
+; TODO: this is poorly configured, it's annoying to fight it when a
+; buffer accidentally crosses project boundaries.
 (use-package perspective
   :ensure t
   :config (persp-mode))
@@ -1329,7 +1331,8 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :interpreter ("python" . python-mode)
   :config
   (setq-default python-fill-docstring-style 'django)
-  (add-hook 'python-mode-hook 'asm/python-mode-hook))
+  (add-hook 'python-mode-hook 'asm/python-mode-hook)
+  (unbind-key "C-c C-j" python-mode-map))
 
 (use-package jedi
   :ensure t)
