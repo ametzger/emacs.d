@@ -71,10 +71,10 @@
 ;;                 auto-package-update-hide-results t)
 ;;   (auto-package-update-maybe))
 
-(use-package paradox
-  :ensure t
-  :config
-  (paradox-enable))
+;; (use-package paradox
+;;   :ensure t
+;;   :config
+;;   (paradox-enable))
 
 ;; vanity
 (setq user-full-name    "Alex Metzger"
