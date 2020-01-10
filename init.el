@@ -1378,16 +1378,16 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package ein
   :ensure t
-  :defer t
+  :defer 2
   :commands (ein:login)
-  :config
+  :init
   (setq ein:complete-on-dot -1
         ein:completion-backend 'ein:use-none-backend
         ein:query-timeout 1000
         ein:default-url-or-port "http://localhost:8888"
         ein:worksheet-enable-undo 'full
         ein:notebook-modes '(ein:notebook-python-mode ein:notebook-plain-mode))
-
+  :config
   (cond
    ((eq system-type 'darwin)
     (setq-default ein:console-args
