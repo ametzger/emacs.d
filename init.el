@@ -1651,6 +1651,17 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
           (expand-file-name "~/org/"))))
     (find-file file-to-open)))
 
+(defun asm/yank-filename ()
+  (interactive)
+  (let ((filename (if (equal major-mode 'dired-mode)
+                           default-directory
+                         (replace-regexp-in-string ".*/proj/" "" (buffer-file-name)))))
+    (when filename
+      (with-temp-buffer
+        (insert filename)
+        (clipboard-kill-region (point-min) (point-max)))
+      (message filename))))
+
 (global-set-key
  (kbd "C-z")
  (defhydra ctrl-z-hydra (:color blue
@@ -1660,6 +1671,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
    ("c" cheatsheet-show "cheatsheet")
    ("d" dash-at-point "dash")
    ("e" flycheck-list-errors "list errors")
+   ("f" asm/yank-filename "yank filename")
    ("l" counsel-bookmark "bookmarks")
    ("i" asm/open-init-file "open init")
    ("n" ein:login "EIN")
