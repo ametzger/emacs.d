@@ -1617,6 +1617,9 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :mode ((".*\\.jinja" . jinja2-mode)
          (".*\\.jinja2" . jinja2-mode)))
 
+(use-package clojure-mode
+  :ensure t)
+
 (use-package restclient
   :ensure t
   :defer t
