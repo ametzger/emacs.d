@@ -259,7 +259,6 @@
 
 (put 'upcase-region 'disabled nil)
 
-;; Newline at end of file
 (setq require-final-newline t)
 
 (delete-selection-mode t)
@@ -565,6 +564,7 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package keyfreq
   :ensure t
+  :disabled
   :commands (keyfreq-mode keyfreq-autosave-mode)
   :init
   (keyfreq-mode 1)
@@ -573,12 +573,12 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package helpful
   :ensure t
   :bind
-  (("C-h f" . helpful-callable)
-   ("C-h v" . helpful-variable)
-   ("C-h k" . helpful-key)
+  (("C-h f"   . helpful-callable)
+   ("C-h v"   . helpful-variable)
+   ("C-h k"   . helpful-key)
    ("C-c C-d" . helpful-at-point)
-   ("C-h F" . helpful-function)
-   ("C-h C" . helpful-command)))
+   ("C-h F"   . helpful-function)
+   ("C-h C"   . helpful-command)))
 
 ;; theme, modeline
 (use-package all-the-icons
@@ -694,6 +694,7 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package forge
   :ensure t
+  :disabled
   :demand t
   :after magit
   :init
@@ -725,6 +726,7 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package direnv
   :ensure t
   :config
+  (setq direnv-always-show-summary nil)
   (direnv-mode))
 
 (use-package ag
@@ -780,6 +782,8 @@ Repeated invocations toggle between the two most recently open buffers."
   :bind
   (:map projectile-mode-map
         ("C-c p" . projectile-command-map))
+  (:map projectile-command-map
+        ("F" . projectile-find-file-other-window))
   :config
   (projectile-mode +1)
   (setq projectile-enable-caching t))
@@ -847,7 +851,8 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package expand-region
   :ensure t
-  :bind ("C-=" . er/expand-region))
+  :bind
+  ("C-=" . er/expand-region))
 
 (use-package browse-kill-ring
   :ensure t
@@ -857,8 +862,6 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 (use-package multiple-cursors
   :ensure t
   :bind
-  ("C-M-S-s-l"     . mc/edit-lines)
-  ("H-l"           . mc/edit-lines)
   ("C-;"           . mc/mark-all-like-this-dwim)
   ("C-c C-<"       . mc/mark-all-like-this)
   ("C->"           . mc/mark-next-like-this)
@@ -938,6 +941,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package dash-at-point
   :ensure t
+  :disabled
   :if (memq window-system '(mac ns))
   :config
   (add-to-list 'dash-at-point-mode-alist '(python-mode . "asmdj"))
@@ -945,6 +949,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package zeal-at-point
   :ensure t
+  :disabled
   :if (memq window-system '(x))
   :config
   (global-set-key (kbd "s-d") #'zeal-at-point))
@@ -1052,6 +1057,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package cheatsheet
   :ensure t
+  :disabled
   :bind
   (:map cheatsheet-mode-map
         ("q" . kill-buffer-and-window))
@@ -1130,20 +1136,11 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package counsel
   :ensure t
-  :config
-  (setcdr (assoc 'counsel-M-x ivy-initial-inputs-alist) "")
   :bind
-  (("M-x" . counsel-M-x)
-   ("C-x b" . asm/contextual-switch-buffer)
+  (("M-x"     . counsel-M-x)
+   ("C-x b"   . asm/contextual-switch-buffer)
    ("C-x C-f" . counsel-find-file)
-   ("<f1> f" . counsel-describe-function)
-   ("<f1> v" . counsel-describe-variable)
-   ("<f1> l" . counsel-find-library)
-   ("<f2> i" . counsel-info-lookup-symbol)
-   ("<f2> u" . counsel-unicode-char)
-   ("C-x l" . counsel-locate)
-   ("C-x i" . counsel-imenu)
-   ("C-c i" . counsel-imenu)
+   ("C-c i"   . counsel-imenu)
    :map minibuffer-local-map
    ("C-r" . counsel-minibuffer-history)
    :map counsel-find-file-map
@@ -1566,6 +1563,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package coffee-mode
   :ensure t
+  :disabled
   :mode
   ("\\.coffee\\'" . coffee-mode)
   :init
@@ -1675,10 +1673,11 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
    ("d" dash-at-point "dash")
    ("e" flycheck-list-errors "list errors")
    ("f" asm/yank-filename "yank filename")
-   ("l" counsel-bookmark "bookmarks")
    ("i" asm/open-init-file "open init")
+   ("l" counsel-bookmark "bookmarks")
    ("n" ein:login "EIN")
    ("o" asm/org-open-file "find org file")
+   ("p" projectile-persp-switch-project "open project")
    ("r" anzu-query-replace-regexp "regex replace")
    ("s" counsel-rg "ripgrep")
    ("w" ace-window "ace window")
