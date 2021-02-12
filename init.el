@@ -1512,14 +1512,21 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :defer t
   :mode "\\.fish$")
 
+(use-package counsel-jq
+  :ensure t
+  :defer 0.4)
+
 (use-package json-mode
   :ensure t
   :defer t
   :mode "\\.json$"
+  :bind
+  (:map json-mode-map
+        ("C-c C-b" . json-pretty-print-buffer)
+        ("C-c C-j" . counsel-jq))
   :init
-  (setq js-indent-level 2)
-  :config
-  (define-key json-mode-map (kbd "C-c C-b") 'json-pretty-print-buffer))
+  (setq js-indent-level 2))
+
 
 (use-package yaml-mode
   :ensure t
