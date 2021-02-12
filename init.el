@@ -521,8 +521,7 @@ Repeated invocations toggle between the two most recently open buffers."
     (add-hook 'org-shiftright-final-hook 'windmove-right)
 
     ;; Re-enable "<s" and other expansions after org 9.2
-    (when (version<= "9.2" (org-version))
-      (require 'org-tempo))))
+    (require 'org-tempo)))
 
 (use-package org-bullets
   :ensure t
@@ -532,6 +531,7 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package org-journal
   :ensure t
+  :disabled
   :defer 2
   :init
   (defun asm/org-journal-done ()
@@ -966,7 +966,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 (use-package company
   :ensure t
   :config
-  (setq company-idle-delay 0.4
+  (setq company-idle-delay 0.2
         company-show-numbers t
         company-tooltip-limit 10
         company-minimum-prefix-length 2
@@ -1081,7 +1081,8 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   (setq undo-tree-auto-save-history t)
   (global-set-key (kbd "C-/") #'undo-tree-undo)
   (global-set-key (kbd "C-?") #'undo-tree-redo)
-  (global-set-key (kbd "C-c u") #'undo-tree-visualize))
+  (global-set-key (kbd "C-c u") #'undo-tree-visualize)
+  (global-undo-tree-mode))
 
 (use-package prescient
   :ensure t)
@@ -1320,7 +1321,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   (setq indent-tabs-mode nil)
   (set (make-local-variable 'company-backends)
        '(company-jedi
-         '(company-anaconda :with company-capf))))
+         company-anaconda)))
 
 (use-package python
   :mode ("\\.py'" . python-mode)
