@@ -1588,7 +1588,10 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :ensure t
   :mode "\\.tf$"
   :hook
-  (terraform-mode . company-mode))
+  (terraform-mode . company-mode)
+  :config
+  (set-face-foreground terraform--resource-name-face "#B58DAE")
+  (set-face-foreground terraform--resource-type-face "#B58DAE"))
 
 (use-package company-terraform
   :ensure t)
