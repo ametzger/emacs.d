@@ -1,6 +1,6 @@
 ;;; init.el --- Alex Metzger's Emacs config
 ;;
-;; Copyright (c) 2019 Alex Metzger
+;; Copyright (c) 2021 Alex Metzger
 ;;
 ;; Author: Alex Metzger <asm@asm.io>
 ;; URL: https://gitlab.com/ametzger/emacs.d
@@ -64,7 +64,6 @@
 (setq-default use-package-enable-imenu-support t
               use-package-verbose nil)
 (require 'use-package)
-
 ;; (use-package auto-package-update
 ;;   :config
 ;;   (setq-default auto-package-update-delete-old-versions t
@@ -297,20 +296,20 @@
 (global-set-key (kbd "M-;") #'asm/comment-sanely)
 
 ;; hippie expand is dabbrev expand on steroids
-(setq hippie-expand-try-functions-list '(try-expand-dabbrev
-                                         try-expand-dabbrev-all-buffers
-                                         try-expand-dabbrev-from-kill
-                                         try-complete-file-name-partially
-                                         try-complete-file-name
-                                         try-expand-all-abbrevs
-                                         try-expand-list
-                                         try-expand-line
-                                         try-complete-lisp-symbol-partially
-                                         try-complete-lisp-symbol))
+(setq hippie-expand-try-functions-list
+      '(try-expand-dabbrev
+        try-expand-dabbrev-all-buffers
+        try-expand-dabbrev-from-kill
+        try-complete-file-name-partially
+        try-complete-file-name
+        try-expand-all-abbrevs
+        try-expand-list
+        try-expand-line
+        try-complete-lisp-symbol-partially
+        try-complete-lisp-symbol))
 
 ;; use hippie-expand instead of dabbrev
 (global-set-key (kbd "M-/") #'hippie-expand)
-(global-set-key (kbd "s-/") #'hippie-expand)
 
 (global-set-key (kbd "C-x \\") #'align-regexp)
 
@@ -358,6 +357,7 @@ Repeated invocations toggle between the two most recently open buffers."
   (global-hl-line-mode +1))
 
 (use-package abbrev
+  :diminish abbrev-mode
   :config
   (setq save-abbrevs 'silently)
   (setq-default abbrev-mode t))
@@ -386,7 +386,7 @@ Repeated invocations toggle between the two most recently open buffers."
         '(search-ring regexp-search-ring)
         ;; save every minute
         savehist-autosave-interval 60
-        ;; keep the home clean
+        ;; keep home clean
         savehist-file (expand-file-name "savehist" asm/savefile-dir))
   (savehist-mode +1))
 
@@ -648,9 +648,11 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package avy
   :ensure t
-  :bind (("s-." . avy-goto-word-or-subword-1)
-         ("s-," . avy-goto-char-timer)
-         ("C-'" . avy-goto-line))
+  :bind (("s-."   . avy-goto-word-or-subword-1)
+         ("s-,"   . avy-goto-char-timer)
+         ("C-'"   . avy-goto-char-2)
+         ("M-g f" . avy-goto-line)
+         ("M-g w" . avy-goto-word-1))
   :config
   (setq avy-background t))
 
@@ -775,6 +777,7 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package projectile
   :ensure t
+  :diminish projectile-mode
   :after (ivy)
   :init
   (setq projectile-completion-system 'ivy
@@ -904,7 +907,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 (use-package zop-to-char
   :ensure t
   :bind (("M-z" . zop-up-to-char)
-         ("M-Z" . zop-to-char)))
+         ("s-z" . (lambda () (interactive) (zop-up-to-char -1)))))
 
 ;; imenu
 ;; recenter around selected imenu items
@@ -956,6 +959,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package flycheck
   :after pyenv-mode
+  :diminish flycheck-mode
   :ensure t
   :config
   (add-hook 'after-init-hook (lambda ()
@@ -965,6 +969,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package company
   :ensure t
+  :diminish company-mode
   :config
   (setq company-idle-delay 0.2
         company-show-numbers t
@@ -979,6 +984,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package yasnippet
   :ensure t
+  :diminish yas-minor-mode
   :config
   (progn
     (setq yas-prompt-functions '(yas-ido-prompt
@@ -1051,6 +1057,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package which-key
   :ensure t
+  :diminish which-key-mode
   :config
   (setq which-key-idle-delay 0.4)
   (which-key-mode +1))
@@ -1074,6 +1081,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package undo-tree
   :ensure t
+  :diminish undo-tree-mode
   :config
   ;; autosave the undo-tree history
   (setq undo-tree-history-directory-alist
@@ -1100,6 +1108,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package ivy
   :ensure t
+  :diminish ivy-mode
   :demand
   :config
   (setq ivy-count-format ""
@@ -1206,6 +1215,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package volatile-highlights
   :ensure t
+  :diminish volatile-highlights-mode
   :config
   (volatile-highlights-mode +1)
 
@@ -1225,6 +1235,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   (add-hook 'prog-mode-hook #'rainbow-mode))
 
 (use-package whitespace
+  :diminish whitespace-mode
   :init
   (dolist (hook '(prog-mode-hook text-mode-hook))
     (add-hook hook #'whitespace-mode))
@@ -1235,6 +1246,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package smartparens
   :ensure t
+  :diminish smartparens-mode
   :init
   (setq sp-highlight-pair-overlay nil)
   (smartparens-global-mode t)
@@ -1376,6 +1388,9 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 (use-package flycheck-mypy
   :ensure t)
 
+;; TODO: ein-poly fucks all kinds of shit up, known working version is
+;; ein-20190611.1229. The new version seems to fuck around with
+;; smartparens and other important modes.
 (use-package ein
   :ensure t
   :defer 2
@@ -1635,12 +1650,6 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :commands (restclient-mode)
   :mode ("\\.\\(http\\|rest\\)$" . restclient-mode))
 
-(defun asm/three-window-split ()
-  (interactive)
-  (command-execute 'split-window-horizontally)
-  (command-execute 'split-window-horizontally)
-  (command-execute 'balance-windows))
-
 (defun asm/open-init-file ()
   (interactive)
   (projectile-persp-switch-project "~/proj/emacs.d")
@@ -1680,8 +1689,6 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
                          :columns 4)
    "Shorties"
    ("b" asm/empty-buffer "empty buffer")
-   ("c" cheatsheet-show "cheatsheet")
-   ("d" dash-at-point "dash")
    ("e" flycheck-list-errors "list errors")
    ("f" asm/yank-filename "yank filename")
    ("i" asm/open-init-file "open init")
