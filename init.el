@@ -1360,16 +1360,24 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   (setq markdown-fontify-code-blocks-natively t))
 
 ;; LSP
-(use-package eglot
-  :ensure t
-  :disabled
-  :config
-  (setq eglot-ignored-server-capabilites '(:documentHighlightProvider)
-        eglot--mode-line-format "LSP"
-        eglot-workspace-configuration '((pyls.configurationSources . ["flake8"])))
-  :hook ((python-mode . eglot-ensure))
-  :bind (:map eglot-mode-map
-              ("C-c h" . eglot-help-at-point)))
+;; (use-package lsp-mode
+;;   :ensure
+;;   :commands lsp
+;;   :custom
+;;   ;; what to use when checking on-save. "check" is default, I prefer clippy
+;;   (lsp-rust-analyzer-cargo-watch-command "clippy")
+;;   (lsp-eldoc-render-all t)
+;;   (lsp-idle-delay 0.6)
+;;   :config
+;;   (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+
+;; (use-package lsp-ui
+;;   :ensure
+;;   :commands lsp-ui-mode
+;;   :custom
+;;   (lsp-ui-peek-always-show t)
+;;   (lsp-ui-sideline-show-hover t)
+;;   (lsp-ui-doc-enable nil))
 
 ;; python
 (use-package pyenv-mode
@@ -1580,7 +1588,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :ensure t
   :after rust-mode
   :config
-  (setq racer-rust-src-path (expand-file-name "~/.rustup/toolchains/stable-x86_64-apple-darwin/lib/rustlib/src/rust/src")
+  (setq racer-rust-src-path (expand-file-name "~/.rustup/toolchains/stable-x86_64-apple-darwin/lib/rustlib/src/rust/library")
         racer-cmd (expand-file-name "~/.cargo/bin/racer")))
 
 (use-package flycheck-rust
