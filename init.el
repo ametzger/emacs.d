@@ -1405,7 +1405,6 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 ;; smartparens and other important modes.
 (use-package ein
   :ensure t
-  :defer 2
   :commands (ein:login)
   :init
   (setq ein:complete-on-dot -1
@@ -1431,9 +1430,12 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
             (lambda ()
               (visual-line-mode +1)
               (whitespace-mode -1)
-              (company-mode +1)
-              (undo-tree-mode +1)
-              (bind-key "C-/" 'undo-tree-undo))))
+              (company-mode nil)
+              (flycheck-mode nil)
+              (undo-tree-mode nil)
+              ;; (bind-key "C-/" 'undo-tree-undo)
+              (bind-key "C-a" 'crux-move-beginning-of-line)
+              )))
 
 ;; golang
 (use-package go-projectile
