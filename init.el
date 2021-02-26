@@ -1181,7 +1181,19 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 ; buffer accidentally crosses project boundaries.
 (use-package perspective
   :ensure t
-  :config (persp-mode))
+  :config
+  (persp-mode)
+
+  ;; switch to perspective when exiting ibuffer
+  (defun asm/persp-ibuffer-visit-buffer ()
+    (interactive)
+    (let ((buf (ibuffer-current-buffer t))
+          (persp-name (string-remove-prefix "Projectile:" (get-text-property
+                       (line-beginning-position) 'ibuffer-filter-group))))
+      (persp-switch persp-name)
+      (switch-to-buffer buf)))
+
+  (define-key ibuffer-mode-map (kbd "RET") 'asm/persp-ibuffer-visit-buffer))
 
 (use-package persp-projectile
   :ensure t
