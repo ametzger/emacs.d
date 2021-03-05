@@ -1730,6 +1730,9 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 (use-package clojure-mode
   :ensure t)
 
+(use-package cider
+  :ensure t)
+
 (use-package restclient
   :ensure t
   :defer t
