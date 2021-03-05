@@ -142,6 +142,11 @@
 ;; indent on RET
 (global-set-key (kbd "RET") #'newline-and-indent)
 
+;; window management
+(use-package winner
+  :init
+  (winner-mode))
+
 ;; TODO(asm,2019-03-21): these don't work correctly with multiple
 ;; monitors.
 (defun asm/window-left ()
@@ -1273,6 +1278,10 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :config
   (shackle-mode))
 
+(use-package zygospore
+  :ensure
+  :bind ("C-x 1" . zygospore-toggle-delete-other-windows))
+
 (use-package zoom
   :disabled
   :init
@@ -1760,6 +1769,15 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
         (clipboard-kill-region (point-min) (point-max)))
       (message filename))))
 
+(defun asm/toggle-maximize-buffer ()
+  "Maximize buffer"
+  (interactive)
+  (if (= 1 (length (window-list)))
+      (jump-to-register '_)
+    (progn
+      (window-configuration-to-register '_)
+      (delete-other-windows))))
+
 (global-set-key
  (kbd "C-z")
  (defhydra ctrl-z-hydra (:color blue
@@ -1777,7 +1795,8 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
    ("s" counsel-rg "ripgrep")
    ("w" ace-window "ace window")
    ("C-s" deadgrep "deadgrep")
-   ("q" nil "quit")))
+   ("q" nil "quit")
+   ("z" asm/toggle-maximize-buffer "zoom")))
 
 ;;; init.el ends here
 ;; Local Variables:
