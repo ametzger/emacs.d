@@ -843,19 +843,19 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 ; TODO: this is slow, see
 ; https://github.com/purcell/ibuffer-projectile/issues/11
-(use-package ibuffer-projectile
-  :ensure t
-  :after (projectile ibuffer)
-  :config
-  (progn
-    (defun asm/ibuffer-hook ()
-      (ibuffer-projectile-set-filter-groups)
-      ;; sort alphabetically then by major mode
-      (unless (eq ibuffer-sorting-mode 'alphabetic)
-        (ibuffer-do-sort-by-alphabetic)
-        (ibuffer-do-sort-by-major-mode)))
+;; (use-package ibuffer-projectile
+;;   :ensure t
+;;   :after (projectile ibuffer)
+;;   :config
+;;   (progn
+;;     (defun asm/ibuffer-hook ()
+;;       (ibuffer-projectile-set-filter-groups)
+;;       ;; sort alphabetically then by major mode
+;;       (unless (eq ibuffer-sorting-mode 'alphabetic)
+;;         (ibuffer-do-sort-by-alphabetic)
+;;         (ibuffer-do-sort-by-major-mode)))
 
-    (add-hook 'ibuffer-hook #'asm/ibuffer-hook)))
+;;     (add-hook 'ibuffer-hook #'asm/ibuffer-hook)))
 
 (use-package expand-region
   :ensure t
@@ -1190,15 +1190,16 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   (persp-mode)
 
   ;; switch to perspective when exiting ibuffer
-  (defun asm/persp-ibuffer-visit-buffer ()
-    (interactive)
-    (let ((buf (ibuffer-current-buffer t))
-          (persp-name (string-remove-prefix "Projectile:" (get-text-property
-                       (line-beginning-position) 'ibuffer-filter-group))))
-      (persp-switch persp-name)
-      (switch-to-buffer buf)))
+  ;; (defun asm/persp-ibuffer-visit-buffer ()
+  ;;   (interactive)
+  ;;   (let ((buf (ibuffer-current-buffer t))
+  ;;         (persp-name (string-remove-prefix "Projectile:" (get-text-property
+  ;;                      (line-beginning-position) 'ibuffer-filter-group))))
+  ;;     (persp-switch persp-name)
+  ;;     (switch-to-buffer buf)))
 
-  (define-key ibuffer-mode-map (kbd "RET") 'asm/persp-ibuffer-visit-buffer))
+  ;; (define-key ibuffer-mode-map (kbd "RET") 'asm/persp-ibuffer-visit-buffer)
+  )
 
 (use-package persp-projectile
   :ensure t
@@ -1750,7 +1751,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   (let ((buf (generate-new-buffer "untitled")))
     (switch-to-buffer buf)
     (funcall initial-major-mode)
-    (setq buffer-offer-save t)
+    (setq buffer-offer-save nil)
     buf))
 
 (defun asm/org-open-file ()
