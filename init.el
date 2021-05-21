@@ -1671,6 +1671,29 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
   (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode)))
 
+(use-package typescript-mode
+  :ensure t
+  :config
+  (setq-default typescript-indent-level 4)
+
+  :mode (("\\.ts\\'" . typescript-mode))
+  :mode (("\\.tsx\\'" . typescript-mode)))
+
+(defun asm/setup-tide-mode ()
+  (interactive)
+  (defun tide-imenu-index () nil)
+  (tide-setup)
+  (tide-hl-identifier-mode +1))
+
+(use-package tide
+  :ensure t
+  :config
+  (progn
+    (add-hook 'typescript-mode-hook #'asm/setup-tide-mode)
+    (add-hook 'js-mode-hook #'asm/setup-tide-mode)
+    (add-hook 'js2-mode-hook #'asm/setup-tide-mode)
+    (add-hook 'rjsx-mode-hook #'asm/setup-tide-mode)))
+
 (use-package coffee-mode
   :ensure t
   :disabled
