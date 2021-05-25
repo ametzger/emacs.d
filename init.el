@@ -1687,6 +1687,8 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package tide
   :ensure t
+  :disabled ; NOTE(asm,2021-05-25): this seems to throw a lot of
+            ; errors, disabling for now
   :config
   (progn
     (add-hook 'typescript-mode-hook #'asm/setup-tide-mode)
