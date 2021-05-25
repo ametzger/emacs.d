@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: note
+# key: note
+# --
+`comment-start` NOTE(asm,`(format-time-string "%Y-%m-%d")`): $0`comment-end`
