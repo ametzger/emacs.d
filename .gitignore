@@ -31,3 +31,4 @@ request/*
 /emojis
 /bookmarks
 *.cache
+/eln-cache/
