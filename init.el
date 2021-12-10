@@ -495,6 +495,11 @@ Repeated invocations toggle between the two most recently open buffers."
         ("<RET>" . org-return-indent))
   :config
   (progn
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((python     . t)
+       (emacs-lisp . t)
+       (restclient . t)))
     (setq org-directory "~/org"
           org-default-notes-file (concat org-directory "/scratch.org")
           org-agenda-files (mapcar
@@ -536,7 +541,6 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package org-journal
   :ensure t
-  :disabled
   :defer 2
   :init
   (defun asm/org-journal-done ()
