@@ -1461,7 +1461,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 (use-package py-isort
   :ensure t
   :config
-  (setq py-isort-options '("--lines=100" "--multi-line=3" "--trailing-comma")))
+  (setq py-isort-options '("-l 100" "--multi-line=3" "--trailing-comma")))
 
 (defun asm/toggle-isort ()
   "Toggle isort before-save-hook."
