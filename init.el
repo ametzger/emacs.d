@@ -1826,7 +1826,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
    ("n" ein:login "EIN")
    ("o" asm/org-open-file "find org file")
    ("p" projectile-persp-switch-project "open project")
-   ("r" anzu-query-replace-regexp "regex replace")
+   ("r" anzu-replace-at-cursor-thing "replace at point")
    ("s" counsel-rg "ripgrep")
    ("w" ace-window "ace window")
    ("C-s" deadgrep "deadgrep")
