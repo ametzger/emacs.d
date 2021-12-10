@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: hack
+# key: hack
+# --
+`comment-start`HACK(asm,`(format-time-string "%Y-%m-%d")`): $0`comment-end`
