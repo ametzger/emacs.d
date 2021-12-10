@@ -32,3 +32,5 @@ request/*
 /bookmarks
 *.cache
 /eln-cache/
+/forge-database.sqlite
+/games/tetris-scores
