@@ -1359,6 +1359,13 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
    ("M-J"   . sp-join-sexp)
    ("C-M-t" . sp-transpose-sexp)))
 
+;; elisp
+(use-package emacs-lisp
+  :mode ("\\.el'" . emacs-lisp-mode)
+  :bind
+  (:map emacs-lisp-mode-map
+        ("C-c C-c" . eval-region)))
+
 ;; ruby
 (use-package ruby-mode
   :config
