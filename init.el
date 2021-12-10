@@ -1728,6 +1728,8 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 (use-package company-terraform
   :ensure t)
 
+(setenv "ASDF_DIR" "/Users/asm/.asdf")
+
 (defun asm/terraform-mode-hook ()
   (subword-mode +1)
   (terraform-format-on-save-mode t)
