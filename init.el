@@ -91,6 +91,10 @@
 
 (setq large-file-warning-threshold 50000000)
 
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+(put 'narrow-to-region 'disabled nil)
+
 (global-set-key (kbd "C-x C-b") #'ibuffer)
 (global-set-key (kbd "C-c k")
                 (lambda ()
@@ -282,6 +286,18 @@
 (setq default-process-coding-system '(utf-8-unix . utf-8-unix)
       locale-coding-system   'utf-8)
 
+(defun asm/occur-dwim ()
+  (interactive)
+  (push (if (region-active-p)
+            (buffer-substring-no-properties
+             (region-beginning)
+             (region-end))
+          (thing-at-point 'symbol))
+        regexp-history)
+  (call-interactively 'occur))
+
+(bind-key "M-s o" #'asm/occur-dwim)
+
 (defun asm/comment-sanely ()
   (interactive)
   (if (region-active-p)
@@ -333,6 +349,10 @@ Repeated invocations toggle between the two most recently open buffers."
 ;; platform-specific
 (if (eq system-type 'darwin)
     (progn
+      (setq delete-by-moving-to-trash t
+            trash-directory "~/.Trash")
+      (put 'ns-print-buffer 'disabled t)
+      (put 'suspend-frame 'disabled t)
       (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
       (add-to-list 'default-frame-alist '(ns-appearance . dark))
       (setq-default ns-use-srgb-colorspace t
@@ -427,6 +447,7 @@ Repeated invocations toggle between the two most recently open buffers."
   ;;            coreutils-ls-path)
   ;;       (setq insert-directory-program coreutils-ls-path))))
 
+  (add-hook 'dired-mode-hook 'auto-revert-mode)
   (require 'ls-lisp)
   (setq ls-lisp-dirs-first t
         ls-lisp-use-insert-directory-program nil)
