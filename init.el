@@ -890,6 +890,10 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 ;;     (add-hook 'ibuffer-hook #'asm/ibuffer-hook)))
 
+(use-package scratch
+  :ensure t
+  :commands scratch)
+
 (use-package expand-region
   :ensure t
   :bind
