@@ -520,7 +520,8 @@ Repeated invocations toggle between the two most recently open buffers."
      'org-babel-load-languages
      '((python     . t)
        (emacs-lisp . t)
-       (restclient . t)))
+       ;; (restclient . t)
+       ))
     (setq org-directory "~/org"
           org-default-notes-file (concat org-directory "/scratch.org")
           org-agenda-files (mapcar
