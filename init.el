@@ -786,9 +786,8 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package deadgrep
   :ensure t
   :after (ripgrep projectile)
-  ;; :init
-  ;; (setq deadgrep-project-root-function #'asm/deadgrep-project-root)
-  )
+  :config
+  (setq deadgrep-project-root-function #'asm/deadgrep-project-root))
 
 (use-package wgrep
   :ensure t)
@@ -905,7 +904,6 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :ensure t
   :bind
   ("C-;"           . mc/mark-all-like-this-dwim)
-  ("C-c C-<"       . mc/mark-all-like-this)
   ("C->"           . mc/mark-next-like-this)
   ("C-<"           . mc/mark-previous-like-this)
   ("C-S-<mouse-1>" . mc/add-cursor-on-click)
