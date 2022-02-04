@@ -742,15 +742,23 @@ Repeated invocations toggle between the two most recently open buffers."
   :ensure t
   :bind (("s-g" . git-timemachine)))
 
-(use-package browse-at-remote
+;; (use-package browse-at-remote
+;;   :ensure t
+;;   :defer t
+;;   :commands (browse-at-remote)
+;;   :bind (("C-c g" . browse-at-remote-kill)
+;;          ("C-c G" . browse-at-remote))
+;;   :custom
+;;   ;; Use full commit hashes for long-lived links
+;;   (browse-at-remote-prefer-symbolic nil))
+
+(use-package git-link
   :ensure t
   :defer t
-  :commands (browse-at-remote)
-  :bind (("C-c g" . browse-at-remote-kill)
-         ("C-c G" . browse-at-remote))
-  :custom
-  ;; Use full commit hashes for long-lived links
-  (browse-at-remote-prefer-symbolic nil))
+  :commands (git-link)
+  :bind (("C-c g" . git-link))
+  :config
+  (setq git-link-use-commit t))
 
 (use-package gitconfig-mode
   :ensure t
@@ -1569,26 +1577,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
   (add-hook 'go-mode-hook 'company-mode)
   (add-hook 'go-mode-hook 'go-eldoc-setup)
-  (add-hook 'go-mode-hook 'asm/go-mode-hook)
-  :bind
-  (:map go-mode-map
-        ("C-c g a" . go-imports-insert-import)
-        ("C-c g p" . go-direx-pop-to-buffer)
-        ("C-c g b" . go-direx-switch-to-buffer)
-        ("C-c g i" . go-impl)
-        ("C-c g f" . go-fill-struct)
-        ("C-c g r" . go-rename)
-        ("C-c g l" . go-imports-reload-packages-list)
-        ("C-c g t" . go-tag-add)
-        ("C-c g v" . go-tag-remove)
-        ("C-c t g" . go-gen-test-dwim)
-        ("C-c t a" . go-gen-test-all)
-        ("C-c t e" . go-gen-test-exported)
-        ("C-c t f" . go-test-current-file)
-        ("C-c t t" . go-test-current-test)
-        ("C-c t p" . go-test-current-project)
-        ("C-c t b" . go-test-current-benchmark)
-        ("C-c t x" . go-run)))
+  (add-hook 'go-mode-hook 'asm/go-mode-hook))
 
 (use-package company-go
   :ensure t
