@@ -34,3 +34,4 @@ request/*
 /eln-cache/
 /forge-database.sqlite
 /games/tetris-scores
+/.lsp-session-v1
