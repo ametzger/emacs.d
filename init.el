@@ -1316,12 +1316,12 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :ensure
   :bind ("C-x 1" . zygospore-toggle-delete-other-windows))
 
-(use-package zoom
-  :disabled
-  :init
-  (zoom-mode +1)
-  :config
-  (setq zoom-size '(0.618 . 0.618)))
+;; (use-package zoom
+;;   :disabled
+;;   :init
+;;   (zoom-mode +1)
+;;   :config
+;;   (setq zoom-size '(0.618 . 0.618)))
 
 (use-package volatile-highlights
   :ensure t
@@ -1631,14 +1631,14 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 (add-hook 'rust-mode-hook #'electric-pair-mode)
 
 ;; misc languages
-(use-package fish-mode
-  :ensure t
-  :defer t
-  :mode "\\.fish$")
+;; (use-package fish-mode
+;;   :ensure t
+;;   :defer t
+;;   :mode "\\.fish$")
 
-(use-package counsel-jq
-  :ensure t
-  :defer 0.4)
+;; (use-package counsel-jq
+;;   :ensure t
+;;   :defer 0.4)
 
 (use-package json-mode
   :ensure t
@@ -1717,13 +1717,13 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
     (add-hook 'js2-mode-hook #'asm/setup-tide-mode)
     (add-hook 'rjsx-mode-hook #'asm/setup-tide-mode)))
 
-(use-package coffee-mode
-  :ensure t
-  :disabled
-  :mode
-  ("\\.coffee\\'" . coffee-mode)
-  :init
-  (setq coffee-tab-width 2))
+;; (use-package coffee-mode
+;;   :ensure t
+;;   :disabled
+;;   :mode
+;;   ("\\.coffee\\'" . coffee-mode)
+;;   :init
+;;   (setq coffee-tab-width 2))
 
 
 (use-package typescript-mode
@@ -1767,9 +1767,9 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :ensure t
   :after (company))
 
-(use-package crontab-mode
-  :ensure t
-  :mode "crontab.*")
+;; (use-package crontab-mode
+;;   :ensure t
+;;   :mode "crontab.*")
 
 (use-package jinja2-mode
   :ensure t
