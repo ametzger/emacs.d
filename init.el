@@ -242,16 +242,13 @@
 (global-set-key (kbd "C-S-SPC") #'asm/select-current-line)
 
 ;; font config
-(let ((font-name
-       ;; "IBM Plex Mono Medium"
-       "Operator Mono Medium"
-       ;; "SF Mono"
-       ;; "Go Mono"
-       ;; "Cascadia Code"
-       )
-      (font-size (if (eq system-type 'darwin)
-                     18
-                   13)))
+(let* ((font-candidates '("Operator Mono Medium"
+                          "Go Mono"
+                          "SF Mono"
+                          "IBM Plex Mono Medium"
+                          "Cascadia Code"))
+       (font-name (seq-find #'x-list-fonts font-candidates nil))
+       (font-size (if (eq system-type 'darwin) 18 13)))
   (set-frame-font (format "%s %d" font-name font-size) t t))
 
 ;; italics for comments, keywords. Prettiest in Operator Mono.
