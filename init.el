@@ -582,6 +582,10 @@ Repeated invocations toggle between the two most recently open buffers."
    :map org-journal-mode-map
    ("C-c C-c" . asm/org-journal-done)))
 
+(use-package re-builder
+  :config
+  (setq reb-re-syntax 'string))
+
 ;; emacs tools
 (use-package esup
   :ensure t
