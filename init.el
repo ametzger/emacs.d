@@ -1771,6 +1771,9 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :ensure t
   :after (company))
 
+(use-package just-mode
+  :ensure t)
+
 ;; (use-package crontab-mode
 ;;   :ensure t
 ;;   :mode "crontab.*")
