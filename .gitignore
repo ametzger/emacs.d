@@ -35,3 +35,5 @@ request/*
 /forge-database.sqlite
 /games/tetris-scores
 /.lsp-session-v1
+# OSM files
+/var/

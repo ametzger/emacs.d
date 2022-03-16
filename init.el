@@ -587,6 +587,18 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq reb-re-syntax 'string))
 
 ;; emacs tools
+(use-package osm
+  :ensure t
+  :defer t
+  :commands (osm-home)
+  :bind (("C-c m h" . osm-home)
+         ;; ("C-c m s" . osm-search)
+         ;; ("C-c m v" . osm-server)
+         ;; ("C-c m t" . osm-goto)
+         ;; ("C-c m x" . osm-gpx-show)
+         ;; ("C-c m j" . osm-bookmark-jump)
+         ))
+
 (use-package esup
   :ensure t
   :disabled
