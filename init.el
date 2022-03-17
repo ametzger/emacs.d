@@ -1749,6 +1749,10 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :init
   (setq typescript-indent-level 2))
 
+(setenv "ASDF_DIR" "/Users/asm/.asdf")
+(setenv "PATH" (concat (getenv "PATH") ":" (expand-file-name "~/.asdf/shims")))
+(setq exec-path (append exec-path (list (expand-file-name "~/.asdf/shims"))))
+
 (use-package terraform-mode
   :ensure t
   :mode "\\.tf$"
@@ -1761,7 +1765,6 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 (use-package company-terraform
   :ensure t)
 
-(setenv "ASDF_DIR" "/Users/asm/.asdf")
 
 (defun asm/terraform-mode-hook ()
   (subword-mode +1)
