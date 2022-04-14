@@ -1561,7 +1561,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
               (whitespace-mode -1)
               (company-mode nil)
               (flycheck-mode nil)
-              (undo-tree-mode nil)
+              (undo-tree-mode t)
               ;; (bind-key "C-/" 'undo-tree-undo)
               (bind-key "C-a" 'crux-move-beginning-of-line)
               )))
