@@ -9,8 +9,8 @@
     First, install Emacs from Homebrew using the [[https://github.com/d12frosted/homebrew-emacs-plus][emacs-plus]] package:
     #+BEGIN_SRC shell
 	brew tap d12frosted/emacs-plus
-	brew install d12frosted/emacs-plus/emacs-plus@27 --with-modern-papirus-icon
-    ln -s /usr/local/opt/emacs-plus/Emacs.app /Applications
+	brew install d12frosted/emacs-plus/emacs-plus@28 --with-nobu417-big-sur-icon
+    ln -s /usr/local/opt/emacs-plus@28/Emacs.app /Applications
     #+END_SRC
 
     Then, clone this repo to =~/.emacs.d=:
