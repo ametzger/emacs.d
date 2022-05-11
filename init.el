@@ -1546,9 +1546,8 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 (use-package flycheck-mypy
   :ensure t)
 
-;; TODO: ein-poly fucks all kinds of shit up, known working version is
-;; ein-20190611.1229. The new version seems to fuck around with
-;; smartparens and other important modes.
+; TODO(asm,2022-05-11): Convert this to use straight.el to make this
+; more reproducible
 (use-package ein
   :ensure t
   :commands (ein:login)
@@ -1797,8 +1796,14 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
                        :repo "magit/transient"
                        :ref "6fc09a663e408ade0d1b88f47701c96a9b051e34"))
 
+(use-package vterm
+  :ensure t)
+
 (use-package docker
   :ensure t
+  :config
+  (setq docker-show-messages nil
+        docker-show-status nil)
   :bind ("C-c d" . docker))
 
 (use-package dockerfile-mode
