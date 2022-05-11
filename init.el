@@ -64,6 +64,23 @@
 (setq-default use-package-enable-imenu-support t
               use-package-verbose nil)
 (require 'use-package)
+
+;; straight.el
+
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+
 ;; (use-package auto-package-update
 ;;   :config
 ;;   (setq-default auto-package-update-delete-old-versions t
@@ -1772,6 +1789,17 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   (set (make-local-variable 'company-backends)
        '(company-terraform)))
 (add-hook 'terraform-mode-hook #'asm/terraform-mode-hook)
+
+; TODO(asm,2022-05-11): hack to work around transient + docker dependencies
+(use-package transient
+  :straight (transient :type git
+                       :host github
+                       :repo "magit/transient"
+                       :ref "6fc09a663e408ade0d1b88f47701c96a9b051e34"))
+
+(use-package docker
+  :ensure t
+  :bind ("C-c d" . docker))
 
 (use-package dockerfile-mode
   :ensure t

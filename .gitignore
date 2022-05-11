@@ -37,3 +37,4 @@ request/*
 /.lsp-session-v1
 # OSM files
 /var/
+/straight/
