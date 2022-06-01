@@ -1827,12 +1827,12 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 (use-package vterm
   :ensure t)
 
-(use-package docker
-  :ensure t
-  :config
-  (setq docker-show-messages nil
-        docker-show-status nil)
-  :bind ("C-c d" . docker))
+;; (use-package docker
+;;   :ensure t
+;;   :config
+;;   (setq docker-show-messages nil
+;;         docker-show-status nil)
+;;   :bind ("C-c d" . docker))
 
 (use-package dockerfile-mode
   :ensure t
