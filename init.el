@@ -534,27 +534,18 @@ Repeated invocations toggle between the two most recently open buffers."
      'org-babel-load-languages
      '((python     . t)
        (emacs-lisp . t)
-       ;; (restclient . t)
        ))
     (setq org-directory "~/org"
-          org-default-notes-file (concat org-directory "/scratch.org")
+          org-default-notes-file (concat org-directory "/inbox.org")
           org-agenda-files (mapcar
                             (lambda (path)
                               (concat org-directory "/" path))
-                            '("scratch.org"
-                              "main.org"
-                              "todo.org"))
-          org-capture-templates '(("t" "Todo" entry
-                                   (file+headline "~/org/todo.org" "Tasks")
-                                   "* TODO %^{Description}
-   :LOGBOOK:
-   - Added: %U
-   :END:")
-                                  ("l" "Link" item (file "~/org/links.org")
-                                   "[[%^{URL}][%^{Description}]] %?%U\n" :prepend t)
-                                  ("n" "Note" item
-                                   (file+headline "~/org/scratch.org" "Notes")
-                                   "%? %U\n%a\n" :prepend t))
+                            '("inbox.org"))
+          org-capture-templates `(
+                                  ("i" "Inbox" entry  (file "inbox.org")
+                                   ,(concat "* TODO %?\n"
+                                            "/Entered on/ %U"))
+                                  )
           org-use-speed-commands t
           org-return-follows-link t
           org-confirm-babel-evaluate nil)
@@ -575,29 +566,29 @@ Repeated invocations toggle between the two most recently open buffers."
   :commands (org-bullets-mode)
   :hook (org-mode . org-bullets-mode))
 
-(use-package org-journal
-  :ensure t
-  :defer 2
-  :init
-  (defun asm/org-journal-done ()
-    "Simple convenience function.
-    Saves the buffer of the current day's entry and kills the window
-    Similar to org-capture like behavior"
-    (interactive)
-    (save-buffer)
-    (kill-buffer-and-window))
-  :custom
-  (org-journal-dir (concat (file-name-as-directory org-directory) "journal"))
-  (org-journal-file-format "%Y/%m/%Y%m%d")
-  (org-journal-date-format "%A, %Y-%m-%d")
-  (org-journal-enable-agenda-integration t)
-  (org-journal-hide-entries-p nil)
-  (org-journal-time-format "%R
-   ")
-  :bind
-  (("C-c C-j" . org-journal-new-entry)
-   :map org-journal-mode-map
-   ("C-c C-c" . asm/org-journal-done)))
+;; (use-package org-journal
+;;   :ensure t
+;;   :defer 2
+;;   :init
+;;   (defun asm/org-journal-done ()
+;;     "Simple convenience function.
+;;     Saves the buffer of the current day's entry and kills the window
+;;     Similar to org-capture like behavior"
+;;     (interactive)
+;;     (save-buffer)
+;;     (kill-buffer-and-window))
+;;   :custom
+;;   (org-journal-dir (concat (file-name-as-directory org-directory) "journal"))
+;;   (org-journal-file-format "%Y/%m/%Y%m%d")
+;;   (org-journal-date-format "%A, %Y-%m-%d")
+;;   (org-journal-enable-agenda-integration t)
+;;   (org-journal-hide-entries-p nil)
+;;   (org-journal-time-format "%R
+;;    ")
+;;   :bind
+;;   (("C-c C-j" . org-journal-new-entry)
+;;    :map org-journal-mode-map
+;;    ("C-c C-c" . asm/org-journal-done)))
 
 (use-package re-builder
   :config
