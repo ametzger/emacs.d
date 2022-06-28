@@ -92,6 +92,11 @@
 ;;   :config
 ;;   (paradox-enable))
 
+;; make sure ASDF stuff gets picked up
+(setenv "ASDF_DIR" (concat (getenv "HOME") "/.asdf"))
+(setenv "PATH" (concat (getenv "PATH") ":" (expand-file-name "~/.asdf/shims")))
+(setq exec-path (append exec-path (list (expand-file-name "~/.asdf/shims"))))
+
 ;; vanity
 (setq user-full-name    "Alex Metzger"
       user-mail-address "asm@asm.io"
@@ -168,27 +173,12 @@
   :init
   (winner-mode))
 
-;; TODO(asm,2019-03-21): these don't work correctly with multiple
-;; monitors.
-(defun asm/window-left ()
-  (interactive)
-  (let ((frame (selected-frame))
-        (one-half-display-pixel-width (/ (display-pixel-width) 3)))
-    (set-frame-width frame one-half-display-pixel-width nil 'pixelwise)
-    (set-frame-height frame (display-pixel-height) nil 'pixelwise)
-    (set-frame-position frame 0 0)))
-
-;; leften the window when starting emacs
-(add-hook 'after-init-hook #'asm/window-max)
-
 (defun asm/window-max ()
   (interactive)
   (toggle-frame-maximized))
 
-  ;; (let ((frame (selected-frame)))
-  ;;   (set-frame-position frame 0 0)
-  ;;   (set-frame-width frame (display-pixel-width) nil 'pixelwise)
-  ;;   (set-frame-height frame (display-pixel-height) nil 'pixelwise)))
+;; maximize the window when starting emacs
+(add-hook 'after-init-hook #'asm/window-max)
 
 (defun asm/split-window-vertically ()
   (interactive)
@@ -279,8 +269,6 @@
               tab-width 4
               sh-basic-offset 2)
 
-(put 'upcase-region 'disabled nil)
-
 (setq require-final-newline t)
 
 (delete-selection-mode t)
@@ -309,7 +297,6 @@
           (thing-at-point 'symbol))
         regexp-history)
   (call-interactively 'occur))
-
 (bind-key "M-s o" #'asm/occur-dwim)
 
 (defun asm/comment-sanely ()
@@ -327,7 +314,6 @@
           (progn
             (comment-or-uncomment-region $lbp $lep)
             (forward-line )))))))
-
 (global-set-key (kbd "M-;") #'asm/comment-sanely)
 
 ;; hippie expand is dabbrev expand on steroids
@@ -409,14 +395,6 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq uniquify-after-kill-buffer-p t)
   ;; don't muck with special buffers
   (setq uniquify-ignore-buffers-re "^\\*"))
-
-;; saveplace remembers your location in a file when saving files
-(use-package saveplace
-  :disabled
-  :config
-  (setq save-place-file (expand-file-name "saveplace" asm/savefile-dir))
-  ;; activate it for all buffers
-  (setq-default save-place t))
 
 (use-package savehist
   :config
@@ -500,29 +478,15 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (setq ibuffer-default-sorting-mode 'major-mode))
 
-(use-package ispell
-  :config
-  (when (executable-find "aspell")
-    (setq ispell-program-name (executable-find "aspell")
-          ispell-extra-args '("--sug-mode=ultra" "--lang=en_US")
-          ispell-silently-savep t)))
-
-(use-package flyspell
-  :init
-  (progn
-    (setq-default flyspell-use-meta-tab nil)))
-
 (defun asm/org-mode-hook ()
   (auto-fill-mode t)
-  (visual-line-mode t)
-  (flyspell-mode t))
+  (visual-line-mode t))
 
 (use-package org
   :ensure t
-  :demand
   :mode ("\\.org\\'" . org-mode)
   :bind
-  ("C-c l" . org-store-link)
+  ;; ("C-c l" . org-store-link)
   ("C-c c" . org-capture)
   ("C-c a" . org-agenda)
   (:map org-mode-map
@@ -595,32 +559,7 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq reb-re-syntax 'string))
 
 ;; emacs tools
-(use-package osm
-  :ensure t
-  :defer t
-  :commands (osm-home)
-  :bind (("C-c m h" . osm-home)
-         ;; ("C-c m s" . osm-search)
-         ;; ("C-c m v" . osm-server)
-         ;; ("C-c m t" . osm-goto)
-         ;; ("C-c m x" . osm-gpx-show)
-         ;; ("C-c m j" . osm-bookmark-jump)
-         ))
-
-(use-package esup
-  :ensure t
-  :disabled
-  :init
-  (setq esup-user-init-file
-        (file-truename "~/.emacs.d/init.el")))
-
-(use-package keyfreq
-  :ensure t
-  :disabled
-  :commands (keyfreq-mode keyfreq-autosave-mode)
-  :init
-  (keyfreq-mode 1)
-  (keyfreq-autosave-mode 1))
+(global-set-key (kbd "C-M-.") #'xref-find-definitions-other-window)
 
 (use-package helpful
   :ensure t
@@ -674,30 +613,7 @@ Repeated invocations toggle between the two most recently open buffers."
         doom-modeline-irc nil
         doom-modeline-env-version nil))
 
-;; emoji
-(use-package company-emoji
-  :ensure t
-  :demand
-  :after (company)
-  :hook
-  ((markdown-mode   . company-mode)
-   (git-commit-mode . company-mode)))
-
-(use-package emojify
-  :ensure t
-  :hook
-  ((markdown-mode     . emojify-mode)
-   (git-commit-mode   . emojify-mode)
-   (magit-status-mode . emojify-mode)
-   (magit-log-mode    . emojify-mode)))
-
 ;; usability
-(use-package hungry-delete
-  :disabled
-  :ensure t
-  :config
-  (global-hungry-delete-mode))
-
 (use-package avy
   :ensure t
   :bind (("s-."   . avy-goto-word-or-subword-1)
@@ -708,28 +624,28 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (setq avy-background t))
 
-(use-package editorconfig
-  :disabled
-  :ensure t
-  :hook
-  ((mardown-mode . editorconfig-mode)
-   (python-mode  . editorconfig-mode)
-   (web-mode     . editorconfig-mode)
-   (js2-mode     . editorconfig-mode)
-   (sh-mode      . editorconfig-mode)
-   (ruby-mode    . editorconfig-mode))
-  :config
-  (add-to-list 'editorconfig-indentation-alist '(web-mode web-mode-attr-indent-offset))
-  (add-to-list 'editorconfig-indentation-alist '(web-mode web-mode-attr-value-indent-offset))
-  (add-to-list 'editorconfig-indentation-alist '(web-mode web-mode-code-indent-offset))
-  (add-to-list 'editorconfig-indentation-alist '(web-mode web-mode-css-indent-offset))
-  (add-to-list 'editorconfig-indentation-alist '(web-mode web-mode-markup-indent-offset))
-  (add-to-list 'editorconfig-indentation-alist '(web-mode web-mode-sql-indent-offset))
-  (add-to-list 'editorconfig-indentation-alist '(web-mode js2-basic-offset))
-  (add-to-list 'editorconfig-indentation-alist '(js-mode js-indent-level js2-basic-offset))
-  (add-to-list 'editorconfig-indentation-alist '(js2-mode js-indent-level js2-basic-offset))
-  (add-to-list 'editorconfig-indentation-alist '(js2-minor-mode js-indent-level js2-basic-offset))
-  (add-to-list 'editorconfig-indentation-alist '(nginx-mode nginx-indent-level nginx-indent-level)))
+;; (use-package editorconfig
+;;   :disabled
+;;   :ensure t
+;;   :hook
+;;   ((mardown-mode . editorconfig-mode)
+;;    (python-mode  . editorconfig-mode)
+;;    (web-mode     . editorconfig-mode)
+;;    (js2-mode     . editorconfig-mode)
+;;    (sh-mode      . editorconfig-mode)
+;;    (ruby-mode    . editorconfig-mode))
+;;   :config
+;;   (add-to-list 'editorconfig-indentation-alist '(web-mode web-mode-attr-indent-offset))
+;;   (add-to-list 'editorconfig-indentation-alist '(web-mode web-mode-attr-value-indent-offset))
+;;   (add-to-list 'editorconfig-indentation-alist '(web-mode web-mode-code-indent-offset))
+;;   (add-to-list 'editorconfig-indentation-alist '(web-mode web-mode-css-indent-offset))
+;;   (add-to-list 'editorconfig-indentation-alist '(web-mode web-mode-markup-indent-offset))
+;;   (add-to-list 'editorconfig-indentation-alist '(web-mode web-mode-sql-indent-offset))
+;;   (add-to-list 'editorconfig-indentation-alist '(web-mode js2-basic-offset))
+;;   (add-to-list 'editorconfig-indentation-alist '(js-mode js-indent-level js2-basic-offset))
+;;   (add-to-list 'editorconfig-indentation-alist '(js2-mode js-indent-level js2-basic-offset))
+;;   (add-to-list 'editorconfig-indentation-alist '(js2-minor-mode js-indent-level js2-basic-offset))
+;;   (add-to-list 'editorconfig-indentation-alist '(nginx-mode nginx-indent-level nginx-indent-level)))
 
 (use-package magit
   :ensure t
@@ -746,32 +662,9 @@ Repeated invocations toggle between the two most recently open buffers."
   (defadvice magit-quit-window (after magit-restore-screen activate)
     (jump-to-register :magit-fullscreen)))
 
-(use-package forge
-  :ensure t
-  :disabled
-  :demand t
-  :after magit
-  :init
-  (setq forge-topic-list-limit '(10 . 0)))
-
-(defun asm/git-commit-hook ()
-  (set (make-local-variable 'company-backends)
-       '(company-emoji)))
-(add-hook 'git-commit-mode-hook #'asm/git-commit-hook)
-
 (use-package git-timemachine
   :ensure t
   :bind (("s-g" . git-timemachine)))
-
-;; (use-package browse-at-remote
-;;   :ensure t
-;;   :defer t
-;;   :commands (browse-at-remote)
-;;   :bind (("C-c g" . browse-at-remote-kill)
-;;          ("C-c G" . browse-at-remote))
-;;   :custom
-;;   ;; Use full commit hashes for long-lived links
-;;   (browse-at-remote-prefer-symbolic nil))
 
 (use-package git-link
   :ensure t
@@ -781,19 +674,11 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (setq git-link-use-commit t))
 
-(use-package gitconfig-mode
-  :ensure t
-  :defer t)
-
 (use-package direnv
   :ensure t
   :config
   (setq direnv-always-show-summary nil)
   (direnv-mode))
-
-(use-package ag
-  :if (executable-find "ag")
-  :ensure t)
 
 (use-package ripgrep
   :if (executable-find "rg")
@@ -849,71 +734,6 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (projectile-mode +1)
   (setq projectile-enable-caching t))
-
-(defhydra hydra-projectile (:color teal
-                            :hint nil)
-     "
-     PROJECTILE: %(projectile-project-root)
-
-     Find File            Search/Tags          Buffers                Cache
-------------------------------------------------------------------------------------------
-_s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache clear
- _ff_: file dwim       _g_: update gtags      _b_: switch to buffer  _x_: remove known project
- _fd_: file curr dir   _o_: multi-occur     _s-k_: Kill all buffers  _X_: cleanup non-existing
-  _r_: recent file                                               ^^^^_z_: cache current
-  _d_: dir
-
-"
-     ("a"   projectile-ag)
-     ("b"   projectile-switch-to-buffer)
-     ("c"   projectile-invalidate-cache)
-     ("d"   projectile-find-dir)
-     ("s-f" projectile-find-file)
-     ("ff"  projectile-find-file-dwim)
-     ("fd"  projectile-find-file-in-directory)
-     ("g"   ggtags-update-tags)
-     ("s-g" ggtags-update-tags)
-     ("i"   projectile-ibuffer)
-     ("K"   projectile-kill-buffers)
-     ("s-k" projectile-kill-buffers)
-     ("m"   projectile-multi-occur)
-     ("o"   projectile-multi-occur)
-     ("s-p" projectile-switch-project "switch project")
-     ("p"   projectile-switch-project)
-     ("s"   projectile-switch-project)
-     ("r"   projectile-recentf)
-     ("x"   projectile-remove-known-project)
-     ("X"   projectile-cleanup-known-projects)
-     ("z"   projectile-cache-current-file)
-     ("`"   hydra-projectile-other-window/body "other window")
-     ("q"   nil "cancel" :color blue))
-
-(use-package counsel-projectile
-  :ensure t
-  :bind
-  ("C-c p SPC" . counsel-projectile)
-  :init
-  (global-set-key (kbd "C-c C-p") #'hydra-projectile/body))
-
-; TODO: this is slow, see
-; https://github.com/purcell/ibuffer-projectile/issues/11
-;; (use-package ibuffer-projectile
-;;   :ensure t
-;;   :after (projectile ibuffer)
-;;   :config
-;;   (progn
-;;     (defun asm/ibuffer-hook ()
-;;       (ibuffer-projectile-set-filter-groups)
-;;       ;; sort alphabetically then by major mode
-;;       (unless (eq ibuffer-sorting-mode 'alphabetic)
-;;         (ibuffer-do-sort-by-alphabetic)
-;;         (ibuffer-do-sort-by-major-mode)))
-
-;;     (add-hook 'ibuffer-hook #'asm/ibuffer-hook)))
-
-(use-package scratch
-  :ensure t
-  :commands scratch)
 
 (use-package expand-region
   :ensure t
@@ -1004,21 +824,6 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   (setq hl-todo-highlight-punctuation ":")
   (global-hl-todo-mode))
 
-(use-package dash-at-point
-  :ensure t
-  :disabled
-  :if (memq window-system '(mac ns))
-  :config
-  (add-to-list 'dash-at-point-mode-alist '(python-mode . "asmdj"))
-  (global-set-key (kbd "s-d") #'dash-at-point))
-
-(use-package zeal-at-point
-  :ensure t
-  :disabled
-  :if (memq window-system '(x))
-  :config
-  (global-set-key (kbd "s-d") #'zeal-at-point))
-
 (use-package flycheck
   :after pyenv-mode
   :diminish flycheck-mode
@@ -1076,15 +881,6 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :ensure t
   :after (yasnippet))
 
-(use-package super-save
-  :disabled
-  :ensure t
-  :config
-  (setq auto-save-default nil)
-  ;; add integration with ace-window
-  (add-to-list 'super-save-triggers 'ace-window)
-  (super-save-mode +1))
-
 (use-package crux
   :ensure t
   :bind (("C-c d"         . crux-duplicate-current-line-or-region)
@@ -1109,32 +905,12 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
          ([(control shift return)] . crux-smart-open-line-above)
          ([remap kill-whole-line] . crux-kill-whole-line)))
 
-(use-package diff-hl
-  :ensure t
-  :disabled
-  :config
-  (global-diff-hl-mode +1)
-  (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
-
 (use-package which-key
   :ensure t
   :diminish which-key-mode
   :config
   (setq which-key-idle-delay 0.4)
   (which-key-mode +1))
-
-(use-package cheatsheet
-  :ensure t
-  :disabled
-  :bind
-  (:map cheatsheet-mode-map
-        ("q" . kill-buffer-and-window))
-  :config
-  (progn
-    (cheatsheet-add :group 'Common
-                    :key "C-z"
-                    :description "Open shorties")))
 
 (use-package discover-my-major
   :ensure t
@@ -1341,13 +1117,6 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :ensure
   :bind ("C-x 1" . zygospore-toggle-delete-other-windows))
 
-;; (use-package zoom
-;;   :disabled
-;;   :init
-;;   (zoom-mode +1)
-;;   :config
-;;   (setq zoom-size '(0.618 . 0.618)))
-
 (use-package volatile-highlights
   :ensure t
   :diminish volatile-highlights-mode
@@ -1362,12 +1131,6 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package rainbow-delimiters
   :ensure t)
-
-(use-package rainbow-mode
-  :disabled
-  :ensure t
-  :config
-  (add-hook 'prog-mode-hook #'rainbow-mode))
 
 (use-package whitespace
   :diminish whitespace-mode
@@ -1683,15 +1446,6 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 (add-hook 'rust-mode-hook #'electric-pair-mode)
 
 ;; misc languages
-;; (use-package fish-mode
-;;   :ensure t
-;;   :defer t
-;;   :mode "\\.fish$")
-
-;; (use-package counsel-jq
-;;   :ensure t
-;;   :defer 0.4)
-
 (use-package json-mode
   :ensure t
   :defer t
@@ -1702,7 +1456,6 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
         ("C-c C-j" . counsel-jq))
   :init
   (setq js-indent-level 2))
-
 
 (use-package yaml-mode
   :ensure t
@@ -1752,42 +1505,22 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :mode (("\\.ts\\'" . typescript-mode))
   :mode (("\\.tsx\\'" . typescript-mode)))
 
-(defun asm/setup-tide-mode ()
-  (interactive)
-  (defun tide-imenu-index () nil)
-  (tide-setup)
-  (tide-hl-identifier-mode +1))
+;; (defun asm/setup-tide-mode ()
+;;   (interactive)
+;;   (defun tide-imenu-index () nil)
+;;   (tide-setup)
+;;   (tide-hl-identifier-mode +1))
 
-(use-package tide
-  :ensure t
-  :disabled ; NOTE(asm,2021-05-25): this seems to throw a lot of
-            ; errors, disabling for now
-  :config
-  (progn
-    (add-hook 'typescript-mode-hook #'asm/setup-tide-mode)
-    (add-hook 'js-mode-hook #'asm/setup-tide-mode)
-    (add-hook 'js2-mode-hook #'asm/setup-tide-mode)
-    (add-hook 'rjsx-mode-hook #'asm/setup-tide-mode)))
-
-;; (use-package coffee-mode
+;; (use-package tide
 ;;   :ensure t
-;;   :disabled
-;;   :mode
-;;   ("\\.coffee\\'" . coffee-mode)
-;;   :init
-;;   (setq coffee-tab-width 2))
-
-
-(use-package typescript-mode
-  :ensure t
-  :mode
-  ("\\.ts\\'" . typescript-mode)
-  :init
-  (setq typescript-indent-level 2))
-
-(setenv "ASDF_DIR" (concat (getenv "HOME") "/.asdf"))
-(setenv "PATH" (concat (getenv "PATH") ":" (expand-file-name "~/.asdf/shims")))
-(setq exec-path (append exec-path (list (expand-file-name "~/.asdf/shims"))))
+;;   :disabled ; NOTE(asm,2021-05-25): this seems to throw a lot of
+;;             ; errors, disabling for now
+;;   :config
+;;   (progn
+;;     (add-hook 'typescript-mode-hook #'asm/setup-tide-mode)
+;;     (add-hook 'js-mode-hook #'asm/setup-tide-mode)
+;;     (add-hook 'js2-mode-hook #'asm/setup-tide-mode)
+;;     (add-hook 'rjsx-mode-hook #'asm/setup-tide-mode)))
 
 (use-package terraform-mode
   :ensure t
@@ -1800,7 +1533,6 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (use-package company-terraform
   :ensure t)
-
 
 (defun asm/terraform-mode-hook ()
   (subword-mode +1)
@@ -1830,21 +1562,8 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   :ensure t
   :defer t)
 
-(use-package nginx-mode
-  :ensure t
-  :defer t
-  :init (setq nginx-indent-level 2))
-
-(use-package company-nginx
-  :ensure t
-  :after (company))
-
 (use-package just-mode
   :ensure t)
-
-;; (use-package crontab-mode
-;;   :ensure t
-;;   :mode "crontab.*")
 
 (use-package jinja2-mode
   :ensure t
