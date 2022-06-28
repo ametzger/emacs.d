@@ -1201,18 +1201,35 @@ Repeated invocations toggle between the two most recently open buffers."
 
 ;; LSP
 (use-package lsp-mode
-  :ensure
-  :commands lsp
+  :ensure t
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  :bind (:map lsp-mode-map
+              ("C-S-SPC" . nil))
   :custom
   ;; what to use when checking on-save. "check" is default, I prefer clippy
   (lsp-rust-analyzer-cargo-watch-command "clippy")
   (lsp-eldoc-render-all t)
   (lsp-idle-delay 0.6)
-  :config
-  (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+  ;; :config
+  ;; (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+  )
+
+(with-eval-after-load 'lsp-mode
+  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration))
+
+(use-package lsp-pyright
+  :ensure t
+  :hook (python-mode . (lambda ()
+                          (require 'lsp-pyright)
+                          (lsp-deferred))))
+
+(use-package lsp-ivy
+  :ensure t
+  :commands lsp-ivy-workspace-symbol)
 
 (use-package lsp-ui
-  :ensure
+  :ensure t
   :commands lsp-ui-mode
   :custom
   (lsp-ui-peek-always-show t)
@@ -1267,21 +1284,21 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (setq-default company-jedi-python-bin "~/.pyenv/shims/python"))
 
-(use-package anaconda-mode
-  :ensure t
-  :config
-  (add-hook 'python-mode-hook 'anaconda-mode))
+;; (use-package anaconda-mode
+;;   :ensure t
+;;   :config
+;;   (add-hook 'python-mode-hook 'anaconda-mode))
 
-(use-package company-anaconda
-  :ensure t
-  :after (company anaconda-mode))
+;; (use-package company-anaconda
+;;   :ensure t
+;;   :after (company anaconda-mode))
 
 (use-package blacken
   :ensure t
-  :hook
-  ((python-mode . blacken-mode))
+  ;; :hook
+  ;; ((python-mode . blacken-mode))
   :config
-  (setq blacken-executable "~/.pyenv/shims/black")
+  (setq blacken-executable "~/.local/bin/black")
   (define-key python-mode-map (kbd "C-c C-b") 'blacken-buffer))
 
 (use-package py-isort
