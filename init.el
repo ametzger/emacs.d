@@ -986,8 +986,8 @@ Repeated invocations toggle between the two most recently open buffers."
   :ensure t
   :bind
   (("M-x"     . counsel-M-x)
-   ;; ("C-x b"   . asm/contextual-switch-buffer)
-   ("C-x b"   . counsel-switch-buffer)
+   ("C-x b"   . asm/contextual-switch-buffer)
+   ;; ("C-x b"   . counsel-switch-buffer)
    ("C-x C-f" . counsel-find-file)
    ("C-c i"   . counsel-imenu)
    :map minibuffer-local-map
@@ -1018,45 +1018,47 @@ Repeated invocations toggle between the two most recently open buffers."
 
 ; TODO: this is poorly configured, it's annoying to fight it when a
 ; buffer accidentally crosses project boundaries.
-;; (use-package perspective
-;;   :ensure t
-;;   :config
-;;   (persp-mode)
+(use-package perspective
+  :ensure t
+  :init
+  (setq persp-suppress-no-prefix-key-warning t)
+  :config
+  (persp-mode)
 
-;;   ;; switch to perspective when exiting ibuffer
-;;   ;; (defun asm/persp-ibuffer-visit-buffer ()
-;;   ;;   (interactive)
-;;   ;;   (let ((buf (ibuffer-current-buffer t))
-;;   ;;         (persp-name (string-remove-prefix "Projectile:" (get-text-property
-;;   ;;                      (line-beginning-position) 'ibuffer-filter-group))))
-;;   ;;     (persp-switch persp-name)
-;;   ;;     (switch-to-buffer buf)))
+  ;; switch to perspective when exiting ibuffer
+  ;; (defun asm/persp-ibuffer-visit-buffer ()
+  ;;   (interactive)
+  ;;   (let ((buf (ibuffer-current-buffer t))
+  ;;         (persp-name (string-remove-prefix "Projectile:" (get-text-property
+  ;;                      (line-beginning-position) 'ibuffer-filter-group))))
+  ;;     (persp-switch persp-name)
+  ;;     (switch-to-buffer buf)))
 
-;;   ;; (define-key ibuffer-mode-map (kbd "RET") 'asm/persp-ibuffer-visit-buffer)
-;;   )
+  ;; (define-key ibuffer-mode-map (kbd "RET") 'asm/persp-ibuffer-visit-buffer)
+  )
 
-;; (use-package persp-projectile
-;;   :ensure t
-;;   :after (perspective)
-;;   :bind
-;;   ("C-c x" . hydra-persp/body)
-;;   :config
-;;   (defhydra hydra-persp (:columns 4
-;;                          :color blue)
-;;     "Perspective"
-;;     ("a" persp-add-buffer "Add Buffer")
-;;     ("i" persp-import "Import")
-;;     ("c" persp-kill "Close")
-;;     ("n" persp-next "Next")
-;;     ("p" persp-prev "Prev")
-;;     ("k" persp-remove-buffer "Kill Buffer")
-;;     ("r" persp-rename "Rename")
-;;     ("A" persp-set-buffer "Set Buffer")
-;;     ("s" persp-switch "Switch")
-;;     ("C-x" persp-switch-last "Switch Last")
-;;     ("b" persp-switch-to-buffer "Switch to Buffer")
-;;     ("P" projectile-persp-switch-project "Switch Project")
-;;     ("q" nil "Quit")))
+(use-package persp-projectile
+  :ensure t
+  :after (perspective)
+  :bind
+  ("C-c x" . hydra-persp/body)
+  :config
+  (defhydra hydra-persp (:columns 4
+                         :color blue)
+    "Perspective"
+    ("a" persp-add-buffer "Add Buffer")
+    ("i" persp-import "Import")
+    ("c" persp-kill "Close")
+    ("n" persp-next "Next")
+    ("p" persp-prev "Prev")
+    ("k" persp-remove-buffer "Kill Buffer")
+    ("r" persp-rename "Rename")
+    ("A" persp-set-buffer "Set Buffer")
+    ("s" persp-switch "Switch")
+    ("C-x" persp-switch-last "Switch Last")
+    ("b" persp-switch-to-buffer "Switch to Buffer")
+    ("P" projectile-persp-switch-project "Switch Project")
+    ("q" nil "Quit")))
 
 ;; see https://gist.github.com/rksm/8c07d9ccc9e15adf752d3dd73dd9a61e
 (defun rk/open-compilation-buffer (&optional buffer-or-name shackle-alist shackle-plist)
@@ -1636,7 +1638,7 @@ Repeated invocations toggle between the two most recently open buffers."
    ("l" counsel-bookmark "bookmarks")
    ("n" ein:login "EIN")
    ("o" asm/org-open-file "find org file")
-   ("p" projectile-switch-project "open project")
+   ("p" projectile-persp-switch-project "open project")
    ("r" anzu-replace-at-cursor-thing "replace at point")
    ("s" counsel-rg "ripgrep")
    ("w" ace-window "ace window")
