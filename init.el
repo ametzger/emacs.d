@@ -103,7 +103,8 @@
       user-login-name   "asm")
 
 ;; emacs baseline + annoyances
-(setq custom-file (make-temp-file ""))
+(setq custom-file (make-temp-file "")
+      line-spacing 0)
 
 (setq save-interprogram-paste-before-kill t
       gc-cons-threshold 64000000)
@@ -908,6 +909,8 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package which-key
   :ensure t
   :diminish which-key-mode
+  :custom
+  (which-key-sort-order #'which-key-prefix-then-key-order)
   :config
   (setq which-key-idle-delay 0.4)
   (which-key-mode +1))
@@ -1263,17 +1266,19 @@ Repeated invocations toggle between the two most recently open buffers."
                 #'python-imenu-create-flat-index))
   (subword-mode +1)
   (setq indent-tabs-mode nil)
-  (set (make-local-variable 'company-backends)
-       '(company-jedi
-         company-anaconda)))
+  ;; (set (make-local-variable 'company-backends)
+  ;;      '(company-jedi
+  ;;        company-anaconda))
+  )
 
 (use-package python
   :mode ("\\.py'" . python-mode)
   :interpreter ("python" . python-mode)
+  :bind (:map python-mode-map
+              ("C-c C-j" . nil))
   :config
   (setq-default python-fill-docstring-style 'django)
-  (add-hook 'python-mode-hook 'asm/python-mode-hook)
-  (unbind-key "C-c C-j" python-mode-map))
+  (add-hook 'python-mode-hook 'asm/python-mode-hook))
 
 (use-package jedi
   :ensure t)
