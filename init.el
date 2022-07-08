@@ -508,8 +508,13 @@ Repeated invocations toggle between the two most recently open buffers."
                             '("inbox.org"))
           org-capture-templates `(
                                   ("i" "Inbox" entry  (file "inbox.org")
+                                   ,(concat "* %?\n"
+                                            "/Entered on/ %U")
+                                   :prepend t)
+                                  ("t" "Todo" entry  (file "inbox.org")
                                    ,(concat "* TODO %?\n"
-                                            "/Entered on/ %U"))
+                                            "/Entered on/ %U")
+                                   :prepend t)
                                   )
           org-use-speed-commands t
           org-return-follows-link t
