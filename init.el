@@ -118,6 +118,7 @@
 (put 'upcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
 
+(global-set-key [remap eval-expression] 'pp-eval-expression)
 (global-set-key (kbd "C-x C-b") #'ibuffer)
 (global-set-key (kbd "C-c k")
                 (lambda ()
