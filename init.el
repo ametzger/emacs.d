@@ -268,7 +268,8 @@
 ;; indentation
 (setq-default indent-tabs-mode nil
               tab-width 4
-              sh-basic-offset 2)
+              sh-basic-offset 2
+              fill-column 100)
 
 (setq require-final-newline t)
 
@@ -483,6 +484,14 @@ Repeated invocations toggle between the two most recently open buffers."
   (auto-fill-mode t)
   (visual-line-mode t))
 
+(defun asm/org-newline (arg)
+  "Add a new item if we are in a list, otherwise indent to current level"
+  (interactive "P")
+  (if (and (not arg)
+           (org-at-item-p))
+      (org-insert-item)
+    (org-return t)))
+
 (use-package org
   :ensure t
   :mode ("\\.org\\'" . org-mode)
@@ -492,7 +501,7 @@ Repeated invocations toggle between the two most recently open buffers."
   ("C-c a" . org-agenda)
   (:map org-mode-map
         ("C-a"   . crux-move-beginning-of-line)
-        ("<RET>" . org-return-indent))
+        ("<RET>" . asm/org-newline))
   :config
   (progn
     (org-babel-do-load-languages
