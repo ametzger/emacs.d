@@ -605,6 +605,9 @@ Repeated invocations toggle between the two most recently open buffers."
    ("C-h F"   . helpful-function)
    ("C-h C"   . helpful-command)))
 
+(use-package s
+  :ensure t)
+
 ;; theme, modeline
 (use-package all-the-icons
   :ensure t)
@@ -882,6 +885,10 @@ Repeated invocations toggle between the two most recently open buffers."
                                    fundamental-mode
                                    ein:notebook-mode))
   (global-company-mode t))
+
+(defun asm/yas-comment-start ()
+  "A properly spaced comment for yasnippet snips"
+  (s-trim comment-start))
 
 (use-package yasnippet
   :ensure t

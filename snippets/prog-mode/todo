@@ -2,4 +2,4 @@
 # name: todo
 # key: todo
 # --
-`comment-start` TODO(asm,`(format-time-string "%Y-%m-%d")`): $0`comment-end`
+`(asm/yas-comment-start)` TODO(asm,`(format-time-string "%Y-%m-%d")`): $0`comment-end`
