@@ -1311,6 +1311,30 @@ Repeated invocations toggle between the two most recently open buffers."
   ;;        company-anaconda))
   )
 
+; NOTE(asm,2022-08-02): there are some changes that need to be made to `python-mode' to be able to
+; support python 3.10 syntax that can't be made here. To do them, run `M-x find-library RET
+; python-mode' and make the following changes:
+; 1. Add "match" and "case" to the `python-rx' macro:
+;;   (defmacro python-rx (&rest regexps)
+;;     "Python mode specialized rx macro.
+;;   This variant of `rx' supports common Python named REGEXPS."
+;;     `(rx-let ((block-start       (seq symbol-start
+;;                                       (or "def" "class" "if" "elif" "else" "try"
+;;                                           "except" "finally" "for" "while" "with"
+;;                                           ; HACK(asm,2022-08-02): added python 3.10 syntax
+;;                                           "match" "case"
+; 2. Add "match" and "case" to `python-font-lock-keywords-level-2':
+;;   (defvar python-font-lock-keywords-level-2
+;;     `(,@python-font-lock-keywords-level-1
+;;       ,(rx symbol-start
+;;            (or
+;;             "and" "del" "from" "not" "while" "as" "elif" "global" "or" "with"
+;;             "assert" "else" "if" "pass" "yield" "break" "except" "import" "class"
+;;             "in" "raise" "continue" "finally" "is" "return" "def" "for" "lambda"
+;;             "try"
+;;             ; HACK(asm,2022-08-02): python 3.10 stuff
+;;             "match" "case"
+; Hopefully these will be integrated upstream soon, but they are not present in emacs 28.
 (use-package python
   :mode ("\\.py'" . python-mode)
   :interpreter ("python" . python-mode)
