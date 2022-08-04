@@ -94,7 +94,9 @@
 
 ;; make sure ASDF stuff gets picked up
 (setenv "ASDF_DIR" (concat (getenv "HOME") "/.asdf"))
-(setenv "PATH" (concat (getenv "PATH") ":" (expand-file-name "~/.asdf/shims")))
+(let ((path (getenv "PATH")))
+  (if (not (cl-search ".asdf/shims" path))
+      (setenv "PATH" (concat (expand-file-name "~/.asdf/shims") ":" path))))
 (setq exec-path (append exec-path (list (expand-file-name "~/.asdf/shims"))))
 
 ;; vanity
