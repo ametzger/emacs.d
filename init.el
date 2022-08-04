@@ -1714,6 +1714,41 @@ Repeated invocations toggle between the two most recently open buffers."
       (window-configuration-to-register '_)
       (delete-other-windows))))
 
+(defun asm/point-in-string-p (pt)
+  "Returns t if PT is in a string"
+  (eq 'string (syntax-ppss-context (syntax-ppss pt))))
+
+(defun asm/beginning-of-string ()
+  "Moves to the beginning of a syntactic string"
+  (interactive)
+  (unless (asm/point-in-string-p (point))
+    (error "You must be in a string for this command to work"))
+  (while (asm/point-in-string-p (point))
+    (forward-char -1))
+  (point))
+
+(defun asm/swap-quotes ()
+  "Swaps the quote symbols around a string"
+  (interactive)
+  (save-excursion
+    (let ((bos (save-excursion
+                 (asm/beginning-of-string)))
+          (eos (save-excursion
+                 (asm/beginning-of-string)
+                 (forward-sexp)
+                 (point)))
+          (replacement-char ?\'))
+      (goto-char bos)
+      ;; if the following character is a single quote then the
+      ;; `replacement-char' should be a double quote.
+      (when (eq (following-char) ?\')
+          (setq replacement-char ?\"))
+      (delete-char 1)
+      (insert replacement-char)
+      (goto-char eos)
+      (delete-char -1)
+      (insert replacement-char))))
+
 (global-set-key
  (kbd "C-z")
  (defhydra ctrl-z-hydra (:color blue
@@ -1731,7 +1766,7 @@ Repeated invocations toggle between the two most recently open buffers."
    ("s" counsel-rg "ripgrep")
    ("w" ace-window "ace window")
    ("C-s" deadgrep "deadgrep")
-   ("q" nil "quit")
+   ("q" asm/swap-quotes "toggle quotes around string")
    ("z" asm/toggle-maximize-buffer "zoom")))
 
 ;;; init.el ends here
