@@ -599,13 +599,16 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package helpful
   :ensure t
+  :commands (helpful-callable helpful-variable helpful-at-point helpful-command helpful-key)
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
   :bind
-  (("C-h f"   . helpful-callable)
-   ("C-h v"   . helpful-variable)
-   ("C-h k"   . helpful-key)
-   ("C-c C-d" . helpful-at-point)
-   ("C-h F"   . helpful-function)
-   ("C-h C"   . helpful-command)))
+  ("C-c C-d"                 . helpful-at-point)
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command]  . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key]      . helpful-key))
 
 (use-package s
   :ensure t)
