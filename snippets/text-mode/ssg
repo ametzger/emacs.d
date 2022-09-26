@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: ssg
+# key: ssg
+# --
+[SSG-${1:issuekey}] $0
