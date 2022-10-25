@@ -1247,6 +1247,14 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (setq markdown-fontify-code-blocks-natively t))
 
+;; eglot
+;; (use-package eglot
+;;   :ensure t
+;;   :hook
+;;   (python-mode . eglot-ensure)
+;;   :config
+;;     (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver" "--stdio"))))
+
 ;; LSP
 (use-package lsp-mode
   :ensure t
@@ -1254,6 +1262,10 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq lsp-keymap-prefix "C-c l")
   :bind (:map lsp-mode-map
               ("C-S-SPC" . nil))
+  :hook
+  (typescript-mode . (lambda () (lsp-deferred)))
+  (javascript-mode . (lambda () (lsp-deferred)))
+  (js2-mode        . (lambda () (lsp-deferred)))
   :custom
   ;; what to use when checking on-save. "check" is default, I prefer clippy
   (lsp-rust-analyzer-cargo-watch-command "clippy")
