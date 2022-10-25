@@ -105,16 +105,13 @@
       user-login-name   "asm")
 
 ;; emacs baseline + annoyances
-(setq custom-file (make-temp-file "")
-      line-spacing 0)
-
-(setq save-interprogram-paste-before-kill t
-      gc-cons-threshold 64000000)
-
-(add-hook 'after-init-hook
-          (lambda () (setq gc-cons-threshold 200000)))
-
-(setq large-file-warning-threshold 50000000)
+(setq custom-file                         (make-temp-file "")
+      line-spacing                        0
+      ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
+      gc-cons-threshold                   100000000
+      large-file-warning-threshold        50000000
+      read-process-output-max             (* 1024 1024)
+      save-interprogram-paste-before-kill t)
 
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
@@ -1270,6 +1267,7 @@ Repeated invocations toggle between the two most recently open buffers."
   (typescript-mode . lsp-deferred)
   (javascript-mode . lsp-deferred)
   (js2-mode        . lsp-deferred)
+  (lsp-mode        . lsp-enable-which-key-integration)
   :custom
   ;; what to use when checking on-save. "check" is default, I prefer clippy
   (lsp-rust-analyzer-cargo-watch-command "clippy")
@@ -1278,9 +1276,6 @@ Repeated invocations toggle between the two most recently open buffers."
   ;; :config
   ;; (add-hook 'lsp-mode-hook 'lsp-ui-mode)
   )
-
-(with-eval-after-load 'lsp-mode
-  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration))
 
 (use-package lsp-pyright
   :ensure t
