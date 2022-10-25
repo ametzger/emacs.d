@@ -1247,7 +1247,11 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (setq markdown-fontify-code-blocks-natively t))
 
-;; eglot
+;; TODO(asm,2022-10-25): lsp-mode is kind of heavy and more opinionated than I would like, it also
+;; adds a lot of UI frills that I find unecessary. eglot seems to be more in line with my "I just
+;; want xref and imenu to pull from LSP" philosophy, but it doesn't seem to integrate with xref
+;; properly when set up this way. I don't have time to hack on it now, but eventually it would be
+;; nice to slim down LSP integration.
 ;; (use-package eglot
 ;;   :ensure t
 ;;   :hook
@@ -1255,7 +1259,7 @@ Repeated invocations toggle between the two most recently open buffers."
 ;;   :config
 ;;     (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver" "--stdio"))))
 
-;; LSP
+;; lsp-mode
 (use-package lsp-mode
   :ensure t
   :init
@@ -1263,9 +1267,9 @@ Repeated invocations toggle between the two most recently open buffers."
   :bind (:map lsp-mode-map
               ("C-S-SPC" . nil))
   :hook
-  (typescript-mode . (lambda () (lsp-deferred)))
-  (javascript-mode . (lambda () (lsp-deferred)))
-  (js2-mode        . (lambda () (lsp-deferred)))
+  (typescript-mode . lsp-deferred)
+  (javascript-mode . lsp-deferred)
+  (js2-mode        . lsp-deferred)
   :custom
   ;; what to use when checking on-save. "check" is default, I prefer clippy
   (lsp-rust-analyzer-cargo-watch-command "clippy")
