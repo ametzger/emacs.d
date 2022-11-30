@@ -38,3 +38,4 @@ request/*
 # OSM files
 /var/
 /straight/
+/network-security.data
