@@ -539,8 +539,7 @@ Repeated invocations toggle between the two most recently open buffers."
                                             "/Entered on/ %U")
                                    :prepend t)
                                   ("t" "Todo" entry  (file "inbox.org")
-                                   ,(concat "* TODO %?\n"
-                                            "/Entered on/ %U")
+                                   "* TODO %?"
                                    :prepend t)
                                   )
           org-use-speed-commands t
