@@ -1572,6 +1572,17 @@ Repeated invocations toggle between the two most recently open buffers."
   :mode (("\\.toml$" . toml-mode)
          ("Pipfile$" . toml-mode)))
 
+(use-package sdlang-mode
+  :ensure t
+  :defer t
+  :mode (("\\.kdl$" . sdlang-mode)
+         ("\\.sdl$" . sdlang-mode)))
+
+(use-package nix-mode
+  :ensure t
+  :defer t
+  :mode "\\.nix\\'")
+
 (use-package web-mode
   :ensure t
   :defer t
