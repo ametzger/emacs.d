@@ -685,6 +685,7 @@ Repeated invocations toggle between the two most recently open buffers."
 ;;   (add-to-list 'editorconfig-indentation-alist '(js2-minor-mode js-indent-level js2-basic-offset))
 ;;   (add-to-list 'editorconfig-indentation-alist '(nginx-mode nginx-indent-level nginx-indent-level)))
 
+; TODO(asm,2023-02-21): this seems to be doing wonky stuff on emacs 29
 (use-package magit
   :ensure t
   :bind (("C-x g" . magit-status))
