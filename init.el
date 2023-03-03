@@ -694,12 +694,13 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq magit-repository-directories '(("~/proj/" . 2)))
 
   ;; use full-screen magit
-  (defadvice magit-status (around magit-fullscreen activate)
-    (window-configuration-to-register :magit-fullscreen)
-    ad-do-it
-    (delete-other-windows))
-  (defadvice magit-quit-window (after magit-restore-screen activate)
-    (jump-to-register :magit-fullscreen)))
+  ;; (defadvice magit-status (around magit-fullscreen activate)
+  ;;   (window-configuration-to-register :magit-fullscreen)
+  ;;   ad-do-it
+  ;;   (delete-other-windows))
+  ;; (defadvice magit-quit-window (after magit-restore-screen activate)
+  ;;   (jump-to-register :magit-fullscreen))
+  )
 
 (use-package git-timemachine
   :ensure t
