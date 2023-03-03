@@ -685,7 +685,6 @@ Repeated invocations toggle between the two most recently open buffers."
 ;;   (add-to-list 'editorconfig-indentation-alist '(js2-minor-mode js-indent-level js2-basic-offset))
 ;;   (add-to-list 'editorconfig-indentation-alist '(nginx-mode nginx-indent-level nginx-indent-level)))
 
-; TODO(asm,2023-02-21): this seems to be doing wonky stuff on emacs 29
 (use-package magit
   :ensure t
   :bind (("C-x g" . magit-status))
@@ -694,12 +693,12 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq magit-repository-directories '(("~/proj/" . 2)))
 
   ;; use full-screen magit
-  ;; (defadvice magit-status (around magit-fullscreen activate)
-  ;;   (window-configuration-to-register :magit-fullscreen)
-  ;;   ad-do-it
-  ;;   (delete-other-windows))
-  ;; (defadvice magit-quit-window (after magit-restore-screen activate)
-  ;;   (jump-to-register :magit-fullscreen))
+  (defadvice magit-status (around magit-fullscreen activate)
+    (window-configuration-to-register :magit-fullscreen)
+    ad-do-it
+    (delete-other-windows))
+  (defadvice magit-mode-bury-buffer (after magit-restore-screen activate)
+    (jump-to-register :magit-fullscreen))
   )
 
 (use-package git-timemachine
@@ -773,7 +772,8 @@ Repeated invocations toggle between the two most recently open buffers."
         ("F" . projectile-find-file-other-window))
   :config
   (projectile-mode +1)
-  (setq projectile-enable-caching t))
+  (setq projectile-enable-caching t
+        projectile-switch-project-action 'magit-status))
 
 (use-package expand-region
   :ensure t
