@@ -1379,14 +1379,16 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package blacken
   :ensure t
-  ;; :hook
-  ;; ((python-mode . blacken-mode))
+  :hook
+  ((python-mode . blacken-mode))
   :config
   (setq blacken-executable "~/.local/bin/black")
   (define-key python-mode-map (kbd "C-c C-b") 'blacken-buffer))
 
 (use-package py-isort
   :ensure t
+  ;; :hook
+  ;; (python-mode . py-isort-before-save)
   :config
   (setq py-isort-options '("-l 100" "--multi-line=3" "--trailing-comma")))
 
