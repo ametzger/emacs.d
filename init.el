@@ -93,11 +93,18 @@
 ;;   (paradox-enable))
 
 ;; make sure ASDF stuff gets picked up
-(setenv "ASDF_DIR" (concat (getenv "HOME") "/.asdf"))
+;; (setenv "ASDF_DIR" (concat (getenv "HOME") "/.asdf"))
+;; (let ((path (getenv "PATH")))
+;;   (if (not (cl-search ".asdf/shims" path))
+;;       (setenv "PATH" (concat (expand-file-name "~/.asdf/shims") ":" path))))
+;; (setq exec-path (append exec-path (list (expand-file-name "~/.asdf/shims"))))
+
+;; make sure rtx stuff gets picked up
 (let ((path (getenv "PATH")))
-  (if (not (cl-search ".asdf/shims" path))
-      (setenv "PATH" (concat (expand-file-name "~/.asdf/shims") ":" path))))
-(setq exec-path (append exec-path (list (expand-file-name "~/.asdf/shims"))))
+  (if (not (cl-search "rtx/shims" path))
+      (setenv "PATH" (concat (expand-file-name "~/.local/share/rtx/shims") ":" path))))
+(setq exec-path (append exec-path (list (expand-file-name "~/.local/share/rtx/shims"))))
+
 
 ;; vanity
 (setq user-full-name    "Alex Metzger"
