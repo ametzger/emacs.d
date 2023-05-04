@@ -1582,6 +1582,8 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package nix-mode
   :ensure t
   :defer t
+  :hook
+  (nix-mode . subword-mode)
   :mode "\\.nix\\'")
 
 (use-package web-mode
@@ -1601,8 +1603,8 @@ Repeated invocations toggle between the two most recently open buffers."
   :defer t
   :mode "\\.js$"
   :config
-  (setq-default js2-basic-indent 4
-                js2-basic-offset 4
+  (setq-default js2-basic-indent 2
+                js2-basic-offset 2
                 js2-auto-indent-p t
                 js2-cleanup-whitespace t
                 js2-enter-indents-newline t
