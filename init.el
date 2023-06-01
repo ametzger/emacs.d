@@ -1266,7 +1266,8 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package lsp-mode
   :ensure t
   :init
-  (setq lsp-keymap-prefix "C-c l")
+  (setq lsp-keymap-prefix "C-c l"
+        lsp-ruff-lsp-ruff-path (expand-file-name "~/.nix-profile/bin/ruff-lsp"))
   :bind (:map lsp-mode-map
               ("C-S-SPC" . nil))
   :hook
