@@ -641,8 +641,8 @@ Repeated invocations toggle between the two most recently open buffers."
         doom-solarized-light-padded-modeline t)
   (let (
         ;; (active-theme 'doom-solarized-light)
-        ;; (active-theme 'doom-nord)
-        (active-theme 'doom-nord-light)
+        (active-theme 'doom-nord)
+        ;; (active-theme 'doom-nord-light)
         )
     (load-theme active-theme t))
   :config
