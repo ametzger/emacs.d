@@ -1268,13 +1268,17 @@ Repeated invocations toggle between the two most recently open buffers."
   :ensure t
   :init
   (setq lsp-keymap-prefix "C-c l"
-        lsp-ruff-lsp-ruff-path (expand-file-name "~/.nix-profile/bin/ruff-lsp"))
+        lsp-ruff-lsp-ruff-path (expand-file-name "~/.nix-profile/bin/ruff-lsp")
+        lsp-terraform-server (expand-file-name "~/.nix-profile/bin/terraform-lsp")
+        lsp-disabled-clients '(tfls)
+        lsp-terraform-ls-prefill-required-fields t)
   :bind (:map lsp-mode-map
               ("C-S-SPC" . nil))
   :hook
   (typescript-mode . lsp-deferred)
   (javascript-mode . lsp-deferred)
   (js2-mode        . lsp-deferred)
+  (terraform-mode  . lsp-deferred)
   (lsp-mode        . lsp-enable-which-key-integration)
   :custom
   ;; what to use when checking on-save. "check" is default, I prefer clippy
