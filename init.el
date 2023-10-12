@@ -171,12 +171,17 @@
       scroll-preserve-screen-position 1
       auto-window-vscroll nil
       frame-resize-pixelwise t
+      show-trailing-whitespace t
       initial-major-mode 'text-mode)
 
 ;; indent on RET
 (global-set-key (kbd "RET") #'newline-and-indent)
 
 ;; window management
+(use-package pixel-scroll
+  :init
+  (pixel-scroll-mode))
+
 (use-package winner
   :init
   (winner-mode))
@@ -278,14 +283,14 @@
               sh-basic-offset 2
               fill-column 100)
 
-(setq require-final-newline t)
+(setq require-final-newline t
+      sentence-end-double-space nil)
 
 (delete-selection-mode t)
 
-(setq backup-directory-alist
-      `((".*" . ,temporary-file-directory)))
-(setq auto-save-file-name-transforms
-      `((".*" ,temporary-file-directory t)))
+(setq backup-directory-alist `((".*" . ,temporary-file-directory))
+      auto-save-file-name-transforms `((".*" ,temporary-file-directory t))
+      backup-by-copying t)
 
 (global-auto-revert-mode t)
 
@@ -353,7 +358,8 @@ Repeated invocations toggle between the two most recently open buffers."
 ;; smart tab behavior - indent or complete
 (setq tab-always-indent 'complete)
 
-(setq frame-title-format nil)
+(setq frame-title-format nil
+      frame-inhibit-implied-resize t)
 
 ;; platform-specific
 (if (eq system-type 'darwin)
