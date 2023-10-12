@@ -1277,15 +1277,17 @@ Repeated invocations toggle between the two most recently open buffers."
         lsp-ruff-lsp-ruff-path (expand-file-name "~/.nix-profile/bin/ruff-lsp")
         lsp-terraform-server (expand-file-name "~/.nix-profile/bin/terraform-lsp")
         lsp-disabled-clients '(tfls)
+        lsp-nix-nil-server-path (expand-file-name "~/.nix-profile/bin/nil")
         lsp-terraform-ls-prefill-required-fields t)
   :bind (:map lsp-mode-map
               ("C-S-SPC" . nil))
   :hook
+  (lsp-mode        . lsp-enable-which-key-integration)
   (typescript-mode . lsp-deferred)
   (javascript-mode . lsp-deferred)
   (js2-mode        . lsp-deferred)
   (terraform-mode  . lsp-deferred)
-  (lsp-mode        . lsp-enable-which-key-integration)
+  (nix-mode        . lsp-deferred)
   :custom
   ;; what to use when checking on-save. "check" is default, I prefer clippy
   (lsp-rust-analyzer-cargo-watch-command "clippy")
@@ -1604,6 +1606,16 @@ Repeated invocations toggle between the two most recently open buffers."
   :hook
   (nix-mode . subword-mode)
   :mode "\\.nix\\'")
+
+(use-package nixpkgs-fmt
+  :ensure t
+  :defer t
+  :hook
+  (nix-mode . nixpkgs-fmt-on-save-mode)
+  :bind (:map nix-mode-map
+              ("C-c C-f" . nixpkgs-fmt))
+  :custom
+  (nixpkgs-fmt-command (expand-file-name "~/.nix-profile/bin/nixpkgs-fmt")))
 
 (use-package web-mode
   :ensure t
