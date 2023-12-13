@@ -1255,7 +1255,8 @@ Repeated invocations toggle between the two most recently open buffers."
   :mode (("\\.md\\'" . gfm-mode)
          ("\\.markdown\\'" . gfm-mode))
   :config
-  (setq markdown-fontify-code-blocks-natively t))
+  (setq markdown-fontify-code-blocks-natively t
+        markdown-disable-tooltip-prompt t))
 
 ;; TODO(asm,2022-10-25): lsp-mode is kind of heavy and more opinionated than I would like, it also
 ;; adds a lot of UI frills that I find unecessary. eglot seems to be more in line with my "I just
