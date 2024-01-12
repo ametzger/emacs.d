@@ -99,11 +99,11 @@
 ;;       (setenv "PATH" (concat (expand-file-name "~/.asdf/shims") ":" path))))
 ;; (setq exec-path (append exec-path (list (expand-file-name "~/.asdf/shims"))))
 
-;; make sure rtx stuff gets picked up
+;; make sure mise stuff gets picked up
 (let ((path (getenv "PATH")))
-  (if (not (cl-search "rtx/shims" path))
-      (setenv "PATH" (concat (expand-file-name "~/.local/share/rtx/shims") ":" path))))
-(setq exec-path (append exec-path (list (expand-file-name "~/.local/share/rtx/shims"))))
+  (if (not (cl-search "mise/shims" path))
+      (setenv "PATH" (concat (expand-file-name "~/.local/share/mise/shims") ":" path))))
+(setq exec-path (append exec-path (list (expand-file-name "~/.local/share/mise/shims"))))
 
 
 ;; vanity
