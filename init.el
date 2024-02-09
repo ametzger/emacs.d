@@ -853,11 +853,6 @@ Repeated invocations toggle between the two most recently open buffers."
       imenu-auto-rescan-maxout (* 1024 1024)
       imenu--rescan-item '("" . -99))
 
-(use-package imenu-anywhere
-  :ensure t
-  :bind (("C-c i" . imenu-anywhere)
-         ("s-i" . imenu-anywhere)))
-
 (use-package imenu-list
   :ensure t
   :defer t
@@ -1317,25 +1312,6 @@ Repeated invocations toggle between the two most recently open buffers."
   (lsp-ui-doc-enable nil))
 
 ;; python
-(use-package pyenv-mode
-  :ensure t
-  :config
-  (add-to-list 'exec-path "~/.pyenv/shims")
-  (add-hook 'python-mode-hook 'pyenv-mode)
-  (setq-default flycheck-python-pycompile-executable (expand-file-name
-                                                      "~/.pyenv/shims/python")
-                flycheck-python-flake8-executable (expand-file-name
-                                                   "~/.pyenv/shims/flake8")
-                flycheck-python-mypy-executable (expand-file-name
-                                                 "~/.pyenv/shims/mypy")
-                flycheck-flake8rc ".flake8"))
-
-(use-package pyenv-mode-auto
-  :ensure t)
-
-(use-package pipenv
-  :ensure t)
-
 (defun asm/python-mode-hook ()
   ;; use flat imenu
   (when (fboundp #'python-imenu-create-flat-index)
@@ -1380,24 +1356,6 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (setq-default python-fill-docstring-style 'django)
   (add-hook 'python-mode-hook 'asm/python-mode-hook))
-
-(use-package jedi
-  :ensure t)
-
-(use-package company-jedi
-  :ensure t
-  :after (company jedi)
-  :config
-  (setq-default company-jedi-python-bin "~/.pyenv/shims/python"))
-
-;; (use-package anaconda-mode
-;;   :ensure t
-;;   :config
-;;   (add-hook 'python-mode-hook 'anaconda-mode))
-
-;; (use-package company-anaconda
-;;   :ensure t
-;;   :after (company anaconda-mode))
 
 (use-package blacken
   :ensure t
