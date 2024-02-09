@@ -172,7 +172,10 @@
       auto-window-vscroll nil
       frame-resize-pixelwise t
       show-trailing-whitespace t
-      initial-major-mode 'text-mode)
+      initial-major-mode 'text-mode
+      ; always prefer vertical splits unless things are getting packed
+      split-width-threshold 120
+      split-height-threshold nil)
 
 ;; indent on RET
 (global-set-key (kbd "RET") #'newline-and-indent)
