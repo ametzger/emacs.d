@@ -1,6 +1,6 @@
 ;;; init.el --- Alex Metzger's Emacs config
 ;;
-;; Copyright (c) 2022 Alex Metzger
+;; Copyright (c) 2024 Alex Metzger
 ;;
 ;; Author: Alex Metzger <asm@asm.io>
 ;; URL: https://gitlab.com/ametzger/emacs.d
@@ -17,7 +17,7 @@
 
 ;; MIT License
 ;;
-;; Copyright (c) 2021 Alex Metzger
+;; Copyright (c) 2024 Alex Metzger
 ;;
 ;; Permission is hereby granted, free of charge, to any person
 ;; obtaining a copy of this software and associated documentation
