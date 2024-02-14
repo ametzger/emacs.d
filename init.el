@@ -1233,6 +1233,7 @@ Repeated invocations toggle between the two most recently open buffers."
   (js2-mode        . lsp-deferred)
   (terraform-mode  . lsp-deferred)
   (nix-mode        . lsp-deferred)
+  (rust-mode       . lsp-deferred)
   :custom
   ;; what to use when checking on-save. "check" is default, I prefer clippy
   (lsp-rust-analyzer-cargo-watch-command "clippy")
@@ -1427,19 +1428,6 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (setq rust-format-on-save t))
 
-(use-package racer
-  :ensure t
-  :after rust-mode
-  :config
-  (setq racer-rust-src-path (expand-file-name "~/.rustup/toolchains/stable-x86_64-apple-darwin/lib/rustlib/src/rust/library")
-        racer-cmd (expand-file-name "~/.cargo/bin/racer")))
-
-(use-package flycheck-rust
-  :ensure t
-  :config
-  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
-
-(add-hook 'rust-mode-hook #'racer-mode)
 (add-hook 'rust-mode-hook #'electric-pair-mode)
 
 ;; misc languages
