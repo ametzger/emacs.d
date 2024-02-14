@@ -1481,11 +1481,11 @@ Repeated invocations toggle between the two most recently open buffers."
   :defer t
   :mode "\\.html$"
   :config
-  (setq-default web-mode-markup-indent-offset 2
-                web-mode-code-indent-offset 2
-                web-mode-css-indent-offset 2
-                web-mode-sql-indent-offset 2
-                web-mode-enable-auto-indentation nil)
+  (setq web-mode-markup-indent-offset 2
+        web-mode-code-indent-offset 2
+        web-mode-css-indent-offset 2
+        web-mode-sql-indent-offset 2
+        web-mode-enable-auto-indentation nil)
   (add-hook 'web-mode-hook (lambda () (web-mode-set-engine "django"))))
 
 (use-package js2-mode
@@ -1493,23 +1493,22 @@ Repeated invocations toggle between the two most recently open buffers."
   :defer t
   :mode "\\.js$"
   :config
-  (setq-default js2-basic-indent 2
-                js2-basic-offset 2
-                js2-auto-indent-p t
-                js2-cleanup-whitespace t
-                js2-enter-indents-newline t
-                js2-indent-on-enter-key t
-                js2-global-externs (list "window" "setTimeout" "clearTimeout" "setInterval"
-                                         "clearInterval" "location" "console" "JSON"
-                                         "jQuery" "$"))
+  (setq js2-basic-indent 2
+        js2-basic-offset 2
+        js2-auto-indent-p t
+        js2-cleanup-whitespace t
+        js2-enter-indents-newline t
+        js2-indent-on-enter-key t
+        js2-global-externs (list "window" "setTimeout" "clearTimeout" "setInterval"
+                                 "clearInterval" "location" "console" "JSON"
+                                 "jQuery" "$"))
 
   (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode)))
 
 (use-package typescript-mode
   :ensure t
   :config
-  (setq-default typescript-indent-level 4)
-
+  (setq typescript-indent-level 2)
   :mode (("\\.ts\\'" . typescript-mode))
   :mode (("\\.tsx\\'" . typescript-mode)))
 
@@ -1538,9 +1537,6 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (set-face-foreground terraform--resource-name-face "#B58DAE")
   (set-face-foreground terraform--resource-type-face "#B58DAE"))
-
-(use-package company-terraform
-  :ensure t)
 
 (defun asm/terraform-mode-hook ()
   (subword-mode +1)
