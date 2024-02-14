@@ -61,24 +61,24 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-(setq-default use-package-enable-imenu-support t
-              use-package-verbose nil)
+(setq use-package-enable-imenu-support t
+      use-package-verbose nil)
 (require 'use-package)
 
 ;; straight.el
 
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+;; (defvar bootstrap-version)
+;; (let ((bootstrap-file
+;;        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+;;       (bootstrap-version 5))
+;;   (unless (file-exists-p bootstrap-file)
+;;     (with-current-buffer
+;;         (url-retrieve-synchronously
+;;          "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+;;          'silent 'inhibit-cookies)
+;;       (goto-char (point-max))
+;;       (eval-print-last-sexp)))
+;;   (load bootstrap-file nil 'nomessage))
 
 
 ;; (use-package auto-package-update
@@ -87,24 +87,11 @@
 ;;                 auto-package-update-hide-results t)
 ;;   (auto-package-update-maybe))
 
-;; (use-package paradox
-;;   :ensure t
-;;   :config
-;;   (paradox-enable))
-
-;; make sure ASDF stuff gets picked up
-;; (setenv "ASDF_DIR" (concat (getenv "HOME") "/.asdf"))
-;; (let ((path (getenv "PATH")))
-;;   (if (not (cl-search ".asdf/shims" path))
-;;       (setenv "PATH" (concat (expand-file-name "~/.asdf/shims") ":" path))))
-;; (setq exec-path (append exec-path (list (expand-file-name "~/.asdf/shims"))))
-
 ;; make sure mise stuff gets picked up
 (let ((path (getenv "PATH")))
   (if (not (cl-search "mise/shims" path))
       (setenv "PATH" (concat (expand-file-name "~/.local/share/mise/shims") ":" path))))
-(setq exec-path (append exec-path (list (expand-file-name "~/.local/share/mise/shims"))))
-
+(setq exec-path (push (expand-file-name "~/.local/share/mise/shims") exec-path))
 
 ;; vanity
 (setq user-full-name    "Alex Metzger"
@@ -162,10 +149,9 @@
 
 (setq ring-bell-function 'ignore
       inhibit-startup-screen t
-      initial-scratch-message (format "Welcome to Emacs %s (started %s, startup took %s)\n\n"
+      initial-scratch-message (format "Welcome to Emacs %s (started %s)\n\n"
                                       emacs-version
-                                      (current-time-string)
-                                      (emacs-init-time))
+                                      (current-time-string))
       scroll-margin 3
       scroll-conservatively 100000
       scroll-preserve-screen-position 1
@@ -478,24 +464,6 @@ Repeated invocations toggle between the two most recently open buffers."
     (setq dired-omit-files
           "^\\.?#\\|^.DS_STORE$\\|^.projectile$\\|^.git$\\|^.CFUserTextEncoding$\\|^.Trash$\\|^__pycache__$")))
 
-
-(use-package dwim-shell-command
-  :ensure t
-  :bind (([remap shell-command] . dwim-shell-command)
-         :map dired-mode-map
-         ([remap dired-do-async-shell-command] . dwim-shell-command)
-         ([remap dired-do-shell-command] . dwim-shell-command)
-         ([remap dired-smart-shell-command] . dwim-shell-command))
-  ;; :config
-  ;; (defun my/dwim-shell-command-convert-to-gif ()
-  ;;   "Convert all marked videos to optimized gif(s)."
-  ;;   (interactive)
-  ;;   (dwim-shell-command-on-marked-files
-  ;;    "Convert to gif"
-  ;;    "ffmpeg -loglevel quiet -stats -y -i <<f>> -pix_fmt rgb24 -r 15 <<fne>>.gif"
-  ;;    :utils "ffmpeg"))
-  )
-
 (use-package lisp-mode
   :config
   (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
@@ -662,7 +630,7 @@ Repeated invocations toggle between the two most recently open buffers."
   :ensure t
   :hook (after-init . doom-modeline-mode)
   :init
-  (setq doom-modeline-python-executable (expand-file-name "~/.pyenv/shims/python")
+  (setq doom-modeline-python-executable (expand-file-name "~/.local/share/mise/shims/python")
         doom-modeline-lsp nil
         doom-modeline-mu4e nil
         doom-modeline-irc nil
@@ -751,9 +719,6 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq deadgrep-project-root-function #'asm/deadgrep-project-root))
 
 (use-package wgrep
-  :ensure t)
-
-(use-package pt
   :ensure t)
 
 (use-package dumb-jump
@@ -856,14 +821,6 @@ Repeated invocations toggle between the two most recently open buffers."
       imenu-auto-rescan-maxout (* 1024 1024)
       imenu--rescan-item '("" . -99))
 
-(use-package imenu-list
-  :ensure t
-  :defer t
-  :functions (imenu-list-smart-toggle)
-  :bind (("C-." . imenu-list-smart-toggle))
-  :config
-  (setq imenu-list-focus-after-activation t))
-
 ;; general code-related
 ;; semantic mode is slow, disable it
 (semantic-mode -1)
@@ -875,7 +832,6 @@ Repeated invocations toggle between the two most recently open buffers."
   (global-hl-todo-mode))
 
 (use-package flycheck
-  :after pyenv-mode
   :diminish flycheck-mode
   :ensure t
   :config
@@ -1652,23 +1608,6 @@ Repeated invocations toggle between the two most recently open buffers."
        '(company-terraform)))
 (add-hook 'terraform-mode-hook #'asm/terraform-mode-hook)
 
-; TODO(asm,2022-05-11): hack to work around transient + docker dependencies
-(use-package transient
-  :straight (transient :type git
-                       :host github
-                       :repo "magit/transient"
-                       :ref "6fc09a663e408ade0d1b88f47701c96a9b051e34"))
-
-(use-package vterm
-  :ensure t)
-
-;; (use-package docker
-;;   :ensure t
-;;   :config
-;;   (setq docker-show-messages nil
-;;         docker-show-status nil)
-;;   :bind ("C-c d" . docker))
-
 (use-package dockerfile-mode
   :ensure t
   :defer t)
@@ -1686,12 +1625,6 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package cider
   :ensure t)
-
-(use-package restclient
-  :ensure t
-  :defer t
-  :commands (restclient-mode)
-  :mode ("\\.\\(http\\|rest\\)$" . restclient-mode))
 
 (defun asm/open-init-file ()
   (interactive)
