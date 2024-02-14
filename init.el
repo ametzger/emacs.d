@@ -1400,61 +1400,24 @@ Repeated invocations toggle between the two most recently open buffers."
   (add-hook 'elixir-mode-hook #'+elixir-format-on-save-mode))
 
 ;; golang
-(use-package go-projectile
-  :ensure t)
-
 (use-package go-mode
   :ensure t
   :defer t
-  :init
-  (add-hook 'before-save-hook 'gofmt-before-save)
   :config
   (add-hook 'go-mode-hook 'electric-pair-mode)
   (defun asm/go-mode-hook ()
     ;; call gofmt before saving
     (add-hook 'before-save-hook 'gofmt-before-save)
     (add-to-list 'exec-path "~/proj/go/bin")
+
     ;; Customize compile command to run go build
     (if (not (string-match "go" compile-command))
         (set (make-local-variable 'compile-command)
              "go build -v && go vet"))
     (local-set-key (kbd "C-c C-c") 'compile)
-    (set (make-local-variable 'company-backends) '(company-go))
-
     (setenv "GOPATH" (expand-file-name "~/proj/go")))
 
-  (add-hook 'go-mode-hook 'company-mode)
-  (add-hook 'go-mode-hook 'go-eldoc-setup)
   (add-hook 'go-mode-hook 'asm/go-mode-hook))
-
-(use-package company-go
-  :ensure t
-  :after go
-  :config
-  (setq tab-width 4)
-  (setq company-go-gocode-command (expand-file-name "~/proj/go/bin/gocode"))
-  ;; (setq company-go-insert-arguments -1)
-  (setq company-go-show-annotation t)
-  :bind (:map go-mode-map
-              ("M-." . godef-jump)))
-
-(use-package go-eldoc
-  :ensure t
-  :after go
-  :hook
-  (go-mode . go-eldoc-setup))
-
-(use-package go-guru
-  :ensure t
-  :after go
-  :hook
-  (go-mode . go-guru-hl-identifier-mode))
-
-(use-package gorepl-mode
-  :ensure t
-  :after go
-  :hook
-  (go-mode . gorepl-mode))
 
 ;; rust
 (use-package rust-mode
