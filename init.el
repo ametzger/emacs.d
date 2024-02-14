@@ -723,21 +723,11 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package dumb-jump
   :ensure t
-  :bind
-  ("C-M-g" . dumb-jump-go)
-  ("C-c j" . hydra-dumb-jump/body)
   :config
-  (setq dumb-jump-selector 'ivy)
-  (defhydra hydra-dumb-jump (:color blue
-                                    :hint nil)
-          "
-[dumb-jump]        _j_ump        _b_ack        _p_review        _J_ump in other window        _q_uit        "
-
-    ("j" dumb-jump-go)
-    ("b" dumb-jump-back)
-    ("p" dumb-jump-quick-look)
-    ("J" dumb-jump-go-other-window)
-    ("q" nil)))
+  (setq dumb-jump-default-project "~/proj"
+        dumb-jump-selector 'ivy
+        dumb-jump-force-searcher 'rg)
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (use-package projectile
   :ensure t
