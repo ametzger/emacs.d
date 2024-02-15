@@ -239,8 +239,8 @@
 (global-set-key (kbd "C-S-SPC") #'asm/select-current-line)
 
 ;; font config
-(let* ((font-candidates '("Operator Mono"
-                          "Go Mono"
+(let* ((font-candidates '("Go Mono"
+                          "Operator Mono"
                           "SF Mono"
                           "IBM Plex Mono Medium"
                           "Cascadia Code"))
@@ -669,15 +669,9 @@ Repeated invocations toggle between the two most recently open buffers."
   :bind (("C-x g" . magit-status))
   :config
   (add-hook 'after-save-hook #'magit-after-save-refresh-status)
-  (setq magit-repository-directories '(("~/proj/" . 2)))
-
-  ;; use full-screen magit
-  (defadvice magit-status (around magit-fullscreen activate)
-    (window-configuration-to-register :magit-fullscreen)
-    ad-do-it
-    (delete-other-windows))
-  (defadvice magit-quit-window (after magit-restore-screen activate)
-    (jump-to-register :magit-fullscreen)))
+  (setq magit-repository-directories '(("~/proj/" . 2))
+        magit-restore-window-configuration t
+        magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1))
 
 (use-package git-timemachine
   :ensure t
@@ -984,7 +978,7 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package counsel
   :ensure t
-  :demand
+  :demand t
   :bind
   (("M-x"     . counsel-M-x)
    ("C-x b"   . asm/contextual-switch-buffer)
@@ -995,6 +989,11 @@ Repeated invocations toggle between the two most recently open buffers."
    ("C-r" . counsel-minibuffer-history)
    :map counsel-find-file-map
    ("C-l" . ivy-backward-delete-char)))
+
+(use-package counsel-projectile
+  :ensure t
+  :demand t
+  :after (counsel projectile))
 
 (use-package ace-window
   :ensure t
