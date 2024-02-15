@@ -1268,9 +1268,6 @@ Repeated invocations toggle between the two most recently open buffers."
                 #'python-imenu-create-flat-index))
   (subword-mode +1)
   (setq indent-tabs-mode nil)
-  ;; (set (make-local-variable 'company-backends)
-  ;;      '(company-jedi
-  ;;        company-anaconda))
   )
 
 ; NOTE(asm,2022-08-02): there are some changes that need to be made to `python-mode' to be able to
@@ -1332,11 +1329,6 @@ Repeated invocations toggle between the two most recently open buffers."
       (add-hook 'before-save-hook 'py-isort-before-save)
       (message "isort enabled"))))
 
-(use-package flycheck-mypy
-  :ensure t)
-
-; TODO(asm,2022-05-11): Convert this to use straight.el to make this
-; more reproducible
 (use-package ein
   :ensure t
   :commands (ein:login)
