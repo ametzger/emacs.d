@@ -66,7 +66,6 @@
 (require 'use-package)
 
 ;; straight.el
-
 ;; (defvar bootstrap-version)
 ;; (let ((bootstrap-file
 ;;        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -79,13 +78,6 @@
 ;;       (goto-char (point-max))
 ;;       (eval-print-last-sexp)))
 ;;   (load bootstrap-file nil 'nomessage))
-
-
-;; (use-package auto-package-update
-;;   :config
-;;   (setq-default auto-package-update-delete-old-versions t
-;;                 auto-package-update-hide-results t)
-;;   (auto-package-update-maybe))
 
 ;; make sure mise stuff gets picked up
 (let ((path (getenv "PATH")))
@@ -167,10 +159,6 @@
 (global-set-key (kbd "RET") #'newline-and-indent)
 
 ;; window management
-(use-package pixel-scroll
-  :init
-  (pixel-scroll-mode))
-
 (use-package winner
   :init
   (winner-mode))
@@ -251,7 +239,7 @@
 (global-set-key (kbd "C-S-SPC") #'asm/select-current-line)
 
 ;; font config
-(let* ((font-candidates '("Operator Mono Medium"
+(let* ((font-candidates '("Operator Mono"
                           "Go Mono"
                           "SF Mono"
                           "IBM Plex Mono Medium"
@@ -467,7 +455,7 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package lisp-mode
   :config
   (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
-  (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
+  ; (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
   (define-key emacs-lisp-mode-map (kbd "C-c C-c") #'eval-defun)
   (define-key emacs-lisp-mode-map (kbd "C-c C-b") #'eval-buffer)
   (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
@@ -476,7 +464,8 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package ielm
   :config
   (add-hook 'ielm-mode-hook #'eldoc-mode)
-  (add-hook 'ielm-mode-hook #'rainbow-delimiters-mode))
+  ; (add-hook 'ielm-mode-hook #'rainbow-delimiters-mode)
+  )
 
 (use-package ibuffer
   :config
@@ -595,7 +584,8 @@ Repeated invocations toggle between the two most recently open buffers."
 
 ;; theme, modeline
 (use-package all-the-icons
-  :ensure t)
+  :ensure t
+  :if (display-graphic-p))
 
 (use-package all-the-icons-dired
   :ensure t
@@ -605,8 +595,7 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package doom-themes
   :ensure t
-  :after (rainbow-delimiters)
-  :init
+  :config
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t
         doom-neotree-file-icons t
@@ -622,12 +611,17 @@ Repeated invocations toggle between the two most recently open buffers."
         ;; (active-theme 'doom-nord-light)
         )
     (load-theme active-theme t))
-  :config
-  (doom-themes-neotree-config)
-  (doom-themes-org-config))
+  ;; :config
+  ;; (doom-themes-neotree-config)
+  ;; (doom-themes-org-config)
+  )
+
+(use-package nerd-icons
+  :ensure t)
 
 (use-package doom-modeline
   :ensure t
+  :after (nerd-icons)
   :hook (after-init . doom-modeline-mode)
   :init
   (setq doom-modeline-python-executable (expand-file-name "~/.local/share/mise/shims/python")
@@ -732,18 +726,17 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package projectile
   :ensure t
   :diminish projectile-mode
-  :after (ivy)
-  :init
-  (setq projectile-completion-system 'ivy
-        projectile-enable-caching t)
+  :demand
   :bind
   (:map projectile-mode-map
         ("C-c p" . projectile-command-map))
   (:map projectile-command-map
         ("F" . projectile-find-file-other-window))
+  :init
+  (setq projectile-completion-system 'ivy
+        projectile-enable-caching t)
   :config
-  (projectile-mode +1)
-  (setq projectile-enable-caching t))
+  (projectile-mode +1))
 
 (use-package expand-region
   :ensure t
@@ -849,9 +842,13 @@ Repeated invocations toggle between the two most recently open buffers."
   "A properly spaced comment for yasnippet snips"
   (s-trim comment-start))
 
+(use-package hydra
+  :ensure t)
+
 (use-package yasnippet
   :ensure t
   :diminish yas-minor-mode
+  :after hydra
   :config
   (progn
     (setq yas-prompt-functions '(yas-ido-prompt
@@ -883,6 +880,7 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package crux
   :ensure t
+  :demand
   :bind (("C-c d"         . crux-duplicate-current-line-or-region)
          ("M-o"           . crux-smart-open-line)
          ("C-c n"         . crux-cleanup-buffer-or-region)
@@ -986,6 +984,7 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package counsel
   :ensure t
+  :demand
   :bind
   (("M-x"     . counsel-M-x)
    ("C-x b"   . asm/contextual-switch-buffer)
@@ -1041,7 +1040,8 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package persp-projectile
   :ensure t
-  :after (perspective)
+  :after (perspective projectile)
+  :demand
   :bind
   ("C-c x" . hydra-persp/body)
   :config
@@ -1151,9 +1151,9 @@ Repeated invocations toggle between the two most recently open buffers."
   :diminish smartparens-mode
   :init
   (setq sp-highlight-pair-overlay nil)
+  :config
   (smartparens-global-mode t)
   (require 'smartparens-config)
-  :config
   (sp-local-pair 'emacs-lisp-mode "`" nil :when '(sp-in-string-p))
   (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
   (sp-pair "'" nil :unless '(sp-point-after-word-p))
