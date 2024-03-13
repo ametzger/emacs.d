@@ -1220,7 +1220,7 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq lsp-keymap-prefix "C-c l"
         lsp-ruff-lsp-ruff-path (expand-file-name "~/.nix-profile/bin/ruff-lsp")
         lsp-terraform-server (expand-file-name "~/.nix-profile/bin/terraform-lsp")
-        lsp-disabled-clients '(tfls)
+        lsp-disabled-clients '(tfls semgrep-ls)
         lsp-nix-nil-server-path (expand-file-name "~/.nix-profile/bin/nil")
         lsp-terraform-ls-prefill-required-fields t)
   :bind (:map lsp-mode-map
