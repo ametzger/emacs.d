@@ -1092,15 +1092,16 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package smartparens
   :ensure t
+  :demand
   :diminish smartparens-mode
   :init
   (setq sp-highlight-pair-overlay nil)
   :config
-  (smartparens-global-mode t)
   (require 'smartparens-config)
   (sp-local-pair 'emacs-lisp-mode "`" nil :when '(sp-in-string-p))
   (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
   (sp-pair "'" nil :unless '(sp-point-after-word-p))
+  (smartparens-global-mode t)
   :bind
   (("C-M-f" . sp-forward-sexp)
    ("C-M-b" . sp-backward-sexp)
