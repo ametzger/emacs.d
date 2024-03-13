@@ -1381,7 +1381,8 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package yaml-mode
   :ensure t
   :defer t
-  :mode "\\.yaml$")
+  :mode (("\\.yaml$" . yaml-mode)
+         ("\\.yml$" . yaml-mode)))
 
 (use-package toml-mode
   :ensure t
