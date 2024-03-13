@@ -1468,12 +1468,7 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package terraform-mode
   :ensure t
-  :mode "\\.tf$"
-  :hook
-  (terraform-mode . company-mode)
-  :config
-  (set-face-foreground terraform--resource-name-face "#B58DAE")
-  (set-face-foreground terraform--resource-type-face "#B58DAE"))
+  :mode "\\.tf$")
 
 (defun asm/terraform-mode-hook ()
   (subword-mode +1)
