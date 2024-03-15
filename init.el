@@ -1147,6 +1147,37 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq markdown-fontify-code-blocks-natively t
         markdown-disable-tooltip-prompt t))
 
+;; treesitter
+(use-package treesit
+  :if (treesit-available-p)
+  :config
+  (require 'treesit)
+  (setq major-mode-remap-alist
+        '((yaml-mode . yaml-ts-mode)
+          (bash-mode . bash-ts-mode)
+          (js2-mode . js-ts-mode)
+          (tsx-mode . tsx-ts-mode)
+          (typescript-mode . typescript-ts-mode)
+          (json-mode . json-ts-mode)
+          (css-mode . css-ts-mode)
+          (python-mode . python-ts-mode)))
+  (setq treesit-language-source-alist
+   '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+     (cmake "https://github.com/uyha/tree-sitter-cmake")
+     (css "https://github.com/tree-sitter/tree-sitter-css")
+     (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+     (go "https://github.com/tree-sitter/tree-sitter-go")
+     (html "https://github.com/tree-sitter/tree-sitter-html")
+     (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+     (json "https://github.com/tree-sitter/tree-sitter-json")
+     (make "https://github.com/alemuller/tree-sitter-make")
+     (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+     (python "https://github.com/tree-sitter/tree-sitter-python")
+     (toml "https://github.com/tree-sitter/tree-sitter-toml")
+     (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+     (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+     (yaml "https://github.com/ikatyang/tree-sitter-yaml"))))
+
 ;; TODO(asm,2022-10-25): lsp-mode is kind of heavy and more opinionated than I would like, it also
 ;; adds a lot of UI frills that I find unecessary. eglot seems to be more in line with my "I just
 ;; want xref and imenu to pull from LSP" philosophy, but it doesn't seem to integrate with xref
@@ -1173,9 +1204,8 @@ Repeated invocations toggle between the two most recently open buffers."
               ("C-S-SPC" . nil))
   :hook
   (lsp-mode        . lsp-enable-which-key-integration)
-  (typescript-mode . lsp-deferred)
-  (javascript-mode . lsp-deferred)
-  (js2-mode        . lsp-deferred)
+  (typescript-ts-mode . lsp-deferred)
+  (js-ts-mode        . lsp-deferred)
   (terraform-mode  . lsp-deferred)
   (nix-mode        . lsp-deferred)
   (rust-mode       . lsp-deferred)
@@ -1190,7 +1220,7 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package lsp-pyright
   :ensure t
-  :hook (python-mode . (lambda ()
+  :hook (python-ts-mode . (lambda ()
                           (require 'lsp-pyright)
                           (lsp-deferred))))
 
@@ -1241,13 +1271,13 @@ Repeated invocations toggle between the two most recently open buffers."
 ;;             "match" "case"
 ; Hopefully these will be integrated upstream soon, but they are not present in emacs 28.
 (use-package python
-  :mode ("\\.py'" . python-mode)
+  :mode ("\\.py'" . python-ts-mode)
   :interpreter ("python" . python-mode)
   :bind (:map python-mode-map
               ("C-c C-j" . nil))
   :config
   (setq-default python-fill-docstring-style 'django)
-  (add-hook 'python-mode-hook 'asm/python-mode-hook))
+  (add-hook 'python-ts-mode-hook 'asm/python-mode-hook))
 
 (use-package blacken
   :ensure t

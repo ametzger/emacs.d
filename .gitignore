@@ -39,3 +39,4 @@ request/*
 /var/
 /straight/
 /network-security.data
+/tree-sitter/
