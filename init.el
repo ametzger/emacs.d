@@ -808,14 +808,14 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq hl-todo-highlight-punctuation ":")
   (global-hl-todo-mode))
 
-(use-package flycheck
-  :diminish flycheck-mode
-  :ensure t
-  :config
-  (add-hook 'after-init-hook (lambda ()
-                               (flymake-mode -1)
-                               (global-flycheck-mode)))
-  (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
+;; (use-package flycheck
+;;   :diminish flycheck-mode
+;;   :ensure t
+;;   :config
+;;   (add-hook 'after-init-hook (lambda ()
+;;                                (flymake-mode -1)
+;;                                (global-flycheck-mode)))
+;;   (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 
 (use-package company
   :ensure t
