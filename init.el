@@ -1203,12 +1203,12 @@ Repeated invocations toggle between the two most recently open buffers."
   :bind (:map lsp-mode-map
               ("C-S-SPC" . nil))
   :hook
-  (lsp-mode        . lsp-enable-which-key-integration)
+  (lsp-mode           . lsp-enable-which-key-integration)
   (typescript-ts-mode . lsp-deferred)
-  (js-ts-mode        . lsp-deferred)
-  (terraform-mode  . lsp-deferred)
-  (nix-mode        . lsp-deferred)
-  (rust-mode       . lsp-deferred)
+  (js-ts-mode         . lsp-deferred)
+  (terraform-mode     . lsp-deferred)
+  (nix-mode           . lsp-deferred)
+  (rust-ts-mode       . lsp-deferred)
   :custom
   ;; what to use when checking on-save. "check" is default, I prefer clippy
   (lsp-rust-analyzer-cargo-watch-command "clippy")
@@ -1333,7 +1333,7 @@ Repeated invocations toggle between the two most recently open buffers."
               (visual-line-mode +1)
               (whitespace-mode -1)
               (company-mode nil)
-              (flycheck-mode nil)
+              ;; (flycheck-mode nil)
               (undo-tree-mode t)
               ;; (bind-key "C-/" 'undo-tree-undo)
               (bind-key "C-a" 'crux-move-beginning-of-line)
@@ -1395,7 +1395,7 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (setq rust-format-on-save t))
 
-(add-hook 'rust-mode-hook #'electric-pair-mode)
+(add-hook 'rust-ts-mode-hook #'electric-pair-mode)
 
 ;; misc languages
 (use-package json-mode
