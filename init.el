@@ -1325,7 +1325,8 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package blacken
   :ensure t
   :hook
-  ((python-mode . blacken-mode))
+  ((python-mode . blacken-mode)
+   (python-ts-mode . blacken-mode))
   :config
   (setq blacken-executable "~/.local/bin/black")
   (define-key python-mode-map (kbd "C-c C-b") 'blacken-buffer))
