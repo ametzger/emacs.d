@@ -151,9 +151,11 @@
       frame-resize-pixelwise t
       show-trailing-whitespace t
       initial-major-mode 'text-mode
-      ; always prefer vertical splits unless things are getting packed
-      split-width-threshold 120
-      split-height-threshold nil)
+      ; TODO(asm,2024-04-08): I want emacs to prefer vertical splits unless I don't - need to figure
+      ; out if shackle/something else is a better option here
+      ; split-width-threshold 120
+      ; split-height-threshold nil
+      )
 
 ;; indent on RET
 (global-set-key (kbd "RET") #'newline-and-indent)
