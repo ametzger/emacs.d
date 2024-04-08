@@ -669,9 +669,11 @@ Repeated invocations toggle between the two most recently open buffers."
   :bind (("C-x g" . magit-status))
   :config
   (add-hook 'after-save-hook #'magit-after-save-refresh-status)
+  ;; see https://takeonrules.com/2024/03/01/quality-of-life-improvement-for-entering-and-exiting-magit/
   (setq magit-repository-directories '(("~/proj/" . 2))
         magit-restore-window-configuration t
-        magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1))
+        magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1
+        magit-bury-buffer-function #'magit-restore-window-configuration))
 
 (use-package git-timemachine
   :ensure t
