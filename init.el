@@ -1252,6 +1252,8 @@ Repeated invocations toggle between the two most recently open buffers."
   :hook
   (lsp-mode           . lsp-enable-which-key-integration)
   (typescript-ts-mode . lsp-deferred)
+  (tsx-mode           . lsp-deferred)
+  (tsx-ts-mode        . lsp-deferred)
   (js-ts-mode         . lsp-deferred)
   (terraform-mode     . lsp-deferred)
   (nix-mode           . lsp-deferred)
