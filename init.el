@@ -1152,78 +1152,80 @@ Repeated invocations toggle between the two most recently open buffers."
         markdown-disable-tooltip-prompt t))
 
 ;; treesitter
-(use-package treesit
-  :if (treesit-available-p)
-  :preface
-  (defun mp-setup-install-grammars ()
-    "Install Tree-sitter grammars if they are absent."
-    (interactive)
-    (dolist (grammar
-              '((css                   . ("https://github.com/tree-sitter/tree-sitter-css" "v0.20.0"))
-                (html                  . ("https://github.com/tree-sitter/tree-sitter-html" "v0.20.1"))
-                (javascript            . ("https://github.com/tree-sitter/tree-sitter-javascript" "v0.20.1" "src"))
-                (json                  . ("https://github.com/tree-sitter/tree-sitter-json" "v0.20.2"))
-                (rust                  . ("https://github.com/tree-sitter/tree-sitter-rust" "v0.20.4"))
-                (python                . ("https://github.com/tree-sitter/tree-sitter-python" "v0.20.4"))
-                (toml                     "https://github.com/tree-sitter/tree-sitter-toml")
-                (tsx                   . ("https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "tsx/src"))
-                (typescript            . ("https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "typescript/src"))
-                (yaml                  . ("https://github.com/ikatyang/tree-sitter-yaml" "v0.5.0"))))
-      (add-to-list 'treesit-language-source-alist grammar)
-      ;; Only install `grammar' if we don't already have it
-      ;; installed. However, if you want to *update* a grammar then
-      ;; this obviously prevents that from happening.
-      (unless (treesit-language-available-p (car grammar))
-        (treesit-install-language-grammar (car grammar)))))
+;; (use-package treesit
+;;   :if (treesit-available-p)
+;;   :preface
+;;   (defun mp-setup-install-grammars ()
+;;     "Install Tree-sitter grammars if they are absent."
+;;     (interactive)
+;;     (dolist (grammar
+;;               '((css                   . ("https://github.com/tree-sitter/tree-sitter-css" "v0.20.0"))
+;;                 (dockerfile            . ("https://github.com/camdencheek/tree-sitter-dockerfile" "v0.1.2" "src"))
+;;                 (html                  . ("https://github.com/tree-sitter/tree-sitter-html" "v0.20.1"))
+;;                 (javascript            . ("https://github.com/tree-sitter/tree-sitter-javascript" "v0.20.1" "src"))
+;;                 (json                  . ("https://github.com/tree-sitter/tree-sitter-json" "v0.20.2"))
+;;                 (rust                  . ("https://github.com/tree-sitter/tree-sitter-rust" "v0.20.4"))
+;;                 (python                . ("https://github.com/tree-sitter/tree-sitter-python" "v0.20.4"))
+;;                 (toml                     "https://github.com/tree-sitter/tree-sitter-toml")
+;;                 (tsx                   . ("https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "tsx/src"))
+;;                 (typescript            . ("https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "typescript/src"))
+;;                 (yaml                  . ("https://github.com/ikatyang/tree-sitter-yaml" "v0.5.0"))))
+;;       (add-to-list 'treesit-language-source-alist grammar)
+;;       ;; Only install `grammar' if we don't already have it
+;;       ;; installed. However, if you want to *update* a grammar then
+;;       ;; this obviously prevents that from happening.
+;;       (unless (treesit-language-available-p (car grammar))
+;;         (treesit-install-language-grammar (car grammar)))))
 
-  ;; Optional, but recommended. Tree-sitter enabled major modes are
-  ;; distinct from their ordinary counterparts.
-  ;;
-  ;; You can remap major modes with `major-mode-remap-alist'. Note
-  ;; that this does *not* extend to hooks! Make sure you migrate them
-  ;; also
-  (dolist (mapping
-         '((bash-mode . bash-ts-mode)
-           (css-mode . css-ts-mode)
-           (js-json-mode . json-ts-mode)
-           (js2-mode . js-ts-mode)
-           (json-mode . json-ts-mode)
-           (python-mode . python-ts-mode)
-           (rust-mode . rust-ts-mode)
-           (tsx-mode . tsx-ts-mode)
-           (typescript-mode . typescript-ts-mode)
-           (yaml-mode . yaml-ts-mode)
-           ))
-    (add-to-list 'major-mode-remap-alist mapping))
-  :config
-  (mp-setup-install-grammars)
-  ;; Do not forget to customize Combobulate to your liking:
-  ;;
-  ;;  M-x customize-group RET combobulate RET
-  ;;
-  (use-package combobulate
-    :straight (combobulate :type git
-                           :host github
-                           :repo "mickeynp/combobulate"
-                           :ref "ee82c568ad639605518f62f82fae4bcc0dfdbb81")
-    :preface
-    ;; You can customize Combobulate's key prefix here.
-    ;; Note that you may have to restart Emacs for this to take effect!
-    (setq combobulate-key-prefix "C-c o")
+;;   ;; Optional, but recommended. Tree-sitter enabled major modes are
+;;   ;; distinct from their ordinary counterparts.
+;;   ;;
+;;   ;; You can remap major modes with `major-mode-remap-alist'. Note
+;;   ;; that this does *not* extend to hooks! Make sure you migrate them
+;;   ;; also
+;;   (dolist (mapping
+;;          '((bash-mode . bash-ts-mode)
+;;            (css-mode . css-ts-mode)
+;;            (js-json-mode . json-ts-mode)
+;;            (js2-mode . js-ts-mode)
+;;            (json-mode . json-ts-mode)
+;;            (python-mode . python-ts-mode)
+;;            (rust-mode . rust-ts-mode)
+;;            (tsx-mode . tsx-ts-mode)
+;;            (typescript-mode . typescript-ts-mode)
+;;            (yaml-mode . yaml-ts-mode)
+;;            ))
+;;     (add-to-list 'major-mode-remap-alist mapping))
+;;   :mode (("Dockerfile" . dockerfile-ts-mode))
+;;   :config
+;;   (mp-setup-install-grammars)
+;;   ;; Do not forget to customize Combobulate to your liking:
+;;   ;;
+;;   ;;  M-x customize-group RET combobulate RET
+;;   ;;
+;;   (use-package combobulate
+;;     :straight (combobulate :type git
+;;                            :host github
+;;                            :repo "mickeynp/combobulate"
+;;                            :ref "ee82c568ad639605518f62f82fae4bcc0dfdbb81")
+;;     :preface
+;;     ;; You can customize Combobulate's key prefix here.
+;;     ;; Note that you may have to restart Emacs for this to take effect!
+;;     (setq combobulate-key-prefix "C-c o")
 
-    ;; Optional, but recommended.
-    ;;
-    ;; You can manually enable Combobulate with `M-x
-    ;; combobulate-mode'.
-    :hook
-      ((python-ts-mode     . combobulate-mode)
-       (js-ts-mode         . combobulate-mode)
-       (html-ts-mode       . combobulate-mode)
-       (css-ts-mode        . combobulate-mode)
-       (yaml-ts-mode       . combobulate-mode)
-       (typescript-ts-mode . combobulate-mode)
-       (json-ts-mode       . combobulate-mode)
-       (tsx-ts-mode        . combobulate-mode))))
+;;     ;; Optional, but recommended.
+;;     ;;
+;;     ;; You can manually enable Combobulate with `M-x
+;;     ;; combobulate-mode'.
+;;     :hook
+;;       ((python-ts-mode     . combobulate-mode)
+;;        (js-ts-mode         . combobulate-mode)
+;;        (html-ts-mode       . combobulate-mode)
+;;        (css-ts-mode        . combobulate-mode)
+;;        (yaml-ts-mode       . combobulate-mode)
+;;        (typescript-ts-mode . combobulate-mode)
+;;        (json-ts-mode       . combobulate-mode)
+;;        (tsx-ts-mode        . combobulate-mode))))
 
 ;; TODO(asm,2022-10-25): lsp-mode is kind of heavy and more opinionated than I would like, it also
 ;; adds a lot of UI frills that I find unecessary. eglot seems to be more in line with my "I just
@@ -1251,13 +1253,13 @@ Repeated invocations toggle between the two most recently open buffers."
               ("C-S-SPC" . nil))
   :hook
   (lsp-mode           . lsp-enable-which-key-integration)
-  (typescript-ts-mode . lsp-deferred)
+  (typescript-mode . lsp-deferred)
   (tsx-mode           . lsp-deferred)
-  (tsx-ts-mode        . lsp-deferred)
-  (js-ts-mode         . lsp-deferred)
+  (tsx-mode        . lsp-deferred)
+  (js-mode         . lsp-deferred)
   (terraform-mode     . lsp-deferred)
   (nix-mode           . lsp-deferred)
-  (rust-ts-mode       . lsp-deferred)
+  (rust-mode       . lsp-deferred)
   :custom
   ;; what to use when checking on-save. "check" is default, I prefer clippy
   (lsp-rust-analyzer-cargo-watch-command "clippy")
@@ -1269,7 +1271,7 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (use-package lsp-pyright
   :ensure t
-  :hook (python-ts-mode . (lambda ()
+  :hook (python-mode . (lambda ()
                           (require 'lsp-pyright)
                           (lsp-deferred))))
 
@@ -1320,19 +1322,19 @@ Repeated invocations toggle between the two most recently open buffers."
 ;;             "match" "case"
 ; Hopefully these will be integrated upstream soon, but they are not present in emacs 28.
 (use-package python
-  :mode ("\\.py'" . python-ts-mode)
+  :mode ("\\.py'" . python-mode)
   :interpreter ("python" . python-mode)
   :bind (:map python-mode-map
               ("C-c C-j" . nil))
   :config
   (setq-default python-fill-docstring-style 'django)
-  (add-hook 'python-ts-mode-hook 'asm/python-mode-hook))
+  (add-hook 'python-mode-hook 'asm/python-mode-hook))
 
 (use-package blacken
   :ensure t
   :hook
   ((python-mode . blacken-mode)
-   (python-ts-mode . blacken-mode))
+   (python-mode . blacken-mode))
   :config
   (setq blacken-executable "~/.local/bin/black")
   (define-key python-mode-map (kbd "C-c C-b") 'blacken-buffer))
@@ -1458,7 +1460,7 @@ Repeated invocations toggle between the two most recently open buffers."
   :config
   (setq rust-format-on-save t))
 
-(add-hook 'rust-ts-mode-hook #'electric-pair-mode)
+(add-hook 'rust-mode-hook #'electric-pair-mode)
 
 ;; misc languages
 (use-package json-mode
@@ -1570,10 +1572,6 @@ Repeated invocations toggle between the two most recently open buffers."
   (set (make-local-variable 'company-backends)
        '(company-terraform)))
 (add-hook 'terraform-mode-hook #'asm/terraform-mode-hook)
-
-(use-package dockerfile-mode
-  :ensure t
-  :defer t)
 
 (use-package just-mode
   :ensure t)
