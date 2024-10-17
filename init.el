@@ -66,18 +66,18 @@
 (require 'use-package)
 
 ;; straight.el
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+;; (defvar bootstrap-version)
+;; (let ((bootstrap-file
+;;        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+;;       (bootstrap-version 5))
+;;   (unless (file-exists-p bootstrap-file)
+;;     (with-current-buffer
+;;         (url-retrieve-synchronously
+;;          "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+;;          'silent 'inhibit-cookies)
+;;       (goto-char (point-max))
+;;       (eval-print-last-sexp)))
+;;   (load bootstrap-file nil 'nomessage))
 
 ;; make sure mise stuff gets picked up
 (let ((path (getenv "PATH")))
@@ -1362,9 +1362,22 @@ Repeated invocations toggle between the two most recently open buffers."
   (setq ein:complete-on-dot -1
         ein:completion-backend 'ein:use-none-backend
         ein:query-timeout 1000
-        ein:default-url-or-port "http://localhost:8888"
         ein:worksheet-enable-undo 'full
         ein:notebook-modes '(ein:notebook-python-mode ein:notebook-plain-mode))
+  (progn
+    ;; fix smartparens not wanting to write closing parenthises when highlighting a region
+    (defun insert-open-parens-or-wrap (&optional arg)
+      (interactive "P")
+      (if (region-active-p)
+          (insert-parentheses arg)
+        (insert "()")
+        (backward-char))
+      )
+
+    (defun setup-key-hack ()
+      (define-key ein:notebook-mode-map (kbd "(") #'insert-open-parens-or-wrap))
+
+    (add-hook 'ein:notebooklist-mode-hook #'setup-key-hack))
   :config
   (cond
    ((eq system-type 'darwin)
@@ -1385,7 +1398,7 @@ Repeated invocations toggle between the two most recently open buffers."
               (company-mode nil)
               ;; (flycheck-mode nil)
               (undo-tree-mode t)
-              ;; (bind-key "C-/" 'undo-tree-undo)
+              (bind-key "C-/" 'undo-tree-undo)
               (bind-key "C-a" 'crux-move-beginning-of-line)
               )))
 
