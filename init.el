@@ -135,9 +135,7 @@
 
 (setq ring-bell-function 'ignore
       inhibit-startup-screen t
-      initial-scratch-message (format "Welcome to Emacs %s (started %s)\n\n"
-                                      emacs-version
-                                      (current-time-string))
+      initial-scratch-message "Hello.\n\n"
       scroll-margin 3
       scroll-conservatively 100000
       scroll-preserve-screen-position 1
@@ -150,6 +148,16 @@
       ; split-width-threshold 120
       ; split-height-threshold nil
       )
+
+;; add initialization time to scratch buffer once it has initialized
+(add-hook 'after-init-hook
+          (lambda ()
+            (with-current-buffer "*scratch*"
+              (goto-char (point-max))
+              (insert (format "Welcome to Emacs %s (started %s)\ninitialization took: %s\n\n"
+                              emacs-version
+                              (current-time-string)
+                              (emacs-init-time))))))
 
 ;; indent on RET
 (global-set-key (kbd "RET") #'newline-and-indent)
