@@ -79,12 +79,6 @@
 ;;       (eval-print-last-sexp)))
 ;;   (load bootstrap-file nil 'nomessage))
 
-;; make sure mise stuff gets picked up
-(let ((path (getenv "PATH")))
-  (if (not (cl-search "mise/shims" path))
-      (setenv "PATH" (concat (expand-file-name "~/.local/share/mise/shims") ":" path))))
-(setq exec-path (push (expand-file-name "~/.local/share/mise/shims") exec-path))
-
 ;; vanity
 (setq user-full-name    "Alex Metzger"
       user-mail-address "asm@asm.io"
@@ -688,6 +682,16 @@ Repeated invocations toggle between the two most recently open buffers."
   :bind (("C-c g" . git-link))
   :config
   (setq git-link-use-commit t))
+
+;; OLD: just in case mise-mode doesn't work well
+;; (let ((path (getenv "PATH")))
+;;   (if (not (cl-search "mise/shims" path))
+;;       (setenv "PATH" (concat (expand-file-name "~/.local/share/mise/shims") ":" path))))
+;; (setq exec-path (push (expand-file-name "~/.local/share/mise/shims") exec-path))
+
+(use-package mise
+  :ensure t
+  :hook (after-init . global-mise-mode))
 
 (use-package direnv
   :ensure t
