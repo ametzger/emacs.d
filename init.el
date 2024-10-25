@@ -91,7 +91,10 @@
       gc-cons-threshold                   100000000
       large-file-warning-threshold        50000000
       read-process-output-max             (* 1024 1024)
-      save-interprogram-paste-before-kill t)
+      save-interprogram-paste-before-kill t
+      help-window-select t
+      confirm-kill-emacs 'y-or-n-p)
+(fset 'yes-or-no-p 'y-or-n-p)
 
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
@@ -152,12 +155,14 @@
 ;; add initialization time to scratch buffer once it has initialized
 (add-hook 'after-init-hook
           (lambda ()
-            (with-current-buffer "*scratch*"
-              (goto-char (point-max))
-              (insert (format "Welcome to Emacs %s (started %s)\ninitialization took: %s\n\n"
+            (let ((welcome-message (format "Welcome to Emacs %s (started %s)\ninitialization took: %s\n\n"
                               emacs-version
                               (current-time-string)
-                              (emacs-init-time))))))
+                              (emacs-init-time))))
+            (with-current-buffer "*scratch*"
+              (goto-char (point-max))
+              (insert welcome-message))
+            (setq initial-scratch-message welcome-message))))
 
 ;; indent on RET
 (global-set-key (kbd "RET") #'newline-and-indent)
@@ -223,17 +228,11 @@
 
 (global-set-key (kbd "C-c |") #'asm/toggle-window-split)
 
-(setq help-window-select t)
-
 (line-number-mode t)
 (column-number-mode t)
 (size-indication-mode t)
 
-(fset 'yes-or-no-p 'y-or-n-p)
-(setq confirm-kill-emacs 'y-or-n-p)
-
-;; Bind C-S-SPC to mark the whole line (similar to
-;; `evil-visual-line')
+;; Bind C-S-SPC to mark the whole line (similar to `evil-visual-line')
 (defun asm/select-current-line ()
   "Select the current line."
   (interactive)
@@ -909,9 +908,9 @@ Repeated invocations toggle between the two most recently open buffers."
          ("C-<backspace>" . crux-kill-line-backwards)
          ("s-o"           . crux-smart-open-line-above)
          ([remap move-beginning-of-line] . crux-move-beginning-of-line)
-         ([(shift return)] . crux-smart-open-line)
-         ([(control shift return)] . crux-smart-open-line-above)
-         ([remap kill-whole-line] . crux-kill-whole-line)))
+         ([(shift return)]               . crux-smart-open-line)
+         ([(control shift return)]       . crux-smart-open-line-above)
+         ([remap kill-whole-line]        . crux-kill-whole-line)))
 
 (use-package which-key
   :ensure t
@@ -1264,13 +1263,13 @@ Repeated invocations toggle between the two most recently open buffers."
   :bind (:map lsp-mode-map
               ("C-S-SPC" . nil))
   :hook
-  (lsp-mode           . lsp-enable-which-key-integration)
+  (lsp-mode        . lsp-enable-which-key-integration)
   (typescript-mode . lsp-deferred)
-  (tsx-mode           . lsp-deferred)
+  (tsx-mode        . lsp-deferred)
   (tsx-mode        . lsp-deferred)
   (js-mode         . lsp-deferred)
-  (terraform-mode     . lsp-deferred)
-  (nix-mode           . lsp-deferred)
+  (terraform-mode  . lsp-deferred)
+  (nix-mode        . lsp-deferred)
   (rust-mode       . lsp-deferred)
   :custom
   ;; what to use when checking on-save. "check" is default, I prefer clippy
@@ -1284,8 +1283,8 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package lsp-pyright
   :ensure t
   :hook (python-mode . (lambda ()
-                          (require 'lsp-pyright)
-                          (lsp-deferred))))
+                         (require 'lsp-pyright)
+                         (lsp-deferred))))
 
 (use-package lsp-ivy
   :ensure t
@@ -1681,20 +1680,20 @@ Repeated invocations toggle between the two most recently open buffers."
  (defhydra ctrl-z-hydra (:color blue
                          :columns 4)
    "Shorties"
-   ("b" asm/empty-buffer "empty buffer")
-   ("e" flycheck-list-errors "list errors")
-   ("f" asm/yank-filename "yank filename")
-   ("i" asm/open-init-file "open init")
-   ("l" counsel-bookmark "bookmarks")
-   ("n" ein:login "EIN")
-   ("o" asm/org-open-file "find org file")
-   ("p" projectile-persp-switch-project "open project")
-   ("r" anzu-replace-at-cursor-thing "replace at point")
-   ("s" counsel-rg "ripgrep")
-   ("w" ace-window "ace window")
-   ("C-s" deadgrep "deadgrep")
-   ("q" asm/swap-quotes "toggle quotes around string")
-   ("z" asm/toggle-maximize-buffer "zoom")))
+   ("b"   asm/empty-buffer                 "empty buffer")
+   ("e"   flycheck-list-errors             "list errors")
+   ("f"   asm/yank-filename                "yank filename")
+   ("i"   asm/open-init-file               "open init")
+   ("l"   counsel-bookmark                 "bookmarks")
+   ("n"   ein:login                        "EIN")
+   ("o"   asm/org-open-file                "find org file")
+   ("p"   projectile-persp-switch-project  "open project")
+   ("r"   anzu-replace-at-cursor-thing     "replace at point")
+   ("s"   counsel-rg                       "ripgrep")
+   ("w"   ace-window                       "ace window")
+   ("C-s" deadgrep                         "deadgrep")
+   ("q"   asm/swap-quotes                  "toggle quotes around string")
+   ("z"   asm/toggle-maximize-buffer       "zoom")))
 
 ;;; init.el ends here
 ;; Local Variables:
