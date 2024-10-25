@@ -40,3 +40,4 @@ request/*
 /straight/
 /network-security.data
 /tree-sitter/
+/ielm-history.eld
