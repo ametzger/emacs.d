@@ -1600,6 +1600,13 @@ Repeated invocations toggle between the two most recently open buffers."
 (use-package cider
   :ensure t)
 
+(use-package chatgpt-shell
+  :ensure t
+  :custom
+  ((chatgpt-shell-openai-key
+    (lambda ()
+      (auth-source-pick-first-password :machine "api.openai.com")))))
+
 (defun asm/open-init-file ()
   (interactive)
   ;; (projectile-persp-switch-project "~/proj/emacs.d")
@@ -1682,6 +1689,7 @@ Repeated invocations toggle between the two most recently open buffers."
  (defhydra ctrl-z-hydra (:color blue
                          :columns 4)
    "Shorties"
+   ("a"   chatgpt-shell-prompt-compose     "chatgpt-shell region")
    ("b"   asm/empty-buffer                 "empty buffer")
    ("e"   flycheck-list-errors             "list errors")
    ("f"   asm/yank-filename                "yank filename")
