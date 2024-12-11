@@ -1256,6 +1256,7 @@ Repeated invocations toggle between the two most recently open buffers."
   :init
   (setq lsp-keymap-prefix "C-c l"
         lsp-ruff-lsp-ruff-path (expand-file-name "~/.nix-profile/bin/ruff-lsp")
+        lsp-ruff-ruff-args '("--preview")
         lsp-terraform-server (expand-file-name "~/.nix-profile/bin/terraform-lsp")
         lsp-disabled-clients '(tfls semgrep-ls)
         lsp-nix-nil-server-path (expand-file-name "~/.nix-profile/bin/nil")
@@ -1376,7 +1377,8 @@ Repeated invocations toggle between the two most recently open buffers."
         ein:completion-backend 'ein:use-none-backend
         ein:query-timeout 1000
         ein:worksheet-enable-undo 'full
-        ein:notebook-modes '(ein:notebook-python-mode ein:notebook-plain-mode))
+        ein:notebook-modes '(ein:notebook-python-mode ein:notebook-plain-mode)
+        ein:urls '("http://localhost:8888"))
   (progn
     ;; fix smartparens not wanting to write closing parenthises when highlighting a region
     (defun insert-open-parens-or-wrap (&optional arg)
