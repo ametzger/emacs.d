@@ -510,15 +510,19 @@ Repeated invocations toggle between the two most recently open buffers."
                             (lambda (path)
                               (concat org-directory "/" path))
                             '("inbox.org"))
-          org-capture-templates `(
-                                  ("i" "Inbox" entry  (file "inbox.org")
+          org-capture-templates `(("i" "Inbox" entry (file "inbox.org")
                                    ,(concat "* %?\n"
                                             "/Entered on/ %U")
                                    :prepend t)
-                                  ("t" "Todo" entry  (file "inbox.org")
+                                  ("t" "Todo" entry (file "inbox.org")
                                    "* TODO %?"
                                    :prepend t)
-                                  )
+                                  ("p" "Python snippet" entry (file "python-snippets.org")
+                                   ,(concat "* %U\n\n"
+                                            "#+begin_src python\n"
+                                            "  %?\n"
+                                            "#+end_src\n\n")
+                                   :prepend t))
           org-use-speed-commands t
           org-return-follows-link t
           org-confirm-babel-evaluate nil)
