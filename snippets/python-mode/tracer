@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: tracer
+# key: tracer
+# --
+with beeline.tracer(name='$0'):
